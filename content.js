@@ -1,15 +1,19 @@
 var oldTime = new Date().getTime();
 
-var wordSplitSymbol="([^А-Яа-яЁёA-Za-z])";
+var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
 
-function replaceWord(ih, word, str, prefix, postfix){
+var actionArray=[];
+
+function prepareExpression(word, str, prefix, postfix){
 	var firstLetter=word[0];
 	var lostWord=word.substr(1);
 	var pattern =
-		(prefix ? wordSplitSymbol : "(.)" ) +
+		(prefix ? wordSplitSymbol : "(.|^)" ) +
 		"(["+firstLetter.toLowerCase()+firstLetter.toUpperCase()+"])"+lostWord+
-		(postfix ? wordSplitSymbol : "(.)" );
-	return ih.replace(new RegExp(pattern,"g"),"$1$2"+str.substr(1)+"$3");
+		(postfix ? wordSplitSymbol : "(.|$)" );
+	var regexp=new RegExp(pattern,"g");
+//	console.log(regexp);
+	actionArray.push([regexp,"$1$2"+str.substr(1)+"$3"]);
 }
 
 var orphoWordsToCorrect=[
@@ -24,11 +28,27 @@ var orphoWordsToCorrect=[
 	["в расплох","врасплох"],
 	["продовца","продавца"],
 	["всмысле","в смысле"],
-	["штоле","что ли"],
+	["штол[еь]","что ли"],
 	["н[еи]знаю","не знаю"],
 	["это-ж","это ж"],
 	["падажди","подожди"],
+	["во первых","во-первых"],
+	["пожалуста","пожалуйста"],
+	["безплатно","бесплатно"],
+	["досвидание","до свидания"],
+	["вс[её]таки","всё-таки"],
+	["в кратце","вкратце"],
+	["ключь","ключ"],
+	["староной","стороной"],
+	["немогу","не могу"],
+	["во+бщем","в общем"],
+	["тожэ","тоже"],
+	["такжэ","также"],
+	["вобще","вообще"],
+	["пожалста","пожалуйста"],
 /*	["",""],
+	["",""],
+	["",""],
 	["",""],
 /*
 	["",""],
@@ -37,7 +57,12 @@ var orphoWordsToCorrect=[
 
 var orphoPrefixToCorrect=[
 	["соеденин","соединен"],
-	["з(?=[бжкпстф-щБЖКПСТФ-Щ])","с"],
+	["симпотич","симпатич"],
+	["девч[её]н","девчон"],
+	["мущин","мужчин"],
+	["большенств","большинств"],
+	["седени","сидени"],
+	["електр","электр"],
 /*
 	["",""],
 */
@@ -47,6 +72,7 @@ var orphoPostfixToCorrect=[
 	["борятся","борются"],
 	["сыпится","сыпется"],
 	["г[ао]в[ао]риш","говоришь"],
+	["ються","ются"],
 /*
 	["",""],
 */
@@ -57,6 +83,8 @@ var orphoFragmentsToCorrect=[
 	["празн","праздн"],
 	["призидент","президент"],
 	["призедент","президент"],
+	["цыкл","цикл"],
+	["мед[еи]ц[иы]н","медицин"],
 /*
 	["",""],
 */
@@ -67,6 +95,16 @@ var matyuki=[
 
 var yo=[
 ];
+
+for(var i=0; i<orphoWordsToCorrect.length; i++)
+	prepareExpression(orphoWordsToCorrect[i][0],orphoWordsToCorrect[i][1],1,1);
+for(var i=0; i<orphoPostfixToCorrect.length; i++)
+	prepareExpression(orphoPostfixToCorrect[i][0],orphoPostfixToCorrect[i][1],0,1);
+for(var i=0; i<orphoPrefixToCorrect.length; i++)
+	prepareExpression(orphoPrefixToCorrect[i][0],orphoPrefixToCorrect[i][1],1,0);
+for(var i=0; i<orphoFragmentsToCorrect.length; i++)
+	prepareExpression(orphoFragmentsToCorrect[i][0],orphoFragmentsToCorrect[i][1],0,0);
+
 
 function mainWork(ih){
 	ih=ih.replace(/([\s?!.,:;])([Вв])о\sпервых(?=[\s?!.,:;])/g,"$1$2о-первых");
@@ -84,20 +122,13 @@ function mainWork(ih){
 	ih=ih.replace(/ньщ/gi,"нщ");
 	ih=ih.replace(/чьн/gi,"чн");
 	ih=ih.replace(/чьк/gi,"чк");
+
+	ih=ih.replace(/([^А-Яа-яЁёA-Za-z]|^)з(?=[бжкпстф-щБЖКПСТФ-Щ])/gi,"$1с");
+	ih=ih.replace(/([^А-Яа-яЁёA-Za-z]|^)З(?=[бжкпстф-щБЖКПСТФ-Щ])/gi,"$1С");
+
 	
-	for(var i=0; i<orphoWordsToCorrect.length; i++)
-		ih=replaceWord(ih,orphoWordsToCorrect[i][0],orphoWordsToCorrect[i][1],1,1);
-	for(var i=0; i<orphoPostfixToCorrect.length; i++)
-		ih=replaceWord(ih,orphoPostfixToCorrect[i][0],orphoPostfixToCorrect[i][1],0,1);
-	for(var i=0; i<orphoPrefixToCorrect.length; i++)
-		ih=replaceWord(ih,orphoPrefixToCorrect[i][0],orphoPrefixToCorrect[i][1],1,0);
-	for(var i=0; i<orphoFragmentsToCorrect.length; i++)
-		ih=replaceWord(ih,orphoFragmentsToCorrect[i][0],orphoFragmentsToCorrect[i][1],0,0);
-//	console.log(ih);
-
-//	ih=ih.replace(/[\s.,>]бля[\s.,<]/g," ");
-
-//	ih=ih.replace(/([\s.,])еще([\s.,])/g,"$1ещё$2");
+	for(var i=0; i<actionArray.length;i++)
+		ih=ih.replace(actionArray[i][0],actionArray[i][1]);
 	
 	return ih;
 }
