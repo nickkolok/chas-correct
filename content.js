@@ -1,8 +1,9 @@
 var oldTime = new Date().getTime();
 
 var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
-
 var actionArray=[];
+var minimalLiteralLength=20480; //Пока с потолка
+
 
 function prepareExpression(word, str, prefix, postfix){
 	var firstLetter=word[0];
@@ -106,14 +107,21 @@ for(var i=0; i<orphoFragmentsToCorrect.length; i++)
 	prepareExpression(orphoFragmentsToCorrect[i][0],orphoFragmentsToCorrect[i][1],0,0);
 
 
+function replaceUniversal(ih){
+	return ih.
+		replace(/[(]{6,}/g,"(((").
+		replace(/[)]{6,}/g,")))").
+		replace(/([.?!])\1{3,}/g,"$1$1$1");
+}
+
 function mainWork(ih){
-	ih=ih.replace(/([\s?!.,:;])([Вв])о\sпервых(?=[\s?!.,:;])/g,"$1$2о-первых");
-	ih=ih.replace(/([.?!А-Яа-яЁё])\1{3,}/g,"$1$1$1");
+	ih=replaceUniversal(ih);
+	if(notContainsCyrillic(ih)){
+		return ih;
+	}
+	ih=ih.replace(/([А-Яа-яЁё])\1{3,}/g,"$1$1$1");
 	ih=ih.replace(/[ь]{2,}/g,"ь");
 	ih=ih.replace(/[ъ]{2,}/g,"ъ");
-
-	ih=ih.replace(/[(]{6,}/g,"(((");
-	ih=ih.replace(/[)]{6,}/g,")))");
 
 	ih=ih.replace(/([ЖжШшЩщ])[ыЫ]/g,"$1и");
 	ih=ih.replace(/([ЧчЩщ])[яЯ]/g,"$1а");
@@ -133,18 +141,34 @@ function mainWork(ih){
 	return ih;
 }
 
-function changeStrings(n, callback) {
+function notContainsCyrillic(str){
+	return str.search(/[А-Яа-яЁё]/) === -1;
+}
+
+function changeStrings(n, callback, checkLiteralLength) {
 	// Эта рекурсивная функция отыскивает все текстовые узлы
 
 	if (n.nodeType == 3 /* Node.TEXT_NODE */){
 		n.data=callback(n.data);
-	} else if (n.nodeType == 1 /* Node.ELEMENT_NODE */ || n.nodeType == 1 /* document */) {
-		// Обратите внимание, обход выполняется с использованием firstChild/nextSibling
+	} else if (n.nodeType == 1 /* Node.ELEMENT_NODE */ || n.nodeType == 9 /* document */) {
+		//"Срезаем угол" - если кириллицы нет в большом элементе, то незачем его трогать кириллическими регулярками
+/*		if(checkLiteralLength){
+			//Пока .innerHTML - слишком медленно
+			var ih=n.innerHTML;
+			var len=ih.length;
+			if(len >= minimalLiteralLength && notContainsCyrillic(ih)){
+				checkLiteralLength = 0;
+				callback = replaceUniversal;
+			} else if (len < minimalLiteralLength){
+				checkLiteralLength = 0;
+			}
+		}
+*/		// Обратите внимание, обход выполняется с использованием firstChild/nextSibling
 		for (var m = n.firstChild; m != null; m = m.nextSibling) {
-			changeStrings(m, callback);
+			changeStrings(m, callback, checkLiteralLength);
 		}
 	}
 }
 
-changeStrings(document.body,mainWork);
+changeStrings(document.body, mainWork, true);
 console.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
