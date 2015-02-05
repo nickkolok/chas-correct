@@ -5,7 +5,7 @@
     "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": [ "dictionary.js","content.js"  ],
+      "js": [ "jquery-2.1.0.min.js","jstorage.min.js","dictionary.js","content.js"  ],
       "all_frames":true,
       "run_at": "document_idle"
     }
