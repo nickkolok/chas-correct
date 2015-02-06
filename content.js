@@ -2,7 +2,6 @@ var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
 var actionArray=[];
 var minimalLiteralLength=204800; //Пока с потолка
 
-
 function prepareExpression(word, str, prefix, postfix){
 	if(word[0] !== str[0])
 		return prepareReplaceHeavy(word, str, prefix, postfix);
@@ -31,16 +30,6 @@ for(var i1=0; i1<=1;i1++)
 			prepareExpression(globalArray[i1][i2][i][0],globalArray[i1][i2][i][1],i1,i2);
 			megaexpressionParts.push(globalArray[i1][i2][i][0]);
 		}
-/*
-for(var i=0; i<orphoWordsToCorrect.length; i++)
-	prepareExpression(orphoWordsToCorrect[i][0],orphoWordsToCorrect[i][1],1,1);
-for(var i=0; i<orphoPostfixToCorrect.length; i++)
-	prepareExpression(orphoPostfixToCorrect[i][0],orphoPostfixToCorrect[i][1],0,1);
-for(var i=0; i<orphoPrefixToCorrect.length; i++)
-	prepareExpression(orphoPrefixToCorrect[i][0],orphoPrefixToCorrect[i][1],1,0);
-for(var i=0; i<orphoFragmentsToCorrect.length; i++)
-	prepareExpression(orphoFragmentsToCorrect[i][0],orphoFragmentsToCorrect[i][1],0,0);
-*/
 
 var megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 
@@ -73,8 +62,6 @@ function prepareReplaceHeavy(reg, str, prefix, postfix){
 }
 
 function specialWork(ih){
-//	lAr.push(ih.length);
-	
 	ih=ih.replace(/([А-Яа-яЁё])\1{3,}/g,"$1$1$1");
 	ih=ih.replace(/[ь]{2,}/g,"ь");
 	ih=ih.replace(/[ъ]{2,}/g,"ъ");
@@ -185,32 +172,6 @@ function fixMistakes(){
 
 /*	var oldTime3=new Date().getTime();
 
-	var known=[];
-	if(typicalNodes.totalPages){
-		for(var text in typicalNodes.nodes){
-			var f=typicalNodes.nodes[text]/typicalNodes.totalPages;
-			if(f>0.2){
-				known.push(text);
-			}
-		}
-	}
-//	correct.log(known);
-	var k=!!known.length;
-	try{
-		regKnown=new RegExp("^("+
-			known.join(")|(").
-			replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&").//Без паники, сейчас вернём скобки!
-			replace(/\\\)\\\|\\\(/g,")|(").
-			replace(/^\\\(/g,"(").
-			replace(/\\\)$/g,")")
-			+
-		")$");
-	}catch(e){
-		k=0;
-	}
-//	correct.log(regKnown);
-	correct.log("chas-correct: на подготовку регулярки типичных нод затрачено (мс): "+(new Date().getTime() - oldTime3));
-*/	
 	var len=textNodes.length-1;
 	var i=0;
 /*	
@@ -248,9 +209,9 @@ function fixMistakes(){
 	*/	
 		if(!(textNodes[i].data in typicalNodes.nodes))
 			textNodes[i].data=mainWork(textNodes[i].data);
-//		}else{
-//			console.log(textNodes[i].data);
-//		}
+//		else
+//			correct.log(textNodes[i].data);
+
 	}
 	correct.log("Основной цикл (мс): "+(new Date().getTime() - timeBeforeMain));
 }
@@ -259,16 +220,6 @@ fixMistakes();
 
 correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
 correct.log("Доля нод с ошибками: "+(errorNodes/totalNodes));
-
-//console.log(textNodesText.join(" "));
-/*
-
-var smAr=[];
-for(var i=0;i<lAr.length;i++)
-	if(lAr[i]<10)
-		smAr.push(lAr[i]);
-
-*/
 
 var freqKeys="абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с","не","ни"]);
 
@@ -361,7 +312,6 @@ observeDOM(document.body, domChangedHandler);
 //Самообучение на типичных нодах
 function autoteachTypicalNodes(){
 	typicalNodes.totalPages++;
-//	typicalNodes.totalPages=1;
 	//Добавляем найденные ноды
 	for(var i=0; i<textNodes.length; i++){
 		var t=textNodes[i].data;
