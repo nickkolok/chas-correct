@@ -13,8 +13,9 @@ function prepareExpression(word, str, prefix, postfix){
 		"(["+firstLetter.toLowerCase()+firstLetter.toUpperCase()+"])"+lostWord+
 		(postfix ? wordSplitSymbol : "(.|[\s\S]|$)" );
 	var regexp=new RegExp(pattern,"gm");
-//	console.log(regexp);
+//	correct.log(regexp);
 	actionArray.push([regexp,"$1$2"+str.substr(1)+"$3"]);
+//	megaexpressionParts.push(pattern);
 }
 
 var megaexpressionParts=[];
@@ -43,7 +44,7 @@ for(var i=0; i<orphoFragmentsToCorrect.length; i++)
 
 var megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 
-console.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
+correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
 
 function replaceUniversal(ih){
 	return ih.
@@ -104,6 +105,7 @@ function mainWork(ih){
 
 	if(!megaexpression.test(ih))
 		return ih;
+//	correct.log(ih.match(megaexpression));
 
 	errorNodes++;
 
@@ -171,16 +173,68 @@ function changeStrings(n, callback, checkLiteralLength) {
 */
 var kuch=3;
 
-function fixMistakes(){
+var regKnown;
+var typicalNodes=$.jStorage.get("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 
+function fixMistakes(){
 	var oldTime2=new Date().getTime();
 	textNodes=[];
 	changeStrings(document.body, mainWork, true);
 
-	console.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
+	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
 
-	var len=textNodes.length;
-	for(var i=0;i<len;i++){
+/*	var oldTime3=new Date().getTime();
+
+	var known=[];
+	if(typicalNodes.totalPages){
+		for(var text in typicalNodes.nodes){
+			var f=typicalNodes.nodes[text]/typicalNodes.totalPages;
+			if(f>0.2){
+				known.push(text);
+			}
+		}
+	}
+//	correct.log(known);
+	var k=!!known.length;
+	try{
+		regKnown=new RegExp("^("+
+			known.join(")|(").
+			replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&").//Без паники, сейчас вернём скобки!
+			replace(/\\\)\\\|\\\(/g,")|(").
+			replace(/^\\\(/g,"(").
+			replace(/\\\)$/g,")")
+			+
+		")$");
+	}catch(e){
+		k=0;
+	}
+//	correct.log(regKnown);
+	correct.log("chas-correct: на подготовку регулярки типичных нод затрачено (мс): "+(new Date().getTime() - oldTime3));
+*/	
+	var len=textNodes.length-1;
+	var i=0;
+/*	
+	var timeBeforeHeader=new Date().getTime();
+	if(typicalNodes.nodes){
+		//Пропускаем "шапку" страницы
+//		while(i<=len && regKnown.test(textNodes[i].data)){
+		while(i<=len && textNodes[i].data in typicalNodes.nodes){
+			i++;
+		};
+		//И низушку
+//		while(i<=len && regKnown.test(textNodes[len].data)){
+		while(i<=len && textNodes[len].data in typicalNodes.nodes){
+			len--;
+		};
+	}
+	var cachedNodes=i+textNodes.length-len-1;
+	correct.log("Нод отнесено к шапке: "+cachedNodes+"("+(cachedNodes/textNodes.length*100)+"%), до "+i+"-й и после "+(len-1)+"-й");
+	correct.log("Выделение шаблона (мс): "+(new Date().getTime() - timeBeforeHeader));
+*/
+
+	var timeBeforeMain=new Date().getTime();
+	
+	for(;i<=len;i++){
 	/*	var textArr=[];
 		if(i%kuch == 0){
 			for(var j=0; (i+j<len) && (j<kuch); j++){
@@ -191,14 +245,20 @@ function fixMistakes(){
 				continue;
 			}
 		}
-	*/	textNodes[i].data=mainWork(textNodes[i].data);
+	*/	
+		if(!(textNodes[i].data in typicalNodes.nodes))
+			textNodes[i].data=mainWork(textNodes[i].data);
+//		}else{
+//			console.log(textNodes[i].data);
+//		}
 	}
+	correct.log("Основной цикл (мс): "+(new Date().getTime() - timeBeforeMain));
 }
 
 fixMistakes();
 
-console.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
-console.log("Доля нод с ошибками: "+(errorNodes/totalNodes));
+correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
+correct.log("Доля нод с ошибками: "+(errorNodes/totalNodes));
 
 //console.log(textNodesText.join(" "));
 /*
@@ -213,7 +273,7 @@ for(var i=0;i<lAr.length;i++)
 var freqKeys="абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с","не","ни"]);
 
 function analizeFreq(){
-	var freqStat=$.jStorage.get("chas-correst-freq-stat",{totalNodes:0,includes:{}});
+	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
 	freqStat.totalNodes += textNodes.length;
 	for(var i=0; i < freqKeys.length; i++){
 		var reg=new RegExp(freqKeys[i],"i");
@@ -223,11 +283,11 @@ function analizeFreq(){
 				freqStat.includes[freqKeys[i]]++;
 			}
 	}
-	$.jStorage.set("chas-correst-freq-stat",freqStat);
+	$.jStorage.set("chas-correct-freq-stat",freqStat);
 }
 
 function logFreq(max){
-	var freqStat=$.jStorage.get("chas-correst-freq-stat",{totalNodes:0,includes:{}});
+	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
 	for(var i=0; i < freqKeys.length; i++){
 		var f=freqStat.includes[freqKeys[i]]/freqStat.totalNodes;
 		if(!(f>max))
@@ -238,7 +298,7 @@ function logFreq(max){
 setTimeout(analizeFreq,1000);
 
 function analizeFreqInRegExp(min){
-	var freqStat=$.jStorage.get("chas-correst-freq-stat",{totalNodes:0,includes:{}});
+	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
 	var rez={};
 	var sum=0;
 	for(var i=0; i < freqKeys.length; i++){
@@ -269,7 +329,8 @@ function domChangedHandler(){
 		return;
 	}
 	fixMistakes();
-	console.log("Вызов chas-correct по смене DOM: "+(new Date().getTime() - newt)+" мс");
+	correct.log("Вызов chas-correct по смене DOM: "+(new Date().getTime() - newt)+" мс");
+	correct.logToConsole();
 	domChangedScheduled=0;
 }
 
@@ -296,3 +357,25 @@ var observeDOM = (function(){
 
 // Observe a specific DOM element:
 observeDOM(document.body, domChangedHandler);
+
+//Самообучение на типичных нодах
+function autoteachTypicalNodes(){
+	typicalNodes.totalPages++;
+//	typicalNodes.totalPages=1;
+	//Добавляем найденные ноды
+	for(var i=0; i<textNodes.length; i++){
+		var t=textNodes[i].data;
+		typicalNodes.nodes[t]||(typicalNodes.nodes[t]=0);
+		typicalNodes.nodes[t]++;
+	}
+	//Чистим те, у которых частота меньше 0.05
+	for(var text in typicalNodes.nodes){
+		var f=typicalNodes.nodes[text]/typicalNodes.totalPages;
+		if(f<0.05){
+			delete typicalNodes.nodes[text];
+		}
+	}
+	$.jStorage.set("chas-correct-typical-nodes",typicalNodes);
+}
+
+setTimeout(autoteachTypicalNodes,3000);
