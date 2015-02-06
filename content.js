@@ -49,6 +49,8 @@ function replaceUniversal(ih){
 	return ih.
 		replace(/[(]{6,}/g,"(((").
 		replace(/[)]{6,}/g,")))").
+		replace(/[!]1+/g,"!").
+		replace(/[?]7+/g,"?").
 		replace(/([.?!])\1{3,}/g,"$1$1$1");
 }
 
@@ -169,29 +171,36 @@ function changeStrings(n, callback, checkLiteralLength) {
 */
 var kuch=3;
 
-changeStrings(document.body, mainWork, true);
+function fixMistakes(){
 
-console.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime));
+	var oldTime2=new Date().getTime();
+	textNodes=[];
+	changeStrings(document.body, mainWork, true);
 
-var len=textNodes.length;
-for(var i=0;i<len;i++){
-/*	var textArr=[];
-	if(i%kuch == 0){
-		for(var j=0; (i+j<len) && (j<kuch); j++){
-			textArr.push(textNodes[i+j].data);
+	console.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
+
+	var len=textNodes.length;
+	for(var i=0;i<len;i++){
+	/*	var textArr=[];
+		if(i%kuch == 0){
+			for(var j=0; (i+j<len) && (j<kuch); j++){
+				textArr.push(textNodes[i+j].data);
+			}
+			if(!megaexpression.test(textArr.join(" "))){
+				i+=kuch;
+				continue;
+			}
 		}
-		if(!megaexpression.test(textArr.join(" "))){
-			i+=kuch;
-			continue;
-		}
+	*/	textNodes[i].data=mainWork(textNodes[i].data);
 	}
-*/	textNodes[i].data=mainWork(textNodes[i].data);
 }
 
+fixMistakes();
 
-//console.log(textNodesText.join(" "));
 console.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
 console.log("Доля нод с ошибками: "+(errorNodes/totalNodes));
+
+//console.log(textNodesText.join(" "));
 /*
 
 var smAr=[];
@@ -201,7 +210,7 @@ for(var i=0;i<lAr.length;i++)
 
 */
 
-var freqKeys="абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с"]);
+var freqKeys="абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с","не","ни"]);
 
 function analizeFreq(){
 	var freqStat=$.jStorage.get("chas-correst-freq-stat",{totalNodes:0,includes:{}});
@@ -246,3 +255,44 @@ function analizeFreqInRegExp(min){
 	}
 	return sum;
 }
+
+var domChangedLastTime=new Date().getTime();
+var domChangedScheduled=0;
+
+function domChangedHandler(){
+	var newt=new Date().getTime();
+	if(newt - domChangedLastTime < 1000){
+		if(!domChangedScheduled){
+			domChangedScheduled=1;
+			setTimeout(domChangedHandler,1000);
+		}
+		return;
+	}
+	fixMistakes();
+	console.log("Вызов chas-correct по смене DOM: "+(new Date().getTime() - newt)+" мс");
+	domChangedScheduled=0;
+}
+
+var observeDOM = (function(){
+    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
+        eventListenerSupported = window.addEventListener;
+
+    return function(obj, callback){
+        if( MutationObserver ){
+            // define a new observer
+            var obs = new MutationObserver(function(mutations, observer){
+                if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
+                    callback();
+            });
+            // have the observer observe foo for changes in children
+            obs.observe( obj, { childList:true, subtree:true });
+        }
+        else if( eventListenerSupported ){
+            obj.addEventListener('DOMNodeInserted', callback, false);
+            obj.addEventListener('DOMNodeRemoved', callback, false);
+        }
+    }
+})();
+
+// Observe a specific DOM element:
+observeDOM(document.body, domChangedHandler);
