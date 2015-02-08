@@ -6,7 +6,7 @@ var minimalLiteralLength=204800; //Пока с потолка
 
 Array.prototype.spliceWithLast=function(index){
 	'use strict';
-	this[index]=this[this.length];
+	this[index]=this[this.length-1];
 	this.length--;
 }
 
@@ -45,13 +45,18 @@ var megaexpression;//=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 
 correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
 
+var reun1=/[(]{6,}/g;
+var reun2=/[)]{6,}/g;
+var reun3=/[!]1+/g;
+var reun4=/[?]7+/g;
+var reun5=/([.?!])\1{3,}/g;
 function replaceUniversal(ih){
 	return ih.
-		replace(/[(]{6,}/g,"(((").
-		replace(/[)]{6,}/g,")))").
-		replace(/[!]1+/g,"!").
-		replace(/[?]7+/g,"?").
-		replace(/([.?!])\1{3,}/g,"$1$1$1");
+		replace(reun1,"(((").
+		replace(reun2,")))").
+		replace(reun3,"!").
+		replace(reun4,"?").
+		replace(reun5,"$1$1$1");
 }
 
 function prepareReplaceHeavy(reg, str, prefix, postfix){
@@ -113,8 +118,9 @@ function mainWork(ih){
 	return ih;
 }
 
+var regCyr=/[А-Яа-яЁё]/;
 function notContainsCyrillic(str){
-	return str.search(/[А-Яа-яЁё]/) === -1;
+	return !regCyr.test(str);
 }
 
 var textNodesText=[];
@@ -340,6 +346,8 @@ function selectRegs(i,len){
 //				correct.log(actionArray[j][2]);
 				actionArray.spliceWithLast(j);
 				l--;
+				j--;
+//				actionArray[j]=0;
 			}else{
 				megaexpressionParts.push(actionArray[j][2].source);
 			}
