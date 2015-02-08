@@ -334,17 +334,21 @@ setTimeout(autoteachTypicalNodes,3000);
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
 
-var textArr;//=[];
+//var textArr;//=[];
 function selectRegs(i,len){
-	textArr=[];
-	megaexpressionParts=[];
+	var text="";
+//	textArr=[];
+//	megaexpressionParts=[];
+	var megaexpressionSource="(";
+	var delimiter=")|(";
 	var t=new Date().getTime();
 	actionArray=actionArrayCopy.slice();
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
-			textArr.push(textNodes[i].data);
+//			textArr.push(textNodes[i].data);
+			text+=" "+textNodes[i].data;
 	}
-	var text=textArr.join(" ");
+//	var text=textArr.join(" ");
 //	correct.log(text);
 	var l=actionArray.length;
 	for(var j=0; j<l; j++){
@@ -356,11 +360,13 @@ function selectRegs(i,len){
 				j--;
 //				actionArray[j]=0;
 			}else{
-				megaexpressionParts.push(actionArray[j][2].source);
+//				megaexpressionParts.push(actionArray[j][2].source);
+				megaexpressionSource+=actionArray[j][2].source+delimiter;
 			}
 		}
 	}
-	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
+//	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
+	megaexpression=new RegExp(megaexpressionSource+")","im");
 	correct.log("Выбор регэкспов, мс: "+(new Date().getTime()-t));
 }
 
