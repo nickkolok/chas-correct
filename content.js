@@ -13,7 +13,7 @@ function prepareExpression(word, str, prefix, postfix){
 		(postfix ? wordSplitSymbol : "(.|[\s\S]|$)" );
 	var regexp=new RegExp(pattern,"gm");
 //	correct.log(regexp);
-	actionArray.push([regexp,"$1$2"+str.substr(1)+"$3"]);
+	actionArray.push([regexp,"$1$2"+str.substr(1)+"$3",new RegExp(word,"im")]);
 //	megaexpressionParts.push(pattern);
 }
 
@@ -28,10 +28,12 @@ for(var i1=0; i1<=1;i1++)
 	for(var i2=0; i2<=1;i2++)
 		for(var i=0; i<globalArray[i1][i2].length; i++){
 			prepareExpression(globalArray[i1][i2][i][0],globalArray[i1][i2][i][1],i1,i2);
-			megaexpressionParts.push(globalArray[i1][i2][i][0]);
+//			megaexpressionParts.push(globalArray[i1][i2][i][0]);
 		}
 
-var megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
+var actionArrayCopy=actionArray.slice();
+
+var megaexpression;//=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 
 correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
 
@@ -57,8 +59,8 @@ function prepareReplaceHeavy(reg, str, prefix, postfix){
 		reg[0].toUpperCase()+lostreg+
 		(postfix ? wordSplitSymbol : "(.|[\s\S]|$)" );
 	var regexp2=new RegExp(pattern2,"gm");
-	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+"$2"]);
-	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+"$2"]);
+	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+"$2",new RegExp(reg,"i")]);
+	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+"$2",new RegExp(reg,"i")]);
 }
 
 function specialWork(ih){
@@ -97,7 +99,8 @@ function mainWork(ih){
 	errorNodes++;
 
 	for(var i=0; i<actionArray.length;i++)
-		ih=ih.replace(actionArray[i][0],actionArray[i][1]);
+		if(actionArray[i])
+			ih=ih.replace(actionArray[i][0],actionArray[i][1]);
 
 	return ih;
 }
@@ -160,21 +163,42 @@ function changeStrings(n, callback, checkLiteralLength) {
 */
 var kuch=3;
 
+function nativeTreeWalker() {
+    var walker = document.createTreeWalker(
+        document.body, 
+        NodeFilter.SHOW_TEXT, 
+        null, 
+        false
+    );
+
+    var node;
+    textNodes = [];
+
+    while(node = walker.nextNode()) {
+		node.data=replaceUniversal(node.data);
+		if(!notContainsCyrillic(node.data)){
+			textNodes.push(node);
+		}
+    }
+}
+
 var regKnown;
 var typicalNodes=$.jStorage.get("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 
+var flagEchoMessageDomChanged;
 function fixMistakes(){
 	var oldTime2=new Date().getTime();
 	textNodes=[];
-	changeStrings(document.body, mainWork, true);
-
+//	changeStrings(document.body, mainWork, true);
+	nativeTreeWalker();
 	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
-
-/*	var oldTime3=new Date().getTime();
 
 	var len=textNodes.length-1;
 	var i=0;
-/*	
+
+	var oldTime3=new Date().getTime();
+
+	
 	var timeBeforeHeader=new Date().getTime();
 	if(typicalNodes.nodes){
 		//Пропускаем "шапку" страницы
@@ -188,11 +212,13 @@ function fixMistakes(){
 			len--;
 		};
 	}
-	var cachedNodes=i+textNodes.length-len-1;
+	len++;//Иначе глючит :(
+	var cachedNodes=i+textNodes.length-len;
 	correct.log("Нод отнесено к шапке: "+cachedNodes+"("+(cachedNodes/textNodes.length*100)+"%), до "+i+"-й и после "+(len-1)+"-й");
 	correct.log("Выделение шаблона (мс): "+(new Date().getTime() - timeBeforeHeader));
-*/
 
+
+	selectRegs(i,len);
 	var timeBeforeMain=new Date().getTime();
 	
 	for(;i<=len;i++){
@@ -207,12 +233,13 @@ function fixMistakes(){
 			}
 		}
 	*/	
-		if(!(textNodes[i].data in typicalNodes.nodes))
+		if(textNodes[i] && !(textNodes[i].data in typicalNodes.nodes))
 			textNodes[i].data=mainWork(textNodes[i].data);
 //		else
 //			correct.log(textNodes[i].data);
 
 	}
+	flagEchoMessageDomChanged=1;
 	correct.log("Основной цикл (мс): "+(new Date().getTime() - timeBeforeMain));
 }
 
@@ -272,6 +299,10 @@ var domChangedScheduled=0;
 
 function domChangedHandler(){
 	var newt=new Date().getTime();
+	if(flagEchoMessageDomChanged){
+		flagEchoMessageDomChanged=0;
+		return;
+	}
 	if(newt - domChangedLastTime < 1000){
 		if(!domChangedScheduled){
 			domChangedScheduled=1;
@@ -329,3 +360,43 @@ function autoteachTypicalNodes(){
 }
 
 setTimeout(autoteachTypicalNodes,3000);
+
+//Эксперимент - объединение текста всех нод и выкидывание ненужных регулярок
+
+var textArr;//=[];
+function selectRegs(i,len){
+	textArr=[];
+	megaexpressionParts=[];
+	var t=new Date().getTime();
+	actionArray=actionArrayCopy.slice();
+	for(;i<len;i++){
+		if(!(textNodes[i].data in typicalNodes.nodes))
+			textArr.push(textNodes[i].data);
+	}
+	var text=textArr.join(" ");
+//	correct.log(text);
+	var l=actionArray.length;
+	for(var j=0; j<l; j++){
+		if(actionArray[j] && actionArray[j][2]){
+			if(!actionArray[j][2].test(text)){
+//				correct.log(actionArray[j][2]);
+				actionArray[j]=0;
+			}else{
+				megaexpressionParts.push(actionArray[j][2].source);
+			}
+		}
+	}
+	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
+	correct.log("Выбор регэкспов, мс: "+(new Date().getTime()-t));
+}
+
+//Сбросить кэш
+function clearNodeCache(){
+	$.jStorage.set("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+}
+
+
+
+
+
+correct.logToConsole();
