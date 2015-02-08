@@ -111,85 +111,37 @@ function notContainsCyrillic(str){
 
 var textNodesText=[];
 var textNodes=[];
-
-function changeStrings(n, callback, checkLiteralLength) {
-	// Эта рекурсивная функция отыскивает все текстовые узлы
-
-	if (n.nodeType == 3 /* Node.TEXT_NODE */){
-		n.data=replaceUniversal(n.data);
-		if(notContainsCyrillic(n.data)){
-			return;
-		}
-		textNodes.push(n);
-//		n.data=callback(n.data);
-	} else if (n.nodeType == 1 /* Node.ELEMENT_NODE */ || n.nodeType == 9 /* document */) {
-/*		if(checkLiteralLength){
-			//Пока .innerHTML - слишком медленно
-			var ih=n.innerHTML;
-			var len=ih.length;
-			if(len >= minimalLiteralLength && !megaexpression.test(ih)){
-				checkLiteralLength = 0;
-				callback = specialWork;
-			} else if (len < minimalLiteralLength){
-				checkLiteralLength = 0;
-			}
-		}
-*/		//"Срезаем угол" - если кириллицы нет в большом элементе, то незачем его трогать кириллическими регулярками
-/*		if(checkLiteralLength){
-			//Пока .innerHTML - слишком медленно
-			var ih=n.innerHTML;
-			var len=ih.length;
-			if(len >= minimalLiteralLength && notContainsCyrillic(ih)){
-				checkLiteralLength = 0;
-				callback = replaceUniversal;
-			} else if (len < minimalLiteralLength){
-				checkLiteralLength = 0;
-			}
-		}
-*/		// Обратите внимание, обход выполняется с использованием firstChild/nextSibling
-		for (var m = n.firstChild; m != null; m = m.nextSibling) {
-			changeStrings(m, callback, checkLiteralLength);
-		}
-	}
-}
-
-/*
-		if(!(i%10)){
-			textNodesText[i/10]=[n.data];
-		}else{
-			textNodesText[i/10].push(n.data);
-		}
-
-*/
 var kuch=3;
 
 function nativeTreeWalker() {
-    var walker = document.createTreeWalker(
-        document.body, 
-        NodeFilter.SHOW_TEXT, 
-        null, 
-        false
-    );
+	var walker = document.createTreeWalker(
+		document.body,
+		NodeFilter.SHOW_TEXT,
+		null,
+		false
+	);
 
-    var node;
-    textNodes = [];
+	var node;
+	textNodes = [];
 
-    while(node = walker.nextNode()) {
-		node.data=replaceUniversal(node.data);
-		if(!notContainsCyrillic(node.data)){
-			textNodes.push(node);
+	while(node = walker.nextNode()) {
+		if(node.data!="" && node.data.trim()!=""){
+			node.data=replaceUniversal(node.data);
+			if(!notContainsCyrillic(node.data)){
+				textNodes.push(node);
+			}
 		}
-    }
+	}
 }
 
 var regKnown;
 var typicalNodes=$.jStorage.get("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 
 var flagEchoMessageDomChanged;
+
 function fixMistakes(){
 	var oldTime2=new Date().getTime();
 	textNodes=[];
-//	changeStrings(document.body, mainWork, true);
 	nativeTreeWalker();
 	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
 
@@ -198,16 +150,14 @@ function fixMistakes(){
 
 	var oldTime3=new Date().getTime();
 
-	
+
 	var timeBeforeHeader=new Date().getTime();
 	if(typicalNodes.nodes){
 		//Пропускаем "шапку" страницы
-//		while(i<=len && regKnown.test(textNodes[i].data)){
 		while(i<=len && textNodes[i].data in typicalNodes.nodes){
 			i++;
 		};
 		//И низушку
-//		while(i<=len && regKnown.test(textNodes[len].data)){
 		while(i<=len && textNodes[len].data in typicalNodes.nodes){
 			len--;
 		};
@@ -317,24 +267,24 @@ function domChangedHandler(){
 }
 
 var observeDOM = (function(){
-    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
-        eventListenerSupported = window.addEventListener;
+	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
+		eventListenerSupported = window.addEventListener;
 
-    return function(obj, callback){
-        if( MutationObserver ){
-            // define a new observer
-            var obs = new MutationObserver(function(mutations, observer){
-                if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
-                    callback();
-            });
-            // have the observer observe foo for changes in children
-            obs.observe( obj, { childList:true, subtree:true });
-        }
-        else if( eventListenerSupported ){
-            obj.addEventListener('DOMNodeInserted', callback, false);
-            obj.addEventListener('DOMNodeRemoved', callback, false);
-        }
-    }
+	return function(obj, callback){
+		if( MutationObserver ){
+			// define a new observer
+			var obs = new MutationObserver(function(mutations, observer){
+				if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
+					callback();
+			});
+			// have the observer observe foo for changes in children
+			obs.observe( obj, { childList:true, subtree:true });
+		}
+		else if( eventListenerSupported ){
+			obj.addEventListener('DOMNodeInserted', callback, false);
+			obj.addEventListener('DOMNodeRemoved', callback, false);
+		}
+	}
 })();
 
 // Observe a specific DOM element:
