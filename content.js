@@ -1,6 +1,14 @@
+'use strict';
+
 var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
 var actionArray=[];
 var minimalLiteralLength=204800; //Пока с потолка
+
+Array.prototype.spliceWithLast=function(index){
+	'use strict';
+	this[index]=this[this.length];
+	this.length--;
+}
 
 function prepareExpression(word, str, prefix, postfix){
 	if(word[0] !== str[0])
@@ -311,7 +319,7 @@ function autoteachTypicalNodes(){
 
 setTimeout(autoteachTypicalNodes,3000);
 
-//Эксперимент - объединение текста всех нод и выкидывание ненужных регулярок
+//Объединение текста всех нод и выкидывание ненужных регулярок
 
 var textArr;//=[];
 function selectRegs(i,len){
@@ -330,7 +338,8 @@ function selectRegs(i,len){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(text)){
 //				correct.log(actionArray[j][2]);
-				actionArray[j]=0;
+				actionArray.spliceWithLast(j);
+				l--;
 			}else{
 				megaexpressionParts.push(actionArray[j][2].source);
 			}
