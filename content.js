@@ -1,7 +1,18 @@
 'use strict';
 
 var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
-var actionArray=[];
+var leftEnd="(.|[\s\S]|^)";
+var rightEnd="(.|[\s\S]|$)";
+var actionArray=[
+	[/[ь]{2,}/g,"ь",/ьь/i],
+	[/[ъ]{2,}/g,"ъ",/ъъ/i],
+
+	[/([ЖжШшЩщ])[ыЫ]/g,"$1и",/[жшщ]ы/i],
+	[/([ЧчЩщ])[яЯ]/g,"$1а",/[чщ]я/i],
+	[/([ЧчЩщ])[юЮ]/g,"$1у",/[чщ]ю/i],
+	[/([^А-Яа-яЁёA-Za-z]|^)з(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав))/g,"$1с",/([^А-Яа-яЁёA-Za-z]|^)з(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
+	[/([^А-Яа-яЁёA-Za-z]|^)З(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав))/g,"$1С",/([^А-Яа-яЁёA-Za-z]|^)З(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
+];
 var minimalLiteralLength=204800; //Пока с потолка
 
 Array.prototype.spliceWithLast=function(index){
@@ -16,12 +27,12 @@ function prepareExpression(word, str, prefix, postfix){
 	var firstLetter=word[0];
 	var lostWord=word.substr(1);
 	var pattern =
-		(prefix ? wordSplitSymbol : "(.|[\s\S]|^)" ) +
+		(prefix ? wordSplitSymbol : leftEnd ) +
 		"(["+firstLetter.toLowerCase()+firstLetter.toUpperCase()+"])"+lostWord+
-		(postfix ? wordSplitSymbol : "(.|[\s\S]|$)" );
+		(postfix ? wordSplitSymbol : rightEnd );
 	var regexp=new RegExp(pattern,"gm");
 //	correct.log(regexp);
-	actionArray.push([regexp,"$1$2"+str.substr(1)+"$3",new RegExp(word,"im")]);
+	actionArray.push([regexp,"$1$2"+str.substr(1)+"$3",new RegExp(word,"i")]);
 //	megaexpressionParts.push(pattern);
 }
 
@@ -45,54 +56,50 @@ var megaexpression;//=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 
 correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
 
-var reun1=/[(]{6,}/g;
-var reun2=/[)]{6,}/g;
-var reun3=/[!]1+/g;
-var reun4=/[?]7+/g;
-var reun5=/([.?!])\1{3,}/g;
+//Кэщируем строки и регэкспы. Вроде как помогает.
+var reun1=/[(]{6,}/g		, stun1="(((";
+var reun2=/[)]{6,}/g		, stun2=")))";
+var reun3=/[!]1+/g			, stun3="!";
+var reun4=/[?]7+/g			, stun4="?";
+var reun5=/([.?!])\1{3,}/g	, stun5="$1$1$1";
 function replaceUniversal(ih){
 	return ih.
-		replace(reun1,"(((").
-		replace(reun2,")))").
-		replace(reun3,"!").
-		replace(reun4,"?").
-		replace(reun5,"$1$1$1");
+		replace(reun1,stun1).
+		replace(reun2,stun2).
+		replace(reun3,stun3).
+		replace(reun4,stun4).
+		replace(reun5,stun5);
 }
 
 function prepareReplaceHeavy(reg, str, prefix, postfix){
 	var lostreg=reg.substr(1);
 	var loststr=str.substr(1);
 	var pattern1 =
-		(prefix ? wordSplitSymbol : "(.|[\s\S]|^)" ) +
+		(prefix ? wordSplitSymbol : leftEnd ) +
 		reg[0].toLowerCase()+lostreg+
-		(postfix ? wordSplitSymbol : "(.|[\s\S]|$)" );
+		(postfix ? wordSplitSymbol : rightEnd );
 	var regexp1=new RegExp(pattern1,"gm");
 	var pattern2 =
-		(prefix ? wordSplitSymbol : "(.|[\s\S]|^)" ) +
+		(prefix ? wordSplitSymbol : leftEnd ) +
 		reg[0].toUpperCase()+lostreg+
-		(postfix ? wordSplitSymbol : "(.|[\s\S]|$)" );
+		(postfix ? wordSplitSymbol : rightEnd );
 	var regexp2=new RegExp(pattern2,"gm");
 	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+"$2",new RegExp(reg,"i")]);
 	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+"$2",new RegExp(reg,"i")]);
 }
 
-function specialWork(ih){
-	ih=ih.replace(/([А-Яа-яЁё])\1{3,}/g,"$1$1$1");
-	ih=ih.replace(/[ь]{2,}/g,"ь");
-	ih=ih.replace(/[ъ]{2,}/g,"ъ");
 
-	ih=ih.replace(/([ЖжШшЩщ])[ыЫ]/g,"$1и");
-	ih=ih.replace(/([ЧчЩщ])[яЯ]/g,"$1а");
-	ih=ih.replace(/([ЧчЩщ])[юЮ]/g,"$1у");
+var reg3podryad=/([А-Яа-яЁё])\1{3,}/g;
+function specialWork(ih){
+	ih=ih.replace(reg3podryad,"$1$1$1");//Это не выносится из-за сигнатуры
+
+/*//Перенесено в словарь
 	ih=ih.replace(/ньч/gi,"нч");
 	ih=ih.replace(/ньщ/gi,"нщ");
 	ih=ih.replace(/чьн/gi,"чн");
 	ih=ih.replace(/щьн/gi,"щн");
 	ih=ih.replace(/чьк/gi,"чк");
-
-	ih=ih.replace(/([^А-Яа-яЁёA-Za-z]|^)з(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав))/g,"$1с");
-	ih=ih.replace(/([^А-Яа-яЁёA-Za-z]|^)З(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав))/g,"$1С");
-	
+*/	
 	return ih;
 }
 
@@ -112,7 +119,7 @@ function mainWork(ih){
 	errorNodes++;
 
 	for(var i=0; i<actionArray.length;i++)
-		if(actionArray[i])
+//		if(actionArray[i])
 			ih=ih.replace(actionArray[i][0],actionArray[i][1]);
 
 	return ih;
