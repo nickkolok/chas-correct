@@ -156,7 +156,15 @@ function nativeTreeWalker() {
 }
 
 var regKnown;
-var typicalNodes=$.jStorage.get("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+var typicalNodes;
+var lastActionArrayLength=$.jStorage.get("lastActionArrayLength",0);
+if(lastActionArrayLength==actionArrayCopy.length){
+	typicalNodes=$.jStorage.get("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+}else{
+	typicalNodes={totalPages:0,nodes:{}};
+	$.jStorage.set("lastActionArrayLength",actionArrayCopy.length);
+	correct.log("Длина словаря изменилась - сбрасываем кэш");
+}
 
 var flagEchoMessageDomChanged;
 
@@ -342,7 +350,7 @@ function selectRegs(i,len){
 	var megaexpressionSource="(";
 	var delimiter=")|(";
 	var t=new Date().getTime();
-	actionArray=actionArrayCopy.slice();
+	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
 //			textArr.push(textNodes[i].data);
