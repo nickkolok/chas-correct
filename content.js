@@ -1,8 +1,10 @@
 'use strict';
 
 var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
-var leftEnd="(.|[\s\S]|^)";
-var rightEnd="(.|[\s\S]|$)";
+//var wordSplitSymbolSafe="(?=[^А-Яа-яЁёA-Za-z]|^|$)";
+var leftEnd="(.|^)";//TODO: переписать так, чтобы стал не нужен
+//var rightEnd="(.|$)";
+//var rightEndSafe="(?=.|[\\s\\S]|$)";
 var actionArray=[
 	[/[ь]{2,}/g,"ь",/ьь/i],
 	[/[ъ]{2,}/g,"ъ",/ъъ/i],
@@ -10,10 +12,26 @@ var actionArray=[
 	[/([ЖжШшЩщ])[ыЫ]/g,"$1и",/[жшщ]ы/i],
 	[/([ЧчЩщ])[яЯ]/g,"$1а",/[чщ]я/i],
 	[/([ЧчЩщ])[юЮ]/g,"$1у",/[чщ]ю/i],
-	[/([^А-Яа-яЁёA-Za-z]|^)з(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав))/g,"$1с",/([^А-Яа-яЁёA-Za-z]|^)з(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
-	[/([^А-Яа-яЁёA-Za-z]|^)З(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав))/g,"$1С",/([^А-Яа-яЁёA-Za-z]|^)З(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
+	[/([^А-Яа-яЁёA-Za-z]|^)з(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав|рас))/g,"$1с",/([^А-Яа-яЁёA-Za-z]|^)з(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
+	[/([^А-Яа-яЁёA-Za-z]|^)З(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав|рас))/g,"$1С",/([^А-Яа-яЁёA-Za-z]|^)З(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
 ];
 var minimalLiteralLength=204800; //Пока с потолка
+
+correct.replacedPairs=[];
+correct.logReplaced=function(){
+	var rez="";
+	var len=this.replacedPairs.length/2;
+	for(var i=0; i<len;i+=2){
+		if(this.replacedPairs[i]!=this.replacedPairs[i+1]){
+			var slen=this.replacedPairs[i].length;
+			for(var j=0; j<slen && this.replacedPairs[i][j]===this.replacedPairs[i+1][j]; j++){
+			}
+			rez+="\n\r\n\r"+this.replacedPairs[i]+"\n\r->\n\r"+this.replacedPairs[i+1].substr(j-10<0?0:j-10);
+		}
+	}
+	this.replacedPairs=[];
+	return rez;
+}
 
 Array.prototype.spliceWithLast=function(index){
 	'use strict';
@@ -21,20 +39,46 @@ Array.prototype.spliceWithLast=function(index){
 	this.length--;
 }
 
+var qmInReg=/\(\?[\=\!]/;
+
 function prepareExpression(word, str, prefix, postfix){
 	if(word[0] !== str[0])
 		return prepareReplaceHeavy(word, str, prefix, postfix);
 	var firstLetter=word[0];
 	var lostWord=word.substr(1);
+//	var safe=qmInReg.test(word)
+//	var wordSplitSymbolHere=(postfix && safe) ? wordSplitSymbolSafe : wordSplitSymbol;
+//	if(postfix && qmInReg.test(word))
+//		correct.log(word+rightEndHere);
+
 	var pattern =
 		(prefix ? wordSplitSymbol : leftEnd ) +
 		"(["+firstLetter.toLowerCase()+firstLetter.toUpperCase()+"])"+lostWord+
-		(postfix ? wordSplitSymbol : rightEnd );
+		(postfix ? wordSplitSymbol : "");
 	var regexp=new RegExp(pattern,"gm");
 //	correct.log(regexp);
-	actionArray.push([regexp,"$1$2"+str.substr(1)+"$3",new RegExp(word,"i")]);
+	actionArray.push([regexp,"$1$2"+str.substr(1)+(postfix?"$3":""),new RegExp(word,"i")]);
 //	megaexpressionParts.push(pattern);
 }
+
+function prepareReplaceHeavy(reg, str, prefix, postfix){
+	var lostreg=reg.substr(1);
+	var loststr=str.substr(1);
+	var pattern1 =
+		(prefix ? wordSplitSymbol : leftEnd ) +
+		reg[0].toLowerCase()+lostreg+
+		(postfix ? wordSplitSymbol : "" );
+	var regexp1=new RegExp(pattern1,"gm");
+	var pattern2 =
+		(prefix ? wordSplitSymbol : leftEnd ) +
+		reg[0].toUpperCase()+lostreg+
+		(postfix ? wordSplitSymbol : "" );
+	var regexp2=new RegExp(pattern2,"gm");
+	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
+	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
+}
+
+
 
 var megaexpressionParts=[];
 
@@ -71,24 +115,6 @@ function replaceUniversal(ih){
 		replace(reun5,stun5);
 }
 
-function prepareReplaceHeavy(reg, str, prefix, postfix){
-	var lostreg=reg.substr(1);
-	var loststr=str.substr(1);
-	var pattern1 =
-		(prefix ? wordSplitSymbol : leftEnd ) +
-		reg[0].toLowerCase()+lostreg+
-		(postfix ? wordSplitSymbol : rightEnd );
-	var regexp1=new RegExp(pattern1,"gm");
-	var pattern2 =
-		(prefix ? wordSplitSymbol : leftEnd ) +
-		reg[0].toUpperCase()+lostreg+
-		(postfix ? wordSplitSymbol : rightEnd );
-	var regexp2=new RegExp(pattern2,"gm");
-	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+"$2",new RegExp(reg,"i")]);
-	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+"$2",new RegExp(reg,"i")]);
-}
-
-
 var reg3podryad=/([А-Яа-яЁё])\1{3,}/g;
 function specialWork(ih){
 	ih=ih.replace(reg3podryad,"$1$1$1");//Это не выносится из-за сигнатуры
@@ -118,9 +144,13 @@ function mainWork(ih){
 
 	errorNodes++;
 
-	for(var i=0; i<actionArray.length;i++)
+	correct.replacedPairs.push(ih);
+	for(var i=0; i<actionArray.length;i++){
 //		if(actionArray[i])
+		if(actionArray[i][2].test(ih))
 			ih=ih.replace(actionArray[i][0],actionArray[i][1]);
+	}
+	correct.replacedPairs.push(ih);
 
 	return ih;
 }
@@ -261,11 +291,11 @@ function analizeFreqInRegExp(min){
 	for(var i=0; i < freqKeys.length; i++){
 		var reg=new RegExp(freqKeys[i],"i");
 		rez[freqKeys[i]] = 0;
-		for(var j=0; j<actionArray.length; j++){
-			if(reg.test(actionArray[j][0].source.replace(/\[.*?\]/g,"")))
+		for(var j=0; j<actionArrayCopy.length; j++){
+			if(reg.test(actionArrayCopy[j][0].source.replace(/\[.*?\]/g,"")))
 				rez[freqKeys[i]]++;
 		}
-		var f=rez[freqKeys[i]]/actionArray.length * (1 - freqStat.includes[freqKeys[i]]/freqStat.totalNodes);
+		var f=rez[freqKeys[i]]/actionArrayCopy.length * (1 - freqStat.includes[freqKeys[i]]/freqStat.totalNodes);
 		sum+=f;
 		if(!(f<min))
 			console.log(freqKeys[i]+": "+f);
@@ -330,8 +360,8 @@ function autoteachTypicalNodes(){
 	}
 	//Чистим те, у которых частота меньше 0.05
 	for(var text in typicalNodes.nodes){
-		var f=typicalNodes.nodes[text]/typicalNodes.totalPages;
-		if(f<0.05){
+		typicalNodes.nodes[text]--;
+		if(typicalNodes.nodes[text]<-20){
 			delete typicalNodes.nodes[text];
 		}
 	}
@@ -343,10 +373,11 @@ setTimeout(autoteachTypicalNodes,3000);
 //Объединение текста всех нод и выкидывание ненужных регулярок
 
 //var textArr;//=[];
+var text="";
 function selectRegs(i,len){
-	var text="";
 //	textArr=[];
 //	megaexpressionParts=[];
+	text="";
 	var megaexpressionSource="(";
 	var delimiter=")|(";
 	var t=new Date().getTime();
@@ -374,7 +405,8 @@ function selectRegs(i,len){
 		}
 	}
 //	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
-	megaexpression=new RegExp(megaexpressionSource+")","im");
+	megaexpression=new RegExp(megaexpressionSource.replace(/\)\|\($/,"")+")","im");
+//	correct.log(megaexpression);
 	correct.log("Выбор регэкспов, мс: "+(new Date().getTime()-t));
 }
 
