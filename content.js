@@ -38,21 +38,6 @@ This file is part of CHAS-CORRECT.
 
 'use strict';
 
-var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
-//var wordSplitSymbolSafe="(?=[^А-Яа-яЁёA-Za-z]|^|$)";
-var leftEnd="(.|^)";//TODO: переписать так, чтобы стал не нужен
-//var rightEnd="(.|$)";
-//var rightEndSafe="(?=.|[\\s\\S]|$)";
-var actionArray=[
-	[/[ь]{2,}/g,"ь",/ьь/i],
-	[/[ъ]{2,}/g,"ъ",/ъъ/i],
-
-	[/([ЖжШшЩщ])[ыЫ]/g,"$1и",/[жшщ]ы/i],
-	[/([ЧчЩщ])[яЯ]/g,"$1а",/[чщ]я/i],
-	[/([ЧчЩщ])[юЮ]/g,"$1у",/[чщ]ю/i],
-	[/([^А-Яа-яЁёA-Za-z]|^)з(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав|рас))/g,"$1с",/([^А-Яа-яЁёA-Za-z]|^)з(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
-	[/([^А-Яа-яЁёA-Za-z]|^)З(?=[бжкпстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав|рас))/g,"$1С",/([^А-Яа-яЁёA-Za-z]|^)З(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
-];
 var minimalLiteralLength=204800; //Пока с потолка
 
 correct.replacedPairs=[];
@@ -77,68 +62,7 @@ Array.prototype.spliceWithLast=function(index){
 	this.length--;
 }
 
-var qmInReg=/\(\?[\=\!]/;
-
-function prepareExpression(word, str, prefix, postfix){
-	if(word[0] !== str[0])
-		return prepareReplaceHeavy(word, str, prefix, postfix);
-	var firstLetter=word[0];
-	var lostWord=word.substr(1);
-//	var safe=qmInReg.test(word)
-//	var wordSplitSymbolHere=(postfix && safe) ? wordSplitSymbolSafe : wordSplitSymbol;
-//	if(postfix && qmInReg.test(word))
-//		correct.log(word+rightEndHere);
-
-	var pattern =
-		(prefix ? wordSplitSymbol : leftEnd ) +
-		"(["+firstLetter.toLowerCase()+firstLetter.toUpperCase()+"])"+lostWord+
-		(postfix ? wordSplitSymbol : "");
-	var regexp=new RegExp(pattern,"gm");
-//	correct.log(regexp);
-	actionArray.push([regexp,"$1$2"+str.substr(1)+(postfix?"$3":""),new RegExp(word,"i")]);
-//	megaexpressionParts.push(pattern);
-}
-
-function prepareReplaceHeavy(reg, str, prefix, postfix){
-	var lostreg=reg.substr(1);
-	var loststr=str.substr(1);
-	var pattern1 =
-		(prefix ? wordSplitSymbol : leftEnd ) +
-		reg[0].toLowerCase()+lostreg+
-		(postfix ? wordSplitSymbol : "" );
-	var regexp1=new RegExp(pattern1,"gm");
-	var pattern2 =
-		(prefix ? wordSplitSymbol : leftEnd ) +
-		reg[0].toUpperCase()+lostreg+
-		(postfix ? wordSplitSymbol : "" );
-	var regexp2=new RegExp(pattern2,"gm");
-	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
-	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
-}
-
-
-
-var megaexpressionParts=[];
-
-var globalArray=[
-	[orphoFragmentsToCorrect,orphoPostfixToCorrect],
-	[orphoPrefixToCorrect,orphoWordsToCorrect],
-];
-
-for(var i1=0; i1<=1;i1++)
-	for(var i2=0; i2<=1;i2++)
-		for(var i=0; i<globalArray[i1][i2].length; i++){
-			prepareExpression(globalArray[i1][i2][i][0],globalArray[i1][i2][i][1],i1,i2);
-//			megaexpressionParts.push(globalArray[i1][i2][i][0]);
-		}
-
-var actionArrayCopy=actionArray.slice();
-
-var megaexpression;//=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
-
-correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
-
-//Кэщируем строки и регэкспы. Вроде как помогает.
+//Кэшируем строки и регэкспы. Вроде как помогает.
 var reun1=/[(]{6,}/g		, stun1="(((";
 var reun2=/[)]{6,}/g		, stun2=")))";
 var reun3=/[!]1+/g			, stun3="!";
@@ -202,7 +126,7 @@ var textNodesText=[];
 var textNodes=[];
 var kuch=3;
 
-function nativeTreeWalker() {
+function updateTextNodes() {
 	var walker = document.createTreeWalker(
 		document.body,
 		NodeFilter.SHOW_TEXT,
@@ -238,8 +162,7 @@ var flagEchoMessageDomChanged;
 
 function fixMistakes(){
 	var oldTime2=new Date().getTime();
-	textNodes=[];
-	nativeTreeWalker();
+	updateTextNodes();
 	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
 
 	var len=textNodes.length-1;

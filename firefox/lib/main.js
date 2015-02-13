@@ -9,6 +9,7 @@ pageMod.PageMod({
 		data.url("jquery-2.1.0.min.js"	),
 		data.url("jstorage.min.js"		),
 		data.url("dictionary.js"		),
+		data.url("prepareDictionary.js"		),
 		data.url("content.js"			),
 	],
 });
