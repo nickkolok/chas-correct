@@ -40,22 +40,6 @@ This file is part of CHAS-CORRECT.
 
 var minimalLiteralLength=204800; //Пока с потолка
 
-correct.replacedPairs=[];
-correct.logReplaced=function(){
-	var rez="";
-	var len=this.replacedPairs.length/2;
-	for(var i=0; i<len;i+=2){
-		if(this.replacedPairs[i]!=this.replacedPairs[i+1]){
-			var slen=this.replacedPairs[i].length;
-			for(var j=0; j<slen && this.replacedPairs[i][j]===this.replacedPairs[i+1][j]; j++){
-			}
-			rez+="\n\r\n\r"+this.replacedPairs[i]+"\n\r->\n\r"+this.replacedPairs[i+1].substr(j-10<0?0:j-10);
-		}
-	}
-	this.replacedPairs=[];
-	return rez;
-}
-
 Array.prototype.spliceWithLast=function(index){
 	'use strict';
 	this[index]=this[this.length-1];
@@ -159,10 +143,23 @@ if(lastActionArrayLength==actionArrayCopy.length){
 }
 
 var flagEchoMessageDomChanged;
+var flagFixMistakesScheduled=0;
+var flagAsyncFixLoopFinished=1;
+var flagFirstTimeFixLaunch=1;
+var firstChangingNode,lastChangingNode;
+var timeBeforeMain;
 
 function fixMistakes(){
 	var oldTime2=new Date().getTime();
-	updateTextNodes();
+
+/*	if(!flagAsyncFixLoopFinished){
+		if(!flagFixMistakesScheduled){
+			setTimeout(fixMistakes,20);
+			flagFixMistakesScheduled=1;
+		}
+		return;
+	}
+*/	updateTextNodes();
 	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
 
 	var len=textNodes.length-1;
@@ -189,9 +186,31 @@ function fixMistakes(){
 
 
 	selectRegs(i,len);
-	var timeBeforeMain=new Date().getTime();
+	timeBeforeMain=new Date().getTime();
 	
-	for(;i<=len;i++){
+	firstChangingNode=i;//TODO: зарефакторить
+	lastChangingNode=len;
+/*	if(flagFirstTimeFixLaunch){
+		setTimeout(asyncFixLoop,0);
+	}else{
+		asyncFixLoop();
+	}
+*/
+//	flagFixMistakesScheduled=0;
+	asyncFixLoop();
+	flagFirstTimeFixLaunch=0;
+	flagEchoMessageDomChanged=1;
+}
+
+fixMistakes();
+
+var asyncFixLoopStartTime;
+var asyncCount=0;
+function asyncFixLoop(){
+	asyncCount++;
+	asyncFixLoopStartTime=new Date().getTime();
+	flagEchoMessageDomChanged=1;
+	for(;firstChangingNode<=lastChangingNode;firstChangingNode++){
 	/*	var textArr=[];
 		if(i%kuch == 0){
 			for(var j=0; (i+j<len) && (j<kuch); j++){
@@ -203,20 +222,34 @@ function fixMistakes(){
 			}
 		}
 	*/	
-		if(textNodes[i] && !(textNodes[i].data in typicalNodes.nodes))
-			textNodes[i].data=mainWork(textNodes[i].data);
+		if(textNodes[firstChangingNode] && !(textNodes[firstChangingNode].data in typicalNodes.nodes))
+			textNodes[firstChangingNode].data=mainWork(textNodes[firstChangingNode].data);
 //		else
 //			correct.log(textNodes[i].data);
-
+/*		if(
+		(firstChangingNode % 100 == 0)
+			// || (new Date().getTime() - asyncFixLoopStartTime > 146)
+		){
+			firstChangingNode++;
+			setTimeout(asyncFixLoop,10);
+			return;
+		}
+*/
 	}
-	flagEchoMessageDomChanged=1;
 	correct.log("Основной цикл (мс): "+(new Date().getTime() - timeBeforeMain));
+	flagAsyncFixLoopFinished=1;
+	actionsAfterFixLoop();
 }
 
-fixMistakes();
-
-correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
-correct.log("Доля нод с ошибками: "+(errorNodes/totalNodes));
+function actionsAfterFixLoop(){
+	setTimeout(analizeFreq,1000);
+	observeDOM(document.body, domChangedHandler);
+	setTimeout(cacheTypicalNodes,3000);
+	correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
+	correct.log("Доля нод с ошибками: "+(errorNodes/textNodes.length)+", "+errorNodes+" из "+textNodes.length);
+	correct.log("Асихронных циклов: "+asyncCount);
+	correct.logToConsole();
+}
 
 var freqKeys="абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с","не","ни"]);
 
@@ -243,7 +276,6 @@ function logFreq(max){
 	}
 }
 
-setTimeout(analizeFreq,1000);
 
 function analizeFreqInRegExp(min){
 	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
@@ -307,29 +339,26 @@ var observeDOM = (function(){
 	}
 })();
 
-// Observe a specific DOM element:
-observeDOM(document.body, domChangedHandler);
 
-//Самообучение на типичных нодах
-function autoteachTypicalNodes(){
+//Кэширование типичных нод
+function cacheTypicalNodes(){
 	typicalNodes.totalPages++;
 	//Добавляем найденные ноды
 	for(var i=0; i<textNodes.length; i++){
 		var t=textNodes[i].data;
 		typicalNodes.nodes[t]||(typicalNodes.nodes[t]=0);
-		typicalNodes.nodes[t]++;
+		typicalNodes.nodes[t]+=20;
 	}
-	//Чистим те, у которых частота меньше 0.05
+	//Чистим те, у которых частота меньше 0
 	for(var text in typicalNodes.nodes){
 		typicalNodes.nodes[text]--;
-		if(typicalNodes.nodes[text]<-20){
+		if(typicalNodes.nodes[text] < 0){
 			delete typicalNodes.nodes[text];
 		}
 	}
 	$.jStorage.set("chas-correct-typical-nodes",typicalNodes);
 }
 
-setTimeout(autoteachTypicalNodes,3000);
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
 
@@ -375,9 +404,3 @@ function selectRegs(i,len){
 function clearNodeCache(){
 	$.jStorage.set("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 }
-
-
-
-
-
-correct.logToConsole();
