@@ -114,4 +114,32 @@ var actionArrayCopy=actionArray.slice();
 
 var megaexpression;//=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 
+
+var correct={
+	logArray:[],
+	log: function(param){
+		this.logArray.push(param);
+	},
+	logToConsole: function(){
+		console.log(this.logArray.join("\n\r"));
+	},
+	replacedPairs:[],
+	logReplaced: function(){
+		var rez="";
+		var len=this.replacedPairs.length/2;
+		for(var i=0; i<len;i+=2){
+			if(this.replacedPairs[i]!=this.replacedPairs[i+1]){
+				var slen=this.replacedPairs[i].length;
+				for(var j=0; j<slen && this.replacedPairs[i][j]===this.replacedPairs[i+1][j]; j++){
+				}
+				rez+="\n\r\n\r"+this.replacedPairs[i]+"\n\r->\n\r"+this.replacedPairs[i+1].substr(j-10<0?0:j-10);
+			}
+		}
+		this.replacedPairs=[];
+		return rez;
+	},
+};
+
+
+
 correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
