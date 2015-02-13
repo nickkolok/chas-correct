@@ -122,6 +122,7 @@ var correct={
 	},
 	logToConsole: function(){
 		console.log(this.logArray.join("\n\r"));
+		this.logArray=[];
 	},
 	replacedPairs:[],
 	logReplaced: function(){
@@ -139,7 +140,5 @@ var correct={
 		return rez;
 	},
 };
-
-
 
 correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));

@@ -45,6 +45,26 @@ Array.prototype.spliceWithLast=function(index){
 	this[index]=this[this.length-1];
 	this.length--;
 }
+var observeDOM = (function(){
+	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
+		eventListenerSupported = window.addEventListener;
+
+	return function(obj, callback){
+		if( MutationObserver ){
+			// define a new observer
+			var obs = new MutationObserver(function(mutations, observer){
+				if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
+					callback();
+			});
+			// have the observer observe foo for changes in children
+			obs.observe( obj, { childList:true, subtree:true });
+		}
+		else if( eventListenerSupported ){
+			obj.addEventListener('DOMNodeInserted', callback, false);
+			obj.addEventListener('DOMNodeRemoved', callback, false);
+		}
+	}
+})();
 
 //Кэшируем строки и регэкспы. Вроде как помогает.
 var reun1=/[(]{6,}/g		, stun1="(((";
@@ -93,6 +113,16 @@ function mainWork(ih){
 	correct.replacedPairs.push(ih);
 	for(var i=0; i<actionArray.length;i++){
 //		if(actionArray[i])
+	/*	if(ih.length>50 && /\./.test(ih)){
+			var temparr=ih.split(".");
+			var len=temparr.length;
+			for(var j=0; j<len; j++){
+				if(actionArray[i][2].test(temparr[j]))
+					temparr[j]=temparr[j].replace(actionArray[i][0],actionArray[i][1]);
+			}
+			ih=temparr.join(".");
+		}else
+	*/	
 		if(actionArray[i][2].test(ih))
 			ih=ih.replace(actionArray[i][0],actionArray[i][1]);
 	}
@@ -240,7 +270,6 @@ function asyncFixLoop(){
 	flagAsyncFixLoopFinished=1;
 	actionsAfterFixLoop();
 }
-
 function actionsAfterFixLoop(){
 	setTimeout(analizeFreq,1000);
 	observeDOM(document.body, domChangedHandler);
@@ -305,39 +334,20 @@ function domChangedHandler(){
 		flagEchoMessageDomChanged=0;
 		return;
 	}
-	if(newt - domChangedLastTime < 1000){
+	if(newt - domChangedLastTime < 1468){
 		if(!domChangedScheduled){
 			domChangedScheduled=1;
-			setTimeout(domChangedHandler,1000);
+			setTimeout(domChangedHandler,1468);
 		}
 		return;
 	}
+	console.log(newt);
+	domChangedLastTime=new Date().getTime();
+	domChangedScheduled=0;
 	fixMistakes();
 	correct.log("Вызов chas-correct по смене DOM: "+(new Date().getTime() - newt)+" мс");
 	correct.logToConsole();
-	domChangedScheduled=0;
 }
-
-var observeDOM = (function(){
-	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
-		eventListenerSupported = window.addEventListener;
-
-	return function(obj, callback){
-		if( MutationObserver ){
-			// define a new observer
-			var obs = new MutationObserver(function(mutations, observer){
-				if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
-					callback();
-			});
-			// have the observer observe foo for changes in children
-			obs.observe( obj, { childList:true, subtree:true });
-		}
-		else if( eventListenerSupported ){
-			obj.addEventListener('DOMNodeInserted', callback, false);
-			obj.addEventListener('DOMNodeRemoved', callback, false);
-		}
-	}
-})();
 
 
 //Кэширование типичных нод
