@@ -6,13 +6,17 @@ source bin/activate
 cd ../..
 
 #Собираем XPI для firefox desktop
-cd chas-correct-firefox
+cd firefox
 cfx xpi
 mv firefox.xpi chas-correct-firefox-desktop.xpi
+#И для mobile
 cfx xpi --force-mobile
 mv firefox.xpi chas-correct-firefox-mobile.xpi
 cd ..
 
+#Для хрома
+./crxmake.sh ../correct ../correct.pem
+cp correct.crx correct.zip
 
 
 
