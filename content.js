@@ -414,3 +414,39 @@ function selectRegs(i,len){
 function clearNodeCache(){
 	$.jStorage.set("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 }
+
+//Расстановка типографики
+document.onkeydown = function(e) {
+    e = e || event;
+	if ((e.ctrlKey && e.shiftKey && e.keyCode == "A".charCodeAt(0))) {
+        forceTypo();
+        return false;
+    }
+}
+
+function forceTypo(){
+	updateTextNodes();
+	var len=textNodes.length;
+	for(var i=0; i<len; i++)
+		textNodes[i].data=forceTypoInString(textNodes[i].data);
+}
+
+//var typoLeft=/ *([,\.!?\):;])( *(?![,\.!?\):;]))/g;
+var typoLeft=/ *([,\.!?\):;»]) */g;
+var typoRight=/ *([\(«]) */g;
+var typoJoin=/([,\.!?\):;]+) *([,\.!?\):;»]+)/g;
+var typoSmallLetter=/([а-яё]{2,}[\.!?]) *[а-яё]/g;
+function replaceSmallLetter(m,$1){
+	console.log(m, $1);
+	return $1+" "+m.substr(-1).toUpperCase();
+}
+
+function forceTypoInString(ih){
+		return ih.
+			replace(typoLeft , "$1 ").
+			replace(typoRight, " $1").
+			replace(typoJoin , "$1$2").
+			replace(typoJoin , "$1$2").
+			replace(typoSmallLetter,replaceSmallLetter)
+			;
+}
