@@ -38,6 +38,14 @@ This file is part of CHAS-CORRECT.
 
 'use strict';
 
+try{
+	var dict=require('./dictionary.js');
+	for(var chto in dict)
+		global[chto]=dict[chto];
+}catch(e){
+	//Значит, не node.js
+}
+
 var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
 //var wordSplitSymbolSafe="(?=[^А-Яа-яЁёA-Za-z]|^|$)";
 var leftEnd="(.|^)";//TODO: переписать так, чтобы стал не нужен
@@ -141,4 +149,9 @@ var correct={
 	},
 };
 
-correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
+try{
+	module.exports.actionArray = actionArray;
+}catch(e){
+	//Значит, не node.js
+	correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
+}
