@@ -326,6 +326,7 @@ function analizeFreqInRegExp(min){
 }
 
 var domChangedLastTime=new Date().getTime();
+var keydownLastTime=new Date().getTime();
 var domChangedScheduled=0;
 
 function domChangedHandler(){
@@ -334,11 +335,11 @@ function domChangedHandler(){
 		flagEchoMessageDomChanged=0;
 		return;
 	}
-	if(newt - domChangedLastTime < 1468){
+	if(newt - domChangedLastTime < 1468 || newt - keydownLastTime < 1468){
 		if(!domChangedScheduled){
 			domChangedScheduled=1;
-			setTimeout(domChangedHandler,1468);
 		}
+			setTimeout(domChangedHandler,1468);
 		return;
 	}
 	console.log(newt);
@@ -415,8 +416,11 @@ function clearNodeCache(){
 	$.jStorage.set("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 }
 
-//Расстановка типографики
-document.onkeydown = function(e) {
+//Расстановка типографики + откладывание автокоррекции при наборе
+document.onkeydown = keydownHandler;
+
+function keydownHandler(e) {
+	keydownLastTime=new Date().getTime();
     e = e || event;
 	if ((e.ctrlKey && e.shiftKey && e.keyCode == "A".charCodeAt(0))) {
         forceTypo();
