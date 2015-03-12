@@ -339,7 +339,7 @@ function domChangedHandler(){
 		if(!domChangedScheduled){
 			domChangedScheduled=1;
 		}
-			setTimeout(domChangedHandler,1468);
+		setTimeout(domChangedHandler,1468);
 		return;
 	}
 	console.log(newt);
