@@ -328,6 +328,14 @@ function analizeFreqInRegExp(min){
 var domChangedLastTime=new Date().getTime();
 var keydownLastTime=new Date().getTime();
 var domChangedScheduled=0;
+var domChangeTimes=0;
+
+var domChangingTimeout=0;
+
+function scheduleDomChangeHandler(time){
+	clearTimeout(domChangingTimeout);
+	domChangingTimeout=setTimeout(domChangedHandler,time);
+}
 
 function domChangedHandler(){
 	var newt=new Date().getTime();
@@ -335,18 +343,19 @@ function domChangedHandler(){
 		flagEchoMessageDomChanged=0;
 		return;
 	}
-	if(newt - domChangedLastTime < 1468 || newt - keydownLastTime < 1468){
-		if(!domChangedScheduled){
-			domChangedScheduled=1;
-		}
-		setTimeout(domChangedHandler,1468);
+	if(newt - domChangedLastTime < 1468 || newt - keydownLastTime < 2*1468){
+//		if(!domChangedScheduled){
+//			domChangedScheduled=1;
+			scheduleDomChangeHandler(1468);
+//		}
 		return;
 	}
-	console.log(newt);
+//	console.log(newt);
 	domChangedLastTime=new Date().getTime();
 	domChangedScheduled=0;
 	fixMistakes();
-	correct.log("Вызов chas-correct по смене DOM: "+(new Date().getTime() - newt)+" мс");
+	domChangeTimes++;
+	correct.log("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз: "+(new Date().getTime() - newt)+" мс");
 	correct.logToConsole();
 }
 
