@@ -369,13 +369,57 @@ function cacheTypicalNodes(){
 		typicalNodes.nodes[t]||(typicalNodes.nodes[t]=0);
 		typicalNodes.nodes[t]+=20;
 	}
-	//Чистим те, у которых частота меньше 0
+
+	//Здесь и далее ограничиваем кэш - по длине и по количеству нод
+	//Считаем количество нод в кэше
+	var cacheNodesCount=0;
+	var lastNode;
+	//И попутно выкидываем не встречавшиеся более 20 страниц
 	for(var text in typicalNodes.nodes){
+		cacheNodesCount++;
 		typicalNodes.nodes[text]--;
 		if(typicalNodes.nodes[text] < 0){
 			delete typicalNodes.nodes[text];
 		}
 	}
+
+	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
+
+	var currentMin;
+	for(;
+		//Ограничиваем кэш 100 килобайтами на сайт (или 200, т. к. юникод? Не важно)
+		cacheLength > 102400
+	||
+		//Не более 1024 нод
+		cacheNodesCount > 1024
+	;){
+//	console.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength);
+		for(var text in typicalNodes.nodes){
+			break;
+		}
+		//Да, это так мы получаем первую ноду из кэша
+		//Считаем её минимальной
+		currentMin = Math.pow(typicalNodes.nodes[text ],2)/( typicalNodes.nodes[text ].length + 6);
+		//Ищем ноду с минимальным отношением квадрата повторяемости к длине
+		for(var text2 in typicalNodes.nodes){
+			if( Math.pow(typicalNodes.nodes[text2],2)/( typicalNodes.nodes[text2].length + 6) < currentMin ){
+				text = text2;
+				currentMin = Math.pow(typicalNodes.nodes[text ],2)/( typicalNodes.nodes[text ].length + 6);
+			}
+		}
+		//Удаляем одну ноду
+		delete typicalNodes.nodes[text];
+
+		//Пересчитываем показатели
+		cacheNodesCount--;
+		cacheLength -= text.length-6;
+
+		//Эталонной нодой снова становится последняя
+		text = lastNode;
+	}
+
+	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
+
 	$.jStorage.set("chas-correct-typical-nodes",typicalNodes);
 }
 
