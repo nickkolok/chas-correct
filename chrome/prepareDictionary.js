@@ -1,7 +1,7 @@
 /*
 Copyright Nikolay Avdeev aka NickKolok aka Николай Авдеев 2015
 
-Всем привет из снежного Воронежа!
+Всем привет из снежного Воронежа! 
 
 This file is part of CHAS-CORRECT.
 
@@ -38,119 +38,120 @@ This file is part of CHAS-CORRECT.
 
 'use strict';
 
-try {
-	var dict = require('./dictionary.js');
-	for (var chto in dict)
-		global[chto] = dict[chto];
-} catch (e) {
+try{
+	var dict=require('./dictionary.js');
+	for(var chto in dict)
+		global[chto]=dict[chto];
+}catch(e){
 	//Значит, не node.js
 }
 
-var wordSplitSymbol = "([^А-Яа-яЁёA-Za-z]|^|$)";
+var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
 //var wordSplitSymbolSafe="(?=[^А-Яа-яЁёA-Za-z]|^|$)";
-var leftEnd = "(.|^)"; //TODO: переписать так, чтобы стал не нужен
+var leftEnd="(.|^)";//TODO: переписать так, чтобы стал не нужен
 //var rightEnd="(.|$)";
 //var rightEndSafe="(?=.|[\\s\\S]|$)";
-var actionArray = [
-	[/[ь]{2,}/g, "ь", /ьь/i],
-	[/[ъ]{2,}/g, "ъ", /ъъ/i],
+var actionArray=[
+	[/[ь]{2,}/g,"ь",/ьь/i],
+	[/[ъ]{2,}/g,"ъ",/ъъ/i],
 
-	[/([ЖжШшЩщ])[ыЫ]/g, "$1и", /[жшщ]ы/i],
-	[/([ЧчЩщ])[яЯ]/g, "$1а", /[чщ]я/i],
-	[/([ЧчЩщ])[юЮ]/g, "$1у", /[чщ]ю/i],
-	[/([^А-Яа-яЁёA-Za-z]|^)з(?=[бжкстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав|рас))/g, "$1с", /([^А-Яа-яЁёA-Za-z]|^)з(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
-	[/([^А-Яа-яЁёA-Za-z]|^)З(?=[бжкстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав|рас))/g, "$1С", /([^А-Яа-яЁёA-Za-z]|^)З(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
+	[/([ЖжШшЩщ])[ыЫ]/g,"$1и",/[жшщ]ы/i],
+	[/([ЧчЩщ])[яЯ]/g,"$1а",/[чщ]я/i],
+	[/([ЧчЩщ])[юЮ]/g,"$1у",/[чщ]ю/i],
+	[/([^А-Яа-яЁёA-Za-z]|^)з(?=[бжкстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав|рас))/g,"$1с",/([^А-Яа-яЁёA-Za-z]|^)з(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
+	[/([^А-Яа-яЁёA-Za-z]|^)З(?=[бжкстф-щБЖКПСТФ-Щ]|д(?!ани|ань|ес|еш|оров|рав|рас))/g,"$1С",/([^А-Яа-яЁёA-Za-z]|^)З(?=[бджкпстф-щБДЖКПСТФ-Щ])/],
 ];
 
 
-var qmInReg = /\(\?[\=\!]/;
+var qmInReg=/\(\?[\=\!]/;
 
-function prepareExpression(word, str, prefix, postfix) {
-	if (word[0] !== str[0])
+function prepareExpression(word, str, prefix, postfix){
+	if(word[0] !== str[0])
 		return prepareReplaceHeavy(word, str, prefix, postfix);
-	var firstLetter = word[0];
-	var lostWord = word.substr(1);
-	//	var safe=qmInReg.test(word)
-	//	var wordSplitSymbolHere=(postfix && safe) ? wordSplitSymbolSafe : wordSplitSymbol;
-	//	if(postfix && qmInReg.test(word))
-	//		correct.log(word+rightEndHere);
+	var firstLetter=word[0];
+	var lostWord=word.substr(1);
+//	var safe=qmInReg.test(word)
+//	var wordSplitSymbolHere=(postfix && safe) ? wordSplitSymbolSafe : wordSplitSymbol;
+//	if(postfix && qmInReg.test(word))
+//		correct.log(word+rightEndHere);
 
 	var pattern =
-		(prefix ? wordSplitSymbol : leftEnd) +
-		"([" + firstLetter.toLowerCase() + firstLetter.toUpperCase() + "])" + lostWord +
+		(prefix ? wordSplitSymbol : leftEnd ) +
+		"(["+firstLetter.toLowerCase()+firstLetter.toUpperCase()+"])"+lostWord+
 		(postfix ? wordSplitSymbol : "");
-	var regexp = new RegExp(pattern, "gm");
-	//	correct.log(regexp);
-	actionArray.push([regexp, "$1$2" + str.substr(1) + (postfix ? "$3" : ""), new RegExp(word, "i")]);
-	//	megaexpressionParts.push(pattern);
+	var regexp=new RegExp(pattern,"gm");
+//	correct.log(regexp);
+	actionArray.push([regexp,"$1$2"+str.substr(1)+(postfix?"$3":""),new RegExp(word,"i")]);
+//	megaexpressionParts.push(pattern);
 }
 
-function prepareReplaceHeavy(reg, str, prefix, postfix) {
-	var lostreg = reg.substr(1);
-	var loststr = str.substr(1);
+function prepareReplaceHeavy(reg, str, prefix, postfix){
+	var lostreg=reg.substr(1);
+	var loststr=str.substr(1);
 	var pattern1 =
-		(prefix ? wordSplitSymbol : leftEnd) +
-		reg[0].toLowerCase() + lostreg +
-		(postfix ? wordSplitSymbol : "");
-	var regexp1 = new RegExp(pattern1, "gm");
+		(prefix ? wordSplitSymbol : leftEnd ) +
+		reg[0].toLowerCase()+lostreg+
+		(postfix ? wordSplitSymbol : "" );
+	var regexp1=new RegExp(pattern1,"gm");
 	var pattern2 =
-		(prefix ? wordSplitSymbol : leftEnd) +
-		reg[0].toUpperCase() + lostreg +
-		(postfix ? wordSplitSymbol : "");
-	var regexp2 = new RegExp(pattern2, "gm");
-	actionArray.push([regexp1, "$1" + str[0].toLowerCase() + loststr + (postfix ? "$2" : ""), new RegExp(reg, "i")]);
-	actionArray.push([regexp2, "$1" + str[0].toUpperCase() + loststr + (postfix ? "$2" : ""), new RegExp(reg, "i")]);
+		(prefix ? wordSplitSymbol : leftEnd ) +
+		reg[0].toUpperCase()+lostreg+
+		(postfix ? wordSplitSymbol : "" );
+	var regexp2=new RegExp(pattern2,"gm");
+	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
+	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
 }
 
 
 
-var megaexpressionParts = [];
+var megaexpressionParts=[];
 
-var globalArray = [
-	[orphoFragmentsToCorrect, orphoPostfixToCorrect],
-	[orphoPrefixToCorrect, orphoWordsToCorrect],
+var globalArray=[
+	[orphoFragmentsToCorrect,orphoPostfixToCorrect],
+	[orphoPrefixToCorrect,orphoWordsToCorrect],
 ];
 
-for (var i1 = 0; i1 <= 1; i1++)
-	for (var i2 = 0; i2 <= 1; i2++)
-		for (var i = 0; i < globalArray[i1][i2].length; i++) {
-			prepareExpression(globalArray[i1][i2][i][0], globalArray[i1][i2][i][1], i1, i2);
-			//			megaexpressionParts.push(globalArray[i1][i2][i][0]);
+for(var i1=0; i1<=1;i1++)
+	for(var i2=0; i2<=1;i2++)
+		for(var i=0; i<globalArray[i1][i2].length; i++){
+			prepareExpression(globalArray[i1][i2][i][0],globalArray[i1][i2][i][1],i1,i2);
+//			megaexpressionParts.push(globalArray[i1][i2][i][0]);
 		}
 
-var actionArrayCopy = actionArray.slice();
+var actionArrayCopy=actionArray.slice();
 
-var megaexpression; //=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
+var megaexpression;//=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 
 
-var correct = {
-	logArray: [],
-	log: function(param) {
+var correct={
+	logArray:[],
+	log: function(param){
 		this.logArray.push(param);
 	},
-	logToConsole: function() {
+	logToConsole: function(){
 		console.log(this.logArray.join("\n\r"));
-		this.logArray = [];
+		this.logArray=[];
 	},
-	replacedPairs: [],
-	logReplaced: function() {
-		var rez = "";
-		var len = this.replacedPairs.length;
-		for (var i = 0; i < len; i += 2) {
-			if (this.replacedPairs[i] != this.replacedPairs[i + 1]) {
-				var slen = this.replacedPairs[i].length;
-				for (var j = 0; j < slen && this.replacedPairs[i][j] === this.replacedPairs[i + 1][j]; j++) {}
-				rez += "\n\r\n\r" + this.replacedPairs[i] + "\n\r->\n\r" + this.replacedPairs[i + 1].substr(j - 10 < 0 ? 0 : j - 10);
+	replacedPairs:[],
+	logReplaced: function(){
+		var rez="";
+		var len=this.replacedPairs.length;
+		for(var i=0; i<len;i+=2){
+			if(this.replacedPairs[i]!=this.replacedPairs[i+1]){
+				var slen=this.replacedPairs[i].length;
+				for(var j=0; j<slen && this.replacedPairs[i][j]===this.replacedPairs[i+1][j]; j++){
+				}
+				rez+="\n\r\n\r"+this.replacedPairs[i]+"\n\r->\n\r"+this.replacedPairs[i+1].substr(j-10<0?0:j-10);
 			}
 		}
-		this.replacedPairs = [];
+		this.replacedPairs=[];
 		return rez;
 	},
 };
 
-try {
+try{
 	module.exports.actionArray = actionArray;
-} catch (e) {
+}catch(e){
 	//Значит, не node.js
-	correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): " + (new Date().getTime() - oldTime));
+	correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
 }
