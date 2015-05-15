@@ -19,7 +19,5 @@ cd ..
 mv chrome.crx bin/chas-correct-chrome-desktop.crx
 cp bin/chas-correct-chrome-desktop.crx bin/chas-correct.zip
 
-
-
-
-
+#По просьбам трудящихся - юзерскрипт
+cat jquery-2.1.0.min.js jstorage.min.js dictionary.js prepareDictionary.js content.js > bin/chas-correct-userscript.js
