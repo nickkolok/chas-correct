@@ -1,7 +1,7 @@
 /*
 Copyright Nikolay Avdeev aka NickKolok aka Николай Авдеев 2015
 
-Всем привет из снежного Воронежа! 
+Всем привет из снежного Воронежа!
 
 This file is part of CHAS-CORRECT.
 
@@ -38,28 +38,31 @@ This file is part of CHAS-CORRECT.
 
 'use strict';
 
-var minimalLiteralLength=204800; //Пока с потолка
+var minimalLiteralLength = 204800; //Пока с потолка
 
-Array.prototype.spliceWithLast=function(index){
+Array.prototype.spliceWithLast = function(index) {
 	'use strict';
-	this[index]=this[this.length-1];
+	this[index] = this[this.length - 1];
 	this.length--;
 }
-var observeDOM = (function(){
+
+var observeDOM = (function() {
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
 		eventListenerSupported = window.addEventListener;
 
-	return function(obj, callback){
-		if( MutationObserver ){
+	return function(obj, callback) {
+		if (MutationObserver) {
 			// define a new observer
-			var obs = new MutationObserver(function(mutations, observer){
-				if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
+			var obs = new MutationObserver(function(mutations, observer) {
+				if (mutations[0].addedNodes.length || mutations[0].removedNodes.length)
 					callback();
 			});
 			// have the observer observe foo for changes in children
-			obs.observe( obj, { childList:true, subtree:true });
-		}
-		else if( eventListenerSupported ){
+			obs.observe(obj, {
+				childList: true,
+				subtree: true
+			});
+		} else if (eventListenerSupported) {
 			obj.addEventListener('DOMNodeInserted', callback, false);
 			obj.addEventListener('DOMNodeRemoved', callback, false);
 		}
@@ -67,78 +70,85 @@ var observeDOM = (function(){
 })();
 
 //Кэшируем строки и регэкспы. Вроде как помогает.
-var reun1=/[(]{6,}/g		, stun1="(((";
-var reun2=/[)]{6,}/g		, stun2=")))";
-var reun3=/[!]1+/g			, stun3="!";
-var reun4=/[?]7+/g			, stun4="?";
-var reun5=/([.?!])\1{3,}/g	, stun5="$1$1$1";
-function replaceUniversal(ih){
+var reun1 = /[(]{6,}/g,
+	stun1 = "(((";
+var reun2 = /[)]{6,}/g,
+	stun2 = ")))";
+var reun3 = /[!]1+/g,
+	stun3 = "!";
+var reun4 = /[?]7+/g,
+	stun4 = "?";
+var reun5 = /([.?!])\1{3,}/g,
+	stun5 = "$1$1$1";
+
+function replaceUniversal(ih) {
 	return ih.
-		replace(reun1,stun1).
-		replace(reun2,stun2).
-		replace(reun3,stun3).
-		replace(reun4,stun4).
-		replace(reun5,stun5);
+	replace(reun1, stun1).
+	replace(reun2, stun2).
+	replace(reun3, stun3).
+	replace(reun4, stun4).
+	replace(reun5, stun5);
 }
 
-var reg3podryad=/([А-Яа-яЁё])\1{3,}/g;
-function specialWork(ih){
-	ih=ih.replace(reg3podryad,"$1$1$1");//Это не выносится из-за сигнатуры
+var reg3podryad = /([А-Яа-яЁё])\1{3,}/g;
 
-/*//Перенесено в словарь
-	ih=ih.replace(/ньч/gi,"нч");
-	ih=ih.replace(/ньщ/gi,"нщ");
-	ih=ih.replace(/чьн/gi,"чн");
-	ih=ih.replace(/щьн/gi,"щн");
-	ih=ih.replace(/чьк/gi,"чк");
-*/	
+function specialWork(ih) {
+	ih = ih.replace(reg3podryad, "$1$1$1"); //Это не выносится из-за сигнатуры
+
+	/*//Перенесено в словарь
+		ih=ih.replace(/ньч/gi,"нч");
+		ih=ih.replace(/ньщ/gi,"нщ");
+		ih=ih.replace(/чьн/gi,"чн");
+		ih=ih.replace(/щьн/gi,"щн");
+		ih=ih.replace(/чьк/gi,"чк");
+	*/
 	return ih;
 }
 
-var lAr=[];
-var totalNodes=0;
-var errorNodes=0;
+var lAr = [];
+var totalNodes = 0;
+var errorNodes = 0;
 
-function mainWork(ih){
-	ih=specialWork(ih);
+function mainWork(ih) {
+	ih = specialWork(ih);
 
 	totalNodes++;
 
-	if(!megaexpression.test(ih))
+	if (!megaexpression.test(ih))
 		return ih;
-//	correct.log(ih.match(megaexpression));
 
 	errorNodes++;
 
 	correct.replacedPairs.push(ih);
-	for(var i=0; i<actionArray.length;i++){
-//		if(actionArray[i])
-	/*	if(ih.length>50 && /\./.test(ih)){
-			var temparr=ih.split(".");
-			var len=temparr.length;
-			for(var j=0; j<len; j++){
-				if(actionArray[i][2].test(temparr[j]))
-					temparr[j]=temparr[j].replace(actionArray[i][0],actionArray[i][1]);
-			}
-			ih=temparr.join(".");
-		}else
-	*/	
-		if(actionArray[i][2].test(ih))
-			ih=ih.replace(actionArray[i][0],actionArray[i][1]);
+	for (var i = 0; i < actionArray.length; i++) {
+		//		if(actionArray[i])
+		/*	if(ih.length>50 && /\./.test(ih)){
+				var temparr=ih.split(".");
+				var len=temparr.length;
+				for(var j=0; j<len; j++){
+					if(actionArray[i][2].test(temparr[j]))
+						temparr[j]=temparr[j].replace(actionArray[i][0],actionArray[i][1]);
+				}
+				ih=temparr.join(".");
+			}else
+		*/
+		if (actionArray[i][2].test(ih))
+			ih = ih.replace(actionArray[i][0], actionArray[i][1]);
 	}
 	correct.replacedPairs.push(ih);
 
 	return ih;
 }
 
-var regCyr=/[А-Яа-яЁё]/;
-function notContainsCyrillic(str){
+var regCyr = /[А-Яа-яЁё]/;
+
+function notContainsCyrillic(str) {
 	return !regCyr.test(str);
 }
 
-var textNodesText=[];
-var textNodes=[];
-var kuch=3;
+var textNodesText = [];
+var textNodes = [];
+var kuch = 3;
 
 function updateTextNodes() {
 	var walker = document.createTreeWalker(
@@ -151,10 +161,10 @@ function updateTextNodes() {
 	var node;
 	textNodes = [];
 
-	while(node = walker.nextNode()) {
-		if(node.data!="" && node.data.trim()!=""){
-			node.data=replaceUniversal(node.data);
-			if(!notContainsCyrillic(node.data)){
+	while (node = walker.nextNode()) {
+		if (node.data != "" && node.data.trim() != "") {
+			node.data = replaceUniversal(node.data);
+			if (!notContainsCyrillic(node.data)) {
 				textNodes.push(node);
 			}
 		}
@@ -163,248 +173,248 @@ function updateTextNodes() {
 
 var regKnown;
 var typicalNodes;
-var lastActionArrayLength=$.jStorage.get("lastActionArrayLength",0);
-if(lastActionArrayLength==actionArrayCopy.length){
-	typicalNodes=$.jStorage.get("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
-}else{
-	typicalNodes={totalPages:0,nodes:{}};
-	$.jStorage.set("lastActionArrayLength",actionArrayCopy.length);
-	correct.log("Длина словаря изменилась - сбрасываем кэш");
+var lastActionArrayLength = JQ21.jStorage.get("lastActionArrayLength", 0);
+if (lastActionArrayLength == actionArrayCopy.length) {
+	typicalNodes = JQ21.jStorage.get("chas-correct-typical-nodes", {
+		totalPages: 0,
+		nodes: {}
+	});
+} else {
+	typicalNodes = {
+		totalPages: 0,
+		nodes: {}
+	};
+	JQ21.jStorage.set("lastActionArrayLength", actionArrayCopy.length);
 }
 
 var flagEchoMessageDomChanged;
-var flagFixMistakesScheduled=0;
-var flagAsyncFixLoopFinished=1;
-var flagFirstTimeFixLaunch=1;
-var firstChangingNode,lastChangingNode;
+var flagFixMistakesScheduled = 0;
+var flagAsyncFixLoopFinished = 1;
+var flagFirstTimeFixLaunch = 1;
+var firstChangingNode, lastChangingNode;
 var timeBeforeMain;
 
-function fixMistakes(){
-	var oldTime2=new Date().getTime();
+function fixMistakes() {
+	var oldTime2 = new Date().getTime();
 
-/*	if(!flagAsyncFixLoopFinished){
-		if(!flagFixMistakesScheduled){
-			setTimeout(fixMistakes,20);
-			flagFixMistakesScheduled=1;
+	/*	if(!flagAsyncFixLoopFinished){
+			if(!flagFixMistakesScheduled){
+				setTimeout(fixMistakes,20);
+				flagFixMistakesScheduled=1;
+			}
+			return;
 		}
-		return;
-	}
-*/	updateTextNodes();
-	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
+	*/
+	updateTextNodes();
 
-	var len=textNodes.length-1;
-	var i=0;
+	var len = textNodes.length - 1;
+	var i = 0;
 
-	var oldTime3=new Date().getTime();
+	var oldTime3 = new Date().getTime();
 
 
-	var timeBeforeHeader=new Date().getTime();
-	if(typicalNodes.nodes){
+	var timeBeforeHeader = new Date().getTime();
+	if (typicalNodes.nodes) {
 		//Пропускаем "шапку" страницы
-		while(i<=len && textNodes[i].data in typicalNodes.nodes){
+		while (i <= len && textNodes[i].data in typicalNodes.nodes) {
 			i++;
 		};
 		//И низушку
-		while(i<=len && textNodes[len].data in typicalNodes.nodes){
+		while (i <= len && textNodes[len].data in typicalNodes.nodes) {
 			len--;
 		};
 	}
-	len++;//Иначе глючит :(
-	var cachedNodes=i+textNodes.length-len;
-	correct.log("Нод отнесено к шапке: "+cachedNodes+"("+(cachedNodes/textNodes.length*100)+"%), до "+i+"-й и после "+(len-1)+"-й");
-	correct.log("Выделение шаблона (мс): "+(new Date().getTime() - timeBeforeHeader));
+	len++; //Иначе глючит :(
+	var cachedNodes = i + textNodes.length - len;
 
 
-	selectRegs(i,len);
-	timeBeforeMain=new Date().getTime();
-	
-	firstChangingNode=i;//TODO: зарефакторить
-	lastChangingNode=len;
-/*	if(flagFirstTimeFixLaunch){
-		setTimeout(asyncFixLoop,0);
-	}else{
-		asyncFixLoop();
-	}
-*/
-//	flagFixMistakesScheduled=0;
+	selectRegs(i, len);
+	timeBeforeMain = new Date().getTime();
+
+	firstChangingNode = i; //TODO: зарефакторить
+	lastChangingNode = len;
+	/*	if(flagFirstTimeFixLaunch){
+			setTimeout(asyncFixLoop,0);
+		}else{
+			asyncFixLoop();
+		}
+	*/
+	//	flagFixMistakesScheduled=0;
 	asyncFixLoop();
-	flagFirstTimeFixLaunch=0;
-	flagEchoMessageDomChanged=1;
+	flagFirstTimeFixLaunch = 0;
+	flagEchoMessageDomChanged = 1;
 }
 
 fixMistakes();
 
 var asyncFixLoopStartTime;
-var asyncCount=0;
-function asyncFixLoop(){
+var asyncCount = 0;
+
+function asyncFixLoop() {
 	asyncCount++;
-	asyncFixLoopStartTime=new Date().getTime();
-	flagEchoMessageDomChanged=1;
-	for(;firstChangingNode<=lastChangingNode;firstChangingNode++){
-	/*	var textArr=[];
-		if(i%kuch == 0){
-			for(var j=0; (i+j<len) && (j<kuch); j++){
-				textArr.push(textNodes[i+j].data);
+	asyncFixLoopStartTime = new Date().getTime();
+	flagEchoMessageDomChanged = 1;
+	for (; firstChangingNode <= lastChangingNode; firstChangingNode++) {
+		/*	var textArr=[];
+			if(i%kuch == 0){
+				for(var j=0; (i+j<len) && (j<kuch); j++){
+					textArr.push(textNodes[i+j].data);
+				}
+				if(!megaexpression.test(textArr.join(" "))){
+					i+=kuch;
+					continue;
+				}
 			}
-			if(!megaexpression.test(textArr.join(" "))){
-				i+=kuch;
-				continue;
-			}
-		}
-	*/	
-		if(textNodes[firstChangingNode] && !(textNodes[firstChangingNode].data in typicalNodes.nodes))
-			textNodes[firstChangingNode].data=mainWork(textNodes[firstChangingNode].data);
-//		else
-//			correct.log(textNodes[i].data);
-/*		if(
-		(firstChangingNode % 100 == 0)
-			// || (new Date().getTime() - asyncFixLoopStartTime > 146)
-		){
-			firstChangingNode++;
-			setTimeout(asyncFixLoop,10);
-			return;
-		}
-*/
+		*/
+		if (textNodes[firstChangingNode] && !(textNodes[firstChangingNode].data in typicalNodes.nodes))
+			textNodes[firstChangingNode].data = mainWork(textNodes[firstChangingNode].data);
+		//		else
+		/*		if(
+				(firstChangingNode % 100 == 0)
+					// || (new Date().getTime() - asyncFixLoopStartTime > 146)
+				){
+					firstChangingNode++;
+					setTimeout(asyncFixLoop,10);
+					return;
+				}
+		*/
 	}
-	correct.log("Основной цикл (мс): "+(new Date().getTime() - timeBeforeMain));
-	flagAsyncFixLoopFinished=1;
+	flagAsyncFixLoopFinished = 1;
 	actionsAfterFixLoop();
 }
-function actionsAfterFixLoop(){
-	setTimeout(analizeFreq,1000);
+
+function actionsAfterFixLoop() {
+	setTimeout(analizeFreq, 1000);
 	observeDOM(document.body, domChangedHandler);
-	setTimeout(cacheTypicalNodes,3000);
-	correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
-	correct.log("Доля нод с ошибками: "+(errorNodes/textNodes.length)+", "+errorNodes+" из "+textNodes.length);
-	correct.log("Асихронных циклов: "+asyncCount);
-	correct.logToConsole();
+	setTimeout(cacheTypicalNodes, 3000);
 }
 
-var freqKeys="абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с","не","ни"]);
+var freqKeys = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с", "не", "ни"]);
 
-function analizeFreq(){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
+function analizeFreq() {
+	var freqStat = JQ21.jStorage.get("chas-correct-freq-stat", {
+		totalNodes: 0,
+		includes: {}
+	});
 	freqStat.totalNodes += textNodes.length;
-	for(var i=0; i < freqKeys.length; i++){
-		var reg=new RegExp(freqKeys[i],"i");
+	for (var i = 0; i < freqKeys.length; i++) {
+		var reg = new RegExp(freqKeys[i], "i");
 		freqStat.includes[freqKeys[i]] || (freqStat.includes[freqKeys[i]] = 0);
-		for(var j=0; j < textNodes.length; j++){
-			if(reg.test(textNodes[j].data))
-				freqStat.includes[freqKeys[i]]++;
-			}
-	}
-	$.jStorage.set("chas-correct-freq-stat",freqStat);
-}
-
-function logFreq(max){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
-	for(var i=0; i < freqKeys.length; i++){
-		var f=freqStat.includes[freqKeys[i]]/freqStat.totalNodes;
-		if(!(f>max))
-			console.log(freqKeys[i]+": "+f);
-	}
-}
-
-
-function analizeFreqInRegExp(min){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
-	var rez={};
-	var sum=0;
-	for(var i=0; i < freqKeys.length; i++){
-		var reg=new RegExp(freqKeys[i],"i");
-		rez[freqKeys[i]] = 0;
-		for(var j=0; j<actionArrayCopy.length; j++){
-			if(reg.test(actionArrayCopy[j][0].source.replace(/\[.*?\]/g,"")))
-				rez[freqKeys[i]]++;
+		for (var j = 0; j < textNodes.length; j++) {
+			if (reg.test(textNodes[j].data))
+				freqStat.includes[freqKeys[i]] ++;
 		}
-		var f=rez[freqKeys[i]]/actionArrayCopy.length * (1 - freqStat.includes[freqKeys[i]]/freqStat.totalNodes);
-		sum+=f;
-		if(!(f<min))
-			console.log(freqKeys[i]+": "+f);
+	}
+	JQ21.jStorage.set("chas-correct-freq-stat", freqStat);
+}
+
+function logFreq(max) {
+	var freqStat = JQ21.jStorage.get("chas-correct-freq-stat", {
+		totalNodes: 0,
+		includes: {}
+	});
+	for (var i = 0; i < freqKeys.length; i++) {
+		var f = freqStat.includes[freqKeys[i]] / freqStat.totalNodes;
+		// if(!(f>max))
+	}
+}
+
+
+function analizeFreqInRegExp(min) {
+	var freqStat = JQ21.jStorage.get("chas-correct-freq-stat", {
+		totalNodes: 0,
+		includes: {}
+	});
+	var rez = {};
+	var sum = 0;
+	for (var i = 0; i < freqKeys.length; i++) {
+		var reg = new RegExp(freqKeys[i], "i");
+		rez[freqKeys[i]] = 0;
+		for (var j = 0; j < actionArrayCopy.length; j++) {
+			if (reg.test(actionArrayCopy[j][0].source.replace(/\[.*?\]/g, "")))
+				rez[freqKeys[i]] ++;
+		}
+		var f = rez[freqKeys[i]] / actionArrayCopy.length * (1 - freqStat.includes[freqKeys[i]] / freqStat.totalNodes);
+		sum += f;
+		// if(!(f<min))
 	}
 	return sum;
 }
 
-var domChangedLastTime=new Date().getTime();
-var keydownLastTime=new Date().getTime();
-var domChangedScheduled=0;
-var domChangeTimes=0;
+var domChangedLastTime = new Date().getTime();
+var keydownLastTime = new Date().getTime();
+var domChangedScheduled = 0;
+var domChangeTimes = 0;
 
-var domChangingTimeout=0;
+var domChangingTimeout = 0;
 
-function scheduleDomChangeHandler(time){
+function scheduleDomChangeHandler(time) {
 	clearTimeout(domChangingTimeout);
-	domChangingTimeout=setTimeout(domChangedHandler,time);
+	domChangingTimeout = setTimeout(domChangedHandler, time);
 }
 
-function domChangedHandler(){
-	var newt=new Date().getTime();
-	if(flagEchoMessageDomChanged){
-		flagEchoMessageDomChanged=0;
+function domChangedHandler() {
+	var newt = new Date().getTime();
+	if (flagEchoMessageDomChanged) {
+		flagEchoMessageDomChanged = 0;
 		return;
 	}
-	if(newt - domChangedLastTime < 1468 || newt - keydownLastTime < 2*1468){
-//		if(!domChangedScheduled){
-//			domChangedScheduled=1;
-			scheduleDomChangeHandler(1468);
-//		}
+	if (newt - domChangedLastTime < 1468 || newt - keydownLastTime < 2 * 1468) {
+		//		if(!domChangedScheduled){
+		//			domChangedScheduled=1;
+		scheduleDomChangeHandler(1468);
+		//		}
 		return;
 	}
-//	console.log(newt);
-	domChangedLastTime=new Date().getTime();
-	domChangedScheduled=0;
+	domChangedLastTime = new Date().getTime();
+	domChangedScheduled = 0;
 	fixMistakes();
 	domChangeTimes++;
-	correct.log("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз: "+(new Date().getTime() - newt)+" мс");
-	correct.logToConsole();
 }
 
 
 //Кэширование типичных нод
-function cacheTypicalNodes(){
+function cacheTypicalNodes() {
 	typicalNodes.totalPages++;
 	//Добавляем найденные ноды
-	for(var i=0; i<textNodes.length; i++){
-		var t=textNodes[i].data;
-		typicalNodes.nodes[t]||(typicalNodes.nodes[t]=0);
-		typicalNodes.nodes[t]+=20;
+	for (var i = 0; i < textNodes.length; i++) {
+		var t = textNodes[i].data;
+		typicalNodes.nodes[t] || (typicalNodes.nodes[t] = 0);
+		typicalNodes.nodes[t] += 20;
 	}
 
 	//Здесь и далее ограничиваем кэш - по длине и по количеству нод
 	//Считаем количество нод в кэше
-	var cacheNodesCount=0;
+	var cacheNodesCount = 0;
 	var lastNode;
 	//И попутно выкидываем не встречавшиеся более 20 страниц
-	for(var text in typicalNodes.nodes){
+	for (var text in typicalNodes.nodes) {
 		cacheNodesCount++;
-		typicalNodes.nodes[text]--;
-		if(typicalNodes.nodes[text] < 0){
+		typicalNodes.nodes[text] --;
+		if (typicalNodes.nodes[text] < 0) {
 			delete typicalNodes.nodes[text];
 		}
 	}
 
-	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
+	var cacheLength = JSON.stringify(typicalNodes.nodes).length;
 
 	var currentMin;
-	for(;
+	for (;
 		//Ограничиваем кэш 100 килобайтами на сайт (или 200, т. к. юникод? Не важно)
-		cacheLength > 102400
-	||
+		cacheLength > 102400 ||
 		//Не более 1024 нод
-		cacheNodesCount > 1024
-	;){
-//	console.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength);
-		for(var text in typicalNodes.nodes){
+		cacheNodesCount > 1024;) {
+		for (var text in typicalNodes.nodes) {
 			break;
 		}
 		//Да, это так мы получаем первую ноду из кэша
 		//Считаем её минимальной
-		currentMin = Math.pow(typicalNodes.nodes[text ],2)/( typicalNodes.nodes[text ].length + 6);
+		currentMin = Math.pow(typicalNodes.nodes[text], 2) / (typicalNodes.nodes[text].length + 6);
 		//Ищем ноду с минимальным отношением квадрата повторяемости к длине
-		for(var text2 in typicalNodes.nodes){
-			if( Math.pow(typicalNodes.nodes[text2],2)/( typicalNodes.nodes[text2].length + 6) < currentMin ){
+		for (var text2 in typicalNodes.nodes) {
+			if (Math.pow(typicalNodes.nodes[text2], 2) / (typicalNodes.nodes[text2].length + 6) < currentMin) {
 				text = text2;
-				currentMin = Math.pow(typicalNodes.nodes[text ],2)/( typicalNodes.nodes[text ].length + 6);
+				currentMin = Math.pow(typicalNodes.nodes[text], 2) / (typicalNodes.nodes[text].length + 6);
 			}
 		}
 		//Удаляем одну ноду
@@ -412,98 +422,96 @@ function cacheTypicalNodes(){
 
 		//Пересчитываем показатели
 		cacheNodesCount--;
-		cacheLength -= text.length-6;
+		cacheLength -= text.length - 6;
 
 		//Эталонной нодой снова становится последняя
 		text = lastNode;
 	}
 
-	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
 
-	$.jStorage.set("chas-correct-typical-nodes",typicalNodes);
+	JQ21.jStorage.set("chas-correct-typical-nodes", typicalNodes);
 }
 
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
 
 //var textArr;//=[];
-var text="";
-function selectRegs(i,len){
-//	textArr=[];
-//	megaexpressionParts=[];
-	text="";
-	var megaexpressionSource="(";
-	var delimiter=")|(";
-	var t=new Date().getTime();
-	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
-	for(;i<len;i++){
-		if(!(textNodes[i].data in typicalNodes.nodes))
-//			textArr.push(textNodes[i].data);
-			text+=" "+textNodes[i].data;
+var text = "";
+
+function selectRegs(i, len) {
+	//	textArr=[];
+	//	megaexpressionParts=[];
+	text = "";
+	var megaexpressionSource = "(";
+	var delimiter = ")|(";
+	var t = new Date().getTime();
+	actionArray = actionArrayCopy.slice(); //Да, так быстрее: http://jsperf.com/array-slice-vs-push
+	for (; i < len; i++) {
+		if (!(textNodes[i].data in typicalNodes.nodes))
+		//			textArr.push(textNodes[i].data);
+			text += " " + textNodes[i].data;
 	}
-//	var text=textArr.join(" ");
-//	correct.log(text);
-	var l=actionArray.length;
-	for(var j=0; j<l; j++){
-		if(actionArray[j] && actionArray[j][2]){
-			if(!actionArray[j][2].test(text)){
-//				correct.log(actionArray[j][2]);
+	//	var text=textArr.join(" ");
+	var l = actionArray.length;
+	for (var j = 0; j < l; j++) {
+		if (actionArray[j] && actionArray[j][2]) {
+			if (!actionArray[j][2].test(text)) {
 				actionArray.spliceWithLast(j);
 				l--;
 				j--;
-//				actionArray[j]=0;
-			}else{
-//				megaexpressionParts.push(actionArray[j][2].source);
-				megaexpressionSource+=actionArray[j][2].source+delimiter;
+				//				actionArray[j]=0;
+			} else {
+				//				megaexpressionParts.push(actionArray[j][2].source);
+				megaexpressionSource += actionArray[j][2].source + delimiter;
 			}
 		}
 	}
-//	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
-	megaexpression=new RegExp(megaexpressionSource.replace(/\)\|\($/,"")+")","im");
-//	correct.log(megaexpression);
-	correct.log("Выбор регэкспов, мс: "+(new Date().getTime()-t));
+	//	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
+	megaexpression = new RegExp(megaexpressionSource.replace(/\)\|\($/, "") + ")", "im");
 }
 
 //Сбросить кэш
-function clearNodeCache(){
-	$.jStorage.set("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+function clearNodeCache() {
+	JQ21.jStorage.set("chas-correct-typical-nodes", {
+		totalPages: 0,
+		nodes: {}
+	});
 }
 
 //Расстановка типографики + откладывание автокоррекции при наборе
 document.onkeydown = keydownHandler;
 
 function keydownHandler(e) {
-	keydownLastTime=new Date().getTime();
-    e = e || event;
+	keydownLastTime = new Date().getTime();
+	e = e || event;
 	if ((e.ctrlKey && e.shiftKey && e.keyCode == "A".charCodeAt(0))) {
-        forceTypo();
-        return false;
-    }
+		forceTypo();
+		return false;
+	}
 }
 
-function forceTypo(){
+function forceTypo() {
 	updateTextNodes();
-	var len=textNodes.length;
-	for(var i=0; i<len; i++)
-		textNodes[i].data=forceTypoInString(textNodes[i].data);
+	var len = textNodes.length;
+	for (var i = 0; i < len; i++)
+		textNodes[i].data = forceTypoInString(textNodes[i].data);
 }
 
 //var typoLeft=/ *([,\.!?\):;])( *(?![,\.!?\):;]))/g;
-var typoLeft=/ *([,\.!?\):;»]) */g;
-var typoRight=/ *([\(«]) */g;
-var typoJoin=/([,\.!?\):;]+) *([,\.!?\):;»]+)/g;
-var typoSmallLetter=/([а-яё]{2,}[\.!?]) *[а-яё]/g;
-function replaceSmallLetter(m,$1){
-	console.log(m, $1);
-	return $1+" "+m.substr(-1).toUpperCase();
+var typoLeft = / *([,\.!?\):;»]) */g;
+var typoRight = / *([\(«]) */g;
+var typoJoin = /([,\.!?\):;]+) *([,\.!?\):;»]+)/g;
+var typoSmallLetter = /([а-яё]{2,}[\.!?]) *[а-яё]/g;
+
+function replaceSmallLetter(m, $1) {
+	return $1 + " " + m.substr(-1).toUpperCase();
 }
 
-function forceTypoInString(ih){
-		return ih.
-			replace(typoLeft , "$1 ").
-			replace(typoRight, " $1").
-			replace(typoJoin , "$1$2").
-			replace(typoJoin , "$1$2").
-			replace(typoSmallLetter,replaceSmallLetter)
-			;
+function forceTypoInString(ih) {
+	return ih.
+	replace(typoLeft, "$1 ").
+	replace(typoRight, " $1").
+	replace(typoJoin, "$1$2").
+	replace(typoJoin, "$1$2").
+	replace(typoSmallLetter, replaceSmallLetter);
 }
