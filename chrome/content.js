@@ -163,13 +163,18 @@ function updateTextNodes() {
 
 var regKnown;
 var typicalNodes;
-var lastActionArrayLength=$.jStorage.get("lastActionArrayLength",0);
-if(lastActionArrayLength==actionArrayCopy.length){
-	typicalNodes=$.jStorage.get("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
-}else{
-	typicalNodes={totalPages:0,nodes:{}};
-	$.jStorage.set("lastActionArrayLength",actionArrayCopy.length);
-	correct.log("Длина словаря изменилась - сбрасываем кэш");
+var lastActionArrayLength = JQ21.jStorage.get("lastActionArrayLength", 0);
+if (lastActionArrayLength == actionArrayCopy.length) {
+	typicalNodes = JQ21.jStorage.get("chas-correct-typical-nodes", {
+		totalPages: 0,
+		nodes: {}
+	});
+} else {
+	typicalNodes = {
+		totalPages: 0,
+		nodes: {}
+	};
+	JQ21.jStorage.set("lastActionArrayLength", actionArrayCopy.length);
 }
 
 var flagEchoMessageDomChanged;
@@ -293,25 +298,30 @@ function analizeFreq(){
 				freqStat.includes[freqKeys[i]]++;
 			}
 	}
-	$.jStorage.set("chas-correct-freq-stat",freqStat);
+	JQ21.jStorage.set("chas-correct-freq-stat", freqStat);
 }
 
-function logFreq(max){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
-	for(var i=0; i < freqKeys.length; i++){
-		var f=freqStat.includes[freqKeys[i]]/freqStat.totalNodes;
-		if(!(f>max))
-			console.log(freqKeys[i]+": "+f);
+function logFreq(max) {
+	var freqStat = JQ21.jStorage.get("chas-correct-freq-stat", {
+		totalNodes: 0,
+		includes: {}
+	});
+	for (var i = 0; i < freqKeys.length; i++) {
+		var f = freqStat.includes[freqKeys[i]] / freqStat.totalNodes;
+		// if(!(f>max))
 	}
 }
 
 
-function analizeFreqInRegExp(min){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
-	var rez={};
-	var sum=0;
-	for(var i=0; i < freqKeys.length; i++){
-		var reg=new RegExp(freqKeys[i],"i");
+function analizeFreqInRegExp(min) {
+	var freqStat = JQ21.jStorage.get("chas-correct-freq-stat", {
+		totalNodes: 0,
+		includes: {}
+	});
+	var rez = {};
+	var sum = 0;
+	for (var i = 0; i < freqKeys.length; i++) {
+		var reg = new RegExp(freqKeys[i], "i");
 		rez[freqKeys[i]] = 0;
 		for(var j=0; j<actionArrayCopy.length; j++){
 			if(reg.test(actionArrayCopy[j][0].source.replace(/\[.*?\]/g,"")))
@@ -420,7 +430,7 @@ function cacheTypicalNodes(){
 
 	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
 
-	$.jStorage.set("chas-correct-typical-nodes",typicalNodes);
+	JQ21.jStorage.set("chas-correct-typical-nodes", typicalNodes);
 }
 
 
@@ -465,8 +475,11 @@ function selectRegs(i,len){
 }
 
 //Сбросить кэш
-function clearNodeCache(){
-	$.jStorage.set("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+function clearNodeCache() {
+	JQ21.jStorage.set("chas-correct-typical-nodes", {
+		totalPages: 0,
+		nodes: {}
+	});
 }
 
 //Расстановка типографики + откладывание автокоррекции при наборе
