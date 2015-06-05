@@ -5,8 +5,7 @@ var https = require('https');
 
 var words = {};
 var regCyr=/[А-Яа-яЁё]/;
-//var divm=/<div class="text">.*?<\/div>/g;
-var wordm=/[\s\[\].,;:?!<>\(\)&…*«»%№"']|^|$/gm;
+var wordm=/[\s\[\].,;:?!<>\(\)&…*«»%№""'']|^|$/gm;//А то IDE смущается
 var tsya=/ть*ся/;
 var oldTime;
 
@@ -19,11 +18,7 @@ function loadPage(page,pagelim,urlPrefix,urlPostfix,filename){
 	for(var psi=0; psi<99; psi++)
 		wgetList.push(urlPrefix+(page*100+psi)+urlPostfix);
 	oldTime=new Date().getTime();
-//	exec('wget -t 100 --header="accept-encoding: identity" '+wgetList.join(' ')+'  -O - | sort -u | sed -e :a -e \'s/<[^>]*>//g;/</N;//ba\'',
 	exec('wget -t 100 --header="accept-encoding: identity" '+wgetList.join(' ')+'  -O - | grep -e [а-яё] | sort -u | sed -e :a -e \'s/<[^>]*>//g;/</N;//ba\'',
-//	exec('wget -t 100 --header="accept-encoding: identity" http://habrahabr.ru/post/{'+page+'00..'+page+'99}/  -O - | grep -e [а-яё] | sort -u | sed -e :a -e \'s/<[^>]*>//g;/</N;//ba\'',
-//	exec('wget -t 100 --header="accept-encoding: identity" http://habrahabr.ru/post/'+page+'/  -O - | grep -e [а-яё] | sort -u | sed -e :a -e \'s/<[^>]*>//g;/</N;//ba\'',
-//	exec('wget -t 100 --header="accept-encoding: identity" http://habrahabr.ru/post/$i/  -O - ',
 	{maxBuffer: 2048*1024},function(error, stdout, stderror) {
 		addTextToWords(stdout);
 		console.log(page);
@@ -109,9 +104,7 @@ var actionArray;
 function countReplacableInJSON(filename,log){
 	
 	(filename);
-//	console.log(Object.keys(words).length)
 	var totalWords=selectReplacable();
-//	console.log(Object.keys(words).length)
 	resultToJSON(log);
 	console.log(totalWords);
 }
@@ -184,6 +177,7 @@ function readFilesToSentences(o, sentencesArray){
 	o.first+=o.step;
 	readFilesToSentences(o, sentencesArray);
 }
+
 
 module.exports.startDownloadTextFiles=startDownloadTextFiles;
 module.exports.downloadTextFiles=downloadTextFiles;
