@@ -443,7 +443,35 @@ function selectRegs(i,len){
 	}
 //	var text=textArr.join(" ");
 //	correct.log(text);
+
+//{{Экспериментальное выкидывание регэкспов парами
+/*	var l=actionArray.length;
+	for(var j=1; j<l; j+=2){
+		if(
+			actionArray[j] && actionArray[j][3] &&
+			actionArray[j-1] && actionArray[j-1][3]
+		){
+			if(!(
+					new RegExp(
+						"("+
+							actionArray[j][3]+")|("+
+							actionArray[j-1][3]+
+						")"
+					)
+				).test(text))
+			{
+				actionArray.spliceWithLast(j);
+				actionArray.spliceWithLast(j-1);
+				l-=2;
+				j-=2;
+			}
+		}
+	}
+	console.log(l);
+*/
+//}}
 	var l=actionArray.length;
+
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(text)){
@@ -453,8 +481,8 @@ function selectRegs(i,len){
 				j--;
 //				actionArray[j]=0;
 			}else{
-//				megaexpressionParts.push(actionArray[j][2].source);
-				megaexpressionSource+=actionArray[j][2].source+delimiter;
+				megaexpressionParts.push(actionArray[j][2].source);
+//				megaexpressionSource+=actionArray[j][3]+delimiter;
 			}
 		}
 	}

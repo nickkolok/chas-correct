@@ -81,7 +81,7 @@ function prepareExpression(word, str, prefix, postfix){
 		(postfix ? wordSplitSymbol : "");
 	var regexp=new RegExp(pattern,"gm");
 //	correct.log(regexp);
-	actionArray.push([regexp,"$1$2"+str.substr(1)+(postfix?"$3":""),new RegExp(word,"i")]);
+	actionArray.push([regexp,"$1$2"+str.substr(1)+(postfix?"$3":""),new RegExp(word,"i"),word]);
 //	megaexpressionParts.push(pattern);
 }
 
@@ -98,8 +98,8 @@ function prepareReplaceHeavy(reg, str, prefix, postfix){
 		reg[0].toUpperCase()+lostreg+
 		(postfix ? wordSplitSymbol : "" );
 	var regexp2=new RegExp(pattern2,"gm");
-	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
-	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
+	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i"),str]);
+	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i"),str]);
 }
 
 
