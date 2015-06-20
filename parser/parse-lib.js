@@ -113,8 +113,12 @@ function isReplacable(chto){
 	return chto==bruteReplace(chto);
 }
 
+function readActionArray(){
+	actionArray = require('../prepareDictionary.js').actionArray;
+}
+
 function selectReplacable(){
-	actionArray = require('./correct/prepareDictionary.js').actionArray;
+	readActionArray();
 	var totalWords=0;
 	for(var chto in words){
 		if(isReplacable(chto)){
@@ -136,8 +140,13 @@ step:		шаг, с которым увеличивать номер
 threads:	количество потоков
 */
 
+var absentFiles=[];
+var lastSettings={};
+
 function startDownloadTextFiles(o){
+	lastSettings=o;
 	var newstep=o.step*o.threads;
+	o.postfix||(o.postfix='');
 	for(var i=0; i<o.threads; i++){
 		downloadTextFiles({
 			prefix:  o.prefix,
@@ -170,17 +179,62 @@ function downloadTextFiles(o){
 }
 
 function readFilesToSentences(o, sentencesArray){
+	lastSettings=o;
 	if(o.first>o.last){
-		return;
+		return sentencesArray;
 	}
-	sentencesArray=sentencesArray.concat(fs.readFileSync(o.dest+o.first, 'utf-8').split("."));
+	try{
+		sentencesArray=sentencesArray.concat(fs.readFileSync(o.dest+o.first, 'utf-8').split("."));
+	}catch(e){
+		console.log("Не удалось прочесть файл "+o.dest+o.first);
+		absentFiles.push(o.first);
+	}
 	o.first+=o.step;
-	readFilesToSentences(o, sentencesArray);
+	return readFilesToSentences(o, sentencesArray);
 }
 
+function countErrorsInTextFileDump(o){
+	var realFirst=o.first;
+	readActionArray();
+	var sentencesArray=[];
+	sentencesArray = readFilesToSentences(o, sentencesArray);
+	var totalErrorsCount=0;
+	var sentencesCount=sentencesArray.length;
+	for(var sentencesProcessed=0; sentencesProcessed<sentencesCount; sentencesProcessed++){
+		if(!isReplacable(sentencesArray[sentencesProcessed])){
+			totalErrorsCount++;
+		}
+		if(!(totalErrorsCount%100)){
+	//		console.log(totalErrorsCount);
+		}
+	}
+	console.log("Всего ошибок: "+totalErrorsCount);
+	console.log("Ошибок на файл: "+( totalErrorsCount / ( (Math.ceil(o.last+1-realFirst)) / o.step )) );
+}
 
+function repairAbsentFiles(o){
+	if(!absentFiles.length){
+		return;
+	}
+	o||(o=lastSettings);
+	o.last=o.first=absentFiles[0];
+	console.log("Докачиваем файл "+o.dest+o.first);
+	downloadTextFiles(o);
+	absentFiles.splice(0,1);
+	repairAbsentFiles();
+}
+
+module.exports.repairAbsentFiles=repairAbsentFiles;
+module.exports.countErrorsInTextFileDump=countErrorsInTextFileDump;
 module.exports.startDownloadTextFiles=startDownloadTextFiles;
 module.exports.downloadTextFiles=downloadTextFiles;
 module.exports.loadPage=loadPage;
 module.exports.sumJSON=sumJSON;
 module.exports.countReplacableInJSON=countReplacableInJSON;
+
+/* Примеры использования
+
+var parseLib=require('./parse-lib.js'); parseLib.startDownloadTextFiles({prefix:'https://ficbook.net/ajax/download_fic?fanfic_id=',postfix:'',first:1,last:313,step:100,threads:1,dest:"../../jsons/ficbook/"});
+
+
+*/
