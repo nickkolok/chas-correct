@@ -8,10 +8,10 @@ cd ../..
 #Собираем XPI для firefox desktop
 cd firefox
 cfx xpi
-mv firefox.xpi ../bin/chas-correct-firefox-desktop.xpi
+mv chas-correct.xpi ../bin/chas-correct-firefox-desktop.xpi
 #И для mobile
 cfx xpi --force-mobile
-mv firefox.xpi ../bin/chas-correct-firefox-mobile.xpi
+mv chas-correct.xpi ../bin/chas-correct-firefox-mobile.xpi
 cd ..
 
 #Для хрома
