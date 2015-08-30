@@ -1,4 +1,6 @@
 *~
+*.pyc
+*.pem
 nohup.out
 npm-debug.log
 
