@@ -38,13 +38,12 @@ This file is part of CHAS-CORRECT.
 
 'use strict';
 
-var minimalLiteralLength=204800; //Пока с потолка
-
 Array.prototype.spliceWithLast=function(index){
 	'use strict';
 	this[index]=this[this.length-1];
 	this.length--;
 }
+
 var observeDOM = (function(){
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
 		eventListenerSupported = window.addEventListener;
@@ -106,7 +105,6 @@ function mainWork(ih){
 
 	if(!megaexpression.test(ih))
 		return ih;
-//	correct.log(ih.match(megaexpression));
 
 	errorNodes++;
 
@@ -189,7 +187,8 @@ function fixMistakes(){
 		}
 		return;
 	}
-*/	updateTextNodes();
+*/
+	updateTextNodes();
 	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
 
 	var len=textNodes.length-1;
@@ -275,8 +274,6 @@ function actionsAfterFixLoop(){
 	observeDOM(document.body, domChangedHandler);
 	setTimeout(cacheTypicalNodes,3000);
 	correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
-	correct.log("Доля нод с ошибками: "+(errorNodes/textNodes.length)+", "+errorNodes+" из "+textNodes.length);
-	correct.log("Асихронных циклов: "+asyncCount);
 	correct.logToConsole();
 }
 
