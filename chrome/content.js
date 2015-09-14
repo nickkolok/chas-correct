@@ -52,15 +52,21 @@ var observeDOM = (function(){
 		if( MutationObserver ){
 			// define a new observer
 			var obs = new MutationObserver(function(mutations, observer){
-				if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
-					callback();
+				var len=mutations.length;
+				for(var i=0; i<len; i++){
+					//TODO: гонять проверялку только по тем нодам, которые добавились
+					//Сложность в том, что добавиться могло целое дерево
+					if(mutations[i].addedNodes.length){
+						callback();
+						break;
+					}
+				}
 			});
 			// have the observer observe foo for changes in children
 			obs.observe( obj, { childList:true, subtree:true });
 		}
 		else if( eventListenerSupported ){
 			obj.addEventListener('DOMNodeInserted', callback, false);
-			obj.addEventListener('DOMNodeRemoved', callback, false);
 		}
 	}
 })();
