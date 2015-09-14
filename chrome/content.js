@@ -16,7 +16,7 @@ This file is part of CHAS-CORRECT.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+    along with CHAS-CORRECT.  If not, see <http://www.gnu.org/licenses/>.
 
   (Этот файл — часть CHAS-CORRECT.
 
