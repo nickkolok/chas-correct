@@ -35,7 +35,7 @@ This file is part of CHAS-CORRECT.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+    along with CHAS-CORRECT.  If not, see <http://www.gnu.org/licenses/>.
 
   (Этот файл — часть CHAS-CORRECT.
 
@@ -70,6 +70,30 @@ var orphoWordsToCorrect=[
 	["",""],
 	["",""],
 */
+	["грю","говорю"],//TODO: проспрягать
+	["тол*ь*к[ао]-*что","только что"],
+	["по-круче","покруче"],
+	["по-началу","поначалу"],
+	["кое[\s]*где","кое-где"],//TODO: аналоги
+	["где-*угодно","где угодно"],
+	["луч[ёе]м","лучом"],
+	["куда-*как","куда как"],
+	["наконецтаки","наконец-таки"],
+	["по[\s-]немногу","понемногу"],
+	["как-*только","как только"],
+	["в-*сч[ёе]т","в счёт"],
+	["молодеж","молодежь"],
+	["в-*первую","в первую"],
+	["по-надежнее","понадежнее"],
+	["по-крупнее","покрупнее"],
+	["потому-как","потому как"],
+	["по-сети","по сети"],
+	["по-*идее","по идее"],
+	["н[еи]зна[еи]т","не знает"],
+	["севодня","сегодня"],
+	["зачемто","зачем-то"],
+	["помоч","помочь"],
+	["тем-*более","тем более"],
 	["так-*что","так что"],
 	["иметь в-*виду","иметь в виду"],//TODO: проспрягать
 	["как-*нить","как-нибудь"],
@@ -129,6 +153,7 @@ var orphoWordsToCorrect=[
 	["ни-*черта","ни черта"],
 	["тыщи","тысячи"],
 	["в[\\s-]*кратце","вкратце"],
+	//[Katzen Gott]: может быть стоит вынести "команд" в префиксы? Нортон Командер с одной "м" вроде нормально выглядит
 	["комманды","команды"],//TODO: просклонять, не обидев Norton Commander. Или обидев.
 	["по\\s*аглийски","по-английски"],
 //?	["чесслово","честное слово"],
@@ -170,6 +195,8 @@ var orphoWordsToCorrect=[
 	["граници","границы"],
 	["в-*принципе","в принципе"],
 	["те-*же","те же"],//TODO: допросклонять
+	["из за","из-за"], //[Katzen Gott]: Не уверена, что к этому нет противопоказаний. Если есть — убирайте.
+	["изза","из-за"],
 	["тыщ","тысяч"],
 	["по-*умолчанию","по умолчанию"],
 	["делаеть","делает"],
@@ -178,7 +205,7 @@ var orphoWordsToCorrect=[
 	["поменятся","поменяться"],
 	["мерится","мериться"],
 	["мерятся","меряться"],
-	["имется","иметься"],//Поднимется
+	["имется","иметься"],//Поднимется [Katzen Gott]: может это было "имеется"?
 	["грится","говорится"],
 	["учаться","учатся"],//Но обучаться
 	["пр[ие]д[её]ть*ся","придётся"],
@@ -208,6 +235,9 @@ var orphoWordsToCorrect=[
 	[""+ca,""],
 	[""+ca,""],
 */
+	["пяли"+ca,"пялится"],
+	["просну"+ca,"проснуться"],
+	["меняю"+ca,"меняются"],
 	["каже"+ca,"кажется"],
 	["верит"+ca,"верится"],
 	["кати"+ca,"катиться"],
@@ -245,7 +275,7 @@ var orphoWordsToCorrect=[
 	["во внутрь","вовнутрь"],
 	["что-*ль","что ль"],//TODO: просклонять
 	["грит","говорит"],//TODO: добить окончаниями
-	["шо","что"],
+	["шо","что"],// [Katzen Gott]: а если это стилистический прием? (для передачи акцента например)
 	["бля","эх"],//Ибо сил моих больше нет
 	["шт*об","чтоб"],
 	["знач","значит"],
@@ -286,7 +316,7 @@ var orphoWordsToCorrect=[
 	["ч[ёое]гонить","чего-нибудь"],
 	["д[ао]фига","очень много"],//Ибо нефиг!
 	["ч[ёое]-*то","что-то"],//TODO: дополнить!
-	//["миня","меня"],//Нельзя, речка такая есть!
+	//["миня","меня"],//Нельзя, речка такая есть! [Katzen Gott] речка с большой буквы должна быть. Так что, наверное, можно
 	["апять","опять"],
 	["н[ие][фв]курс[ие]","не в курсе"],
 	["зопиши","запиши"],
@@ -371,7 +401,7 @@ var orphoWordsToCorrect=[
 	["чтото","что-то"],
 	["скем","с кем"],
 	["смореть","смотреть"],
-	["ихн(?:ий|его|ему|им|ем|ее|яя|ей|юю|ие|их|им)","их"],
+	["ихн(?:ий|его|ему|им|ем|ее|яя|ей|юю|ие|их|ими)","их"],
 	["на тощак","натощак"],
 	["чтоли","что ли"],
 	["сдесь","здесь"],
@@ -392,7 +422,7 @@ var orphoWordsToCorrect=[
 	["п[ао]ч[ие]му","почему"],
 	["наконецто","наконец-то"],
 	["гдебы","где бы"],
-	["вс[её]время","всё время"],
+	["вс[её]-*время","всё время"],
 	["чуть-*ли","чуть ли"],
 	["вря[дт]-*ли","вряд ли"],
 	["ка[кг]-*бу[дт]то","как будто"],
@@ -404,11 +434,14 @@ var orphoWordsToCorrect=[
 	["что-бы","чтобы"],
 	["што-бы","чтобы"],
 	["видете","видите"],//TODO: проспрягать
+	["видешь","видишь"],
+	["видет","видит"],
+	["видем","видим"], //[Katzen Gott]: тут вроде все. Может быть можно как-то их "склеить"?
 	["в догонку","вдогонку"],
 	["сп[оа]сиб[оа]","спасибо"],
 	["типо","типа"],
 	["граммот","грамот"],
-	["конешно","конечно"],
+	["к[ао]не[шч]но","конечно"], //[Katzen Gott]: надеюсь, я все правильно сделала...
 	["ключ[её]м","ключом"],
 	["недай","не дай"],
 	["нович[ёе]к","новичок"],
@@ -462,6 +495,7 @@ var orphoWordsToCorrect=[
 	["по-*порядку","по порядку"],
 	["молодожённых","молодожён"],//TODO: просклонять
 	["не-*спеша","не спеша"],
+	//["амбула",??], // [Katzen Gott]: хочется уже убивать за "амбулу", но надо придумать на что ее менять.
 ];
 
 var orphoPrefixToCorrect=[
@@ -469,8 +503,8 @@ var orphoPrefixToCorrect=[
 	["",""],
 	["",""],
 	["",""],
-	["",""],
 */
+	["корысн","корыстн"],
 	["д[еи][ао]лект","диалект"],
 	["спорт*цмен","спортсмен"],
 	["совпод","совпад"],
@@ -575,7 +609,7 @@ var orphoPrefixToCorrect=[
 	["пильмен","пельмен"],
 	["децтв","детств"],
 	["ужос","ужас"],
-	["криве[тд]к","креветк"],
+	["кр[еи]ве[тд]к","креветк"], //[Katzen Gott]: "креведко" тоже встречается, или его не трогать?
 	["тегров","тигров"],
 	["испепил","испепел"],
 	["сдрав*ств","здравств"],
@@ -710,12 +744,17 @@ var orphoPostfixToCorrect=[
 /*	
 	["",""],
 	["",""],
+	["",""],
+	["",""],
+	["",""],
 */
+	["прячся","прячься"],
+	["хранилищь","хранилищ"],
+	["знакомся","знакомься"],
 	["выгонет","выгонит"],
 	["кажеться","кажется"],
 	["ругалсо","ругался"],
 	["глядет","глядит"],
-	["рву"+ca,"рвутся"],
 	["давным\\s*давно","давным-давно"],
 	["в-*курсе","в курсе"],
 	["\\s*-*\\s+на-*все[вг][оа]","-навсего"],
@@ -753,6 +792,20 @@ var orphoPostfixToCorrect=[
 	["надеятся","надеяться"],
 	["гадатся","гадаться"],
 	["печататся","печататься"],
+/*
+	[""+ca,""],
+	[""+ca,""],
+	[""+ca,""],
+	[""+ca,""],
+	[""+ca,""],
+	[""+ca,""],
+*/
+	["сыпае"+ca,"сыпается"],
+	["рву"+ca,"рвутся"],
+	["крыва"+ca,"крываться"],
+	["крывае"+ca,"крывается"],
+	["нрави"+ca,"нравится"],
+	["зывае"+ca,"зывается"],
 	["готовяться","готовятся"],
 	["боиться","боится"],
 	["думатся","думаться"],
@@ -868,6 +921,7 @@ var orphoFragmentsToCorrect=[
 	["",""],
 	["",""],
 	["",""],
+	["",""],
 */
 	["с[ие]р[ьъ][её]з","серьёз"],
 	["елемент","элемент"],
@@ -877,6 +931,7 @@ var orphoFragmentsToCorrect=[
 	["ат+р[ие]бут","атрибут"],
 	["искуств","искусств"],
 	["естесств","естеств"],
+	["ьезд","ъезд"],
 	["ьезж","ъезж"],
 	["ньюанс","нюанс"],
 	["паралел","параллел"],
@@ -927,6 +982,7 @@ var orphoFragmentsToCorrect=[
 	["ъэ","э"],
 	["тендор","тендер"],
 	["будующ","будущ"],
+	["следущ","следующ"],
 	["празн","праздн"],
 	["пр[ие]з[ие]дент","президент"],
 	["цыкл","цикл"],
@@ -1064,7 +1120,7 @@ function prepareExpression(word, str, prefix, postfix){
 		(postfix ? wordSplitSymbol : "");
 	var regexp=new RegExp(pattern,"gm");
 //	correct.log(regexp);
-	actionArray.push([regexp,"$1$2"+str.substr(1)+(postfix?"$3":""),new RegExp(word,"i")]);
+	actionArray.push([regexp,"$1$2"+str.substr(1)+(postfix?"$3":""),new RegExp(word,"i"),word]);
 //	megaexpressionParts.push(pattern);
 }
 
@@ -1081,8 +1137,8 @@ function prepareReplaceHeavy(reg, str, prefix, postfix){
 		reg[0].toUpperCase()+lostreg+
 		(postfix ? wordSplitSymbol : "" );
 	var regexp2=new RegExp(pattern2,"gm");
-	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
-	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i")]);
+	actionArray.push([regexp1,"$1"+str[0].toLowerCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i"),str]);
+	actionArray.push([regexp2,"$1"+str[0].toUpperCase()+loststr+(postfix ? "$2" : ""),new RegExp(reg,"i"),str]);
 }
 
 
@@ -1156,7 +1212,7 @@ This file is part of CHAS-CORRECT.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+    along with CHAS-CORRECT.  If not, see <http://www.gnu.org/licenses/>.
 
   (Этот файл — часть CHAS-CORRECT.
 
@@ -1178,13 +1234,12 @@ This file is part of CHAS-CORRECT.
 
 'use strict';
 
-var minimalLiteralLength=204800; //Пока с потолка
-
 Array.prototype.spliceWithLast=function(index){
 	'use strict';
 	this[index]=this[this.length-1];
 	this.length--;
 }
+
 var observeDOM = (function(){
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
 		eventListenerSupported = window.addEventListener;
@@ -1193,15 +1248,21 @@ var observeDOM = (function(){
 		if( MutationObserver ){
 			// define a new observer
 			var obs = new MutationObserver(function(mutations, observer){
-				if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
-					callback();
+				var len=mutations.length;
+				for(var i=0; i<len; i++){
+					//TODO: гонять проверялку только по тем нодам, которые добавились
+					//Сложность в том, что добавиться могло целое дерево
+					if(mutations[i].addedNodes.length){
+						callback();
+						break;
+					}
+				}
 			});
 			// have the observer observe foo for changes in children
 			obs.observe( obj, { childList:true, subtree:true });
 		}
 		else if( eventListenerSupported ){
 			obj.addEventListener('DOMNodeInserted', callback, false);
-			obj.addEventListener('DOMNodeRemoved', callback, false);
 		}
 	}
 })();
@@ -1246,7 +1307,6 @@ function mainWork(ih){
 
 	if(!megaexpression.test(ih))
 		return ih;
-//	correct.log(ih.match(megaexpression));
 
 	errorNodes++;
 
@@ -1329,7 +1389,8 @@ function fixMistakes(){
 		}
 		return;
 	}
-*/	updateTextNodes();
+*/
+	updateTextNodes();
 	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
 
 	var len=textNodes.length-1;
@@ -1415,8 +1476,6 @@ function actionsAfterFixLoop(){
 	observeDOM(document.body, domChangedHandler);
 	setTimeout(cacheTypicalNodes,3000);
 	correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
-	correct.log("Доля нод с ошибками: "+(errorNodes/textNodes.length)+", "+errorNodes+" из "+textNodes.length);
-	correct.log("Асихронных циклов: "+asyncCount);
 	correct.logToConsole();
 }
 
@@ -1583,7 +1642,35 @@ function selectRegs(i,len){
 	}
 //	var text=textArr.join(" ");
 //	correct.log(text);
+
+//{{Экспериментальное выкидывание регэкспов парами
+/*	var l=actionArray.length;
+	for(var j=1; j<l; j+=2){
+		if(
+			actionArray[j] && actionArray[j][3] &&
+			actionArray[j-1] && actionArray[j-1][3]
+		){
+			if(!(
+					new RegExp(
+						"("+
+							actionArray[j][3]+")|("+
+							actionArray[j-1][3]+
+						")"
+					)
+				).test(text))
+			{
+				actionArray.spliceWithLast(j);
+				actionArray.spliceWithLast(j-1);
+				l-=2;
+				j-=2;
+			}
+		}
+	}
+	console.log(l);
+*/
+//}}
 	var l=actionArray.length;
+
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(text)){
@@ -1593,8 +1680,8 @@ function selectRegs(i,len){
 				j--;
 //				actionArray[j]=0;
 			}else{
-//				megaexpressionParts.push(actionArray[j][2].source);
-				megaexpressionSource+=actionArray[j][2].source+delimiter;
+				megaexpressionParts.push(actionArray[j][2].source);
+//				megaexpressionSource+=actionArray[j][3]+delimiter;
 			}
 		}
 	}
