@@ -276,56 +276,11 @@ function asyncFixLoop(){
 	actionsAfterFixLoop();
 }
 function actionsAfterFixLoop(){
-	setTimeout(analizeFreq,1000);
+//	setTimeout(analizeFreq,1000);
 	observeDOM(document.body, domChangedHandler);
 	setTimeout(cacheTypicalNodes,3000);
 	correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
 	correct.logToConsole();
-}
-
-var freqKeys="абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с","не","ни"]);
-
-function analizeFreq(){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
-	freqStat.totalNodes += textNodes.length;
-	for(var i=0; i < freqKeys.length; i++){
-		var reg=new RegExp(freqKeys[i],"i");
-		freqStat.includes[freqKeys[i]] || (freqStat.includes[freqKeys[i]] = 0);
-		for(var j=0; j < textNodes.length; j++){
-			if(reg.test(textNodes[j].data))
-				freqStat.includes[freqKeys[i]]++;
-			}
-	}
-	$.jStorage.set("chas-correct-freq-stat",freqStat);
-}
-
-function logFreq(max){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
-	for(var i=0; i < freqKeys.length; i++){
-		var f=freqStat.includes[freqKeys[i]]/freqStat.totalNodes;
-		if(!(f>max))
-			console.log(freqKeys[i]+": "+f);
-	}
-}
-
-
-function analizeFreqInRegExp(min){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
-	var rez={};
-	var sum=0;
-	for(var i=0; i < freqKeys.length; i++){
-		var reg=new RegExp(freqKeys[i],"i");
-		rez[freqKeys[i]] = 0;
-		for(var j=0; j<actionArrayCopy.length; j++){
-			if(reg.test(actionArrayCopy[j][0].source.replace(/\[.*?\]/g,"")))
-				rez[freqKeys[i]]++;
-		}
-		var f=rez[freqKeys[i]]/actionArrayCopy.length * (1 - freqStat.includes[freqKeys[i]]/freqStat.totalNodes);
-		sum+=f;
-		if(!(f<min))
-			console.log(freqKeys[i]+": "+f);
-	}
-	return sum;
 }
 
 var domChangedLastTime=new Date().getTime();
