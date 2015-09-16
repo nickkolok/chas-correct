@@ -39,7 +39,7 @@ This file is part of CHAS-CORRECT.
 var freqKeys="абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("").concat(["ть*с","не","ни"]);
 
 function analizeFreq(){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
+	var freqStat=storageWrapper.getKey("chas-correct-freq-stat",{totalNodes:0,includes:{}});
 	freqStat.totalNodes += textNodes.length;
 	for(var i=0; i < freqKeys.length; i++){
 		var reg=new RegExp(freqKeys[i],"i");
@@ -49,11 +49,11 @@ function analizeFreq(){
 				freqStat.includes[freqKeys[i]]++;
 			}
 	}
-	$.jStorage.set("chas-correct-freq-stat",freqStat);
+	storageWrapper.setKey("chas-correct-freq-stat",freqStat);
 }
 
 function logFreq(max){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
+	var freqStat=storageWrapper.getKey("chas-correct-freq-stat",{totalNodes:0,includes:{}});
 	for(var i=0; i < freqKeys.length; i++){
 		var f=freqStat.includes[freqKeys[i]]/freqStat.totalNodes;
 		if(!(f>max))
@@ -62,7 +62,7 @@ function logFreq(max){
 }
 
 function analizeFreqInRegExp(min){
-	var freqStat=$.jStorage.get("chas-correct-freq-stat",{totalNodes:0,includes:{}});
+	var freqStat=storageWrapper.getKey("chas-correct-freq-stat",{totalNodes:0,includes:{}});
 	var rez={};
 	var sum=0;
 	for(var i=0; i < freqKeys.length; i++){

@@ -42,7 +42,16 @@ Array.prototype.spliceWithLast=function(index){
 	'use strict';
 	this[index]=this[this.length-1];
 	this.length--;
-}
+};
+
+var storageWrapper={
+	getKey: function(key,defaultValue){
+		return JSON.parse(localStorage.getItem(key)) || defaultValue;
+	},
+	setKey: function(key,value){
+		localStorage.setItem(key,JSON.stringify(value));
+	},
+};
 
 var observeDOM = (function(){
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
@@ -167,12 +176,12 @@ function updateTextNodes() {
 
 var regKnown;
 var typicalNodes;
-var lastActionArrayLength=$.jStorage.get("lastActionArrayLength",0);
+var lastActionArrayLength=storageWrapper.getKey("lastActionArrayLength",0);
 if(lastActionArrayLength==actionArrayCopy.length){
-	typicalNodes=$.jStorage.get("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+	typicalNodes=storageWrapper.getKey("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 }else{
 	typicalNodes={totalPages:0,nodes:{}};
-	$.jStorage.set("lastActionArrayLength",actionArrayCopy.length);
+	storageWrapper.setKey("lastActionArrayLength",actionArrayCopy.length);
 	correct.log("Длина словаря изменилась - сбрасываем кэш");
 }
 
@@ -378,7 +387,7 @@ function cacheTypicalNodes(){
 
 	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
 
-	$.jStorage.set("chas-correct-typical-nodes",typicalNodes);
+	storageWrapper.setKey("chas-correct-typical-nodes",typicalNodes);
 }
 
 
@@ -452,7 +461,7 @@ function selectRegs(i,len){
 
 //Сбросить кэш
 function clearNodeCache(){
-	$.jStorage.set("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+	storageWrapper.setKey("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 }
 
 //Расстановка типографики + откладывание автокоррекции при наборе

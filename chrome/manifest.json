@@ -6,8 +6,6 @@
     {
       "matches": ["*://*/*"],
       "js": [
-		  "jquery-2.1.0.min.js",
-		  "jstorage.min.js",
 		  "dictionary.js",
 		  "prepareDictionary.js",
 		  "content.js"
