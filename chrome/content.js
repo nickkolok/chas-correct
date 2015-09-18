@@ -385,6 +385,9 @@ function cacheTypicalNodes(){
 		text = lastNode;
 	}
 
+	//Нечего память кушать! Надо будет - новые нагенерятся
+	textNodes=[];
+
 	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
 
 	storageWrapper.setKey("chas-correct-typical-nodes",typicalNodes);
