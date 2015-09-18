@@ -5,6 +5,13 @@
     "content_scripts": [
     {
       "matches": ["*://*/*"],
+      "exclude_globs": [
+		"*://www.facebook.com/plugins/like.php*",
+		"*://vk.com/notifier.php?act=storage_frame*",
+		"*://queuev4.vk.com/q_frame.php*",
+		"*://*.webagent.mail.ru/webim/agent/rpc.html*",
+		"*://apis.google.com/se/0/_/+1/fastbutton*"
+      ],
       "js": [
 		  "dictionary.js",
 		  "prepareDictionary.js",
