@@ -149,6 +149,10 @@ var correct={
 	},
 };
 
+//Теперь удаляем исходные словари - они больше не нужны, все слова уже обработаны, только память занимают
+//TODO: делать это вообще при сборке. Когда она будет
+orphoWordsToCorrect=orphoPrefixToCorrect=orphoPostfixToCorrect=orphoFragmentsToCorrect=globalArray=null;
+
 try{
 	module.exports.actionArray = actionArray;
 }catch(e){
