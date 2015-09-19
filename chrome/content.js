@@ -254,6 +254,7 @@ function fixMistakes() {
 function firstRun() {
 	extractAllTextNodes();
 	fixMistakes();
+	typicalNodes.totalPages++;//Логично, считаем настоящее количество страниц
 	setTimeout(cacheRemoveOutdated,4000);//TODO: кэширование вообще растащить
 }
 
@@ -277,10 +278,16 @@ function asyncFixLoop(){
 			}
 		}
 	*/	
-		if(textNodes[firstChangingNode] && !(textNodes[firstChangingNode].data in typicalNodes.nodes))
-			textNodes[firstChangingNode].data=mainWork(textNodes[firstChangingNode].data);
-//		else
-//			correct.log(textNodes[i].data);
+		var currentNode=textNodes[firstChangingNode];
+		if(!currentNode)//Не знаю, что имеется в виду
+			continue;
+		if(currentNode.data in typicalNodes.nodes){
+			typicalNodes.nodes[currentNode.data]+=20;
+		}else{
+			currentNode.data=mainWork(currentNode.data);
+			typicalNodes.nodes[currentNode.data]=20;
+		}
+
 /*		if(
 		(firstChangingNode % 100 == 0)
 			// || (new Date().getTime() - asyncFixLoopStartTime > 146)
@@ -296,10 +303,14 @@ function asyncFixLoop(){
 	actionsAfterFixLoop();
 }
 function actionsAfterFixLoop(){
-//	setTimeout(analizeFreq,1000);
 	observeDOM(document.body, domChangedHandler);
-	setTimeout(cacheTypicalNodes,3000);
-	correct.logTimestamp("chas-correct отработал. Времени затрачено", oldTime);
+
+	//Нечего память кушать! Надо будет - новые нагенерятся
+	textNodes=[];
+	//Кэш не резиновый
+	setTimeout(cacheCrop,3000);
+
+	correct.logTimestamp("chas-correct отработал. С момента запуска", oldTime);
 	correct.logToConsole();
 }
 
@@ -336,63 +347,61 @@ function domChangedHandler(){
 	correct.logToConsole();
 }
 
-
 //Кэширование типичных нод
-function cacheTypicalNodes(){
-	typicalNodes.totalPages++;
-	//Добавляем найденные ноды
-	for(var i=0; i<textNodes.length; i++){
-		var t=textNodes[i].data;
-		typicalNodes.nodes[t]||(typicalNodes.nodes[t]=0);
-		typicalNodes.nodes[t]+=20;
-	}
 
-	//Здесь и далее ограничиваем кэш - по длине и по количеству нод
+function cacheMetrika(text) {
+	return Math.pow(typicalNodes.nodes[text],2)/( typicalNodes.nodes[text].length + 6);
+}
+
+function cacheCrop() {
+	///Удаление из кэша лишних (по некоторой метрике) нод
 	//Считаем количество нод в кэше
 	var cacheNodesCount=Object.keys(typicalNodes.nodes).length;
-	var lastNode;
+	var timeBefore=new Date().getTime();
 
 	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
-
 	var currentMin;
-	for(;
+	var deletedNodes=0;
+	var deletedNodesLength=0;
+	var lastNode;
+
+	while(
 		//Ограничиваем кэш 100 килобайтами на сайт (или 200, т. к. юникод? Не важно)
 		cacheLength > 102400
 	||
 		//Не более 1024 нод
 		cacheNodesCount > 1024
-	;){
-//	console.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength);
+	){
 		for(var text in typicalNodes.nodes){
 			break;
 		}
 		//Да, это так мы получаем первую ноду из кэша
 		//Считаем её минимальной
-		currentMin = Math.pow(typicalNodes.nodes[text ],2)/( typicalNodes.nodes[text ].length + 6);
+		currentMin = cacheMetrika(text);
 		//Ищем ноду с минимальным отношением квадрата повторяемости к длине
 		for(var text2 in typicalNodes.nodes){
-			if( Math.pow(typicalNodes.nodes[text2],2)/( typicalNodes.nodes[text2].length + 6) < currentMin ){
+			var otherMetrika = cacheMetrika(text2);
+			if( otherMetrika < currentMin ){
 				text = text2;
-				currentMin = Math.pow(typicalNodes.nodes[text ],2)/( typicalNodes.nodes[text ].length + 6);
+				currentMin = otherMetrika;
 			}
 		}
 		//Удаляем одну ноду
+		deletedNodes++;
+		deletedNodesLength+=text.length;
 		delete typicalNodes.nodes[text];
 
 		//Пересчитываем показатели
 		cacheNodesCount--;
-		cacheLength -= text.length-6;
+		cacheLength -= text.length+6;
 
 		//Эталонной нодой снова становится последняя
 		text = lastNode;
+		//TODO: метрики тоже куда-то кэшировать
 	}
-
-	//Нечего память кушать! Надо будет - новые нагенерятся
-	textNodes=[];
-
-	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
-
 	storageWrapper.setKey("chas-correct-typical-nodes",typicalNodes);
+	correct.logTimestamp("Редукция кэша (нод: "+deletedNodes+", сумма длин удалённых нод: "+deletedNodesLength+")",timeBefore);
+	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
 }
 
 function cacheRemoveOutdated() {
