@@ -57,7 +57,7 @@ var storageWrapper={
 };
 
 var observeDOM = (function(){
-	///Наблюдение за DOM и вызок корректора при добавлении новых нод
+	///Наблюдение за DOM и вызов корректора при добавлении новых нод
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
 		eventListenerSupported = window.addEventListener;
 
@@ -65,21 +65,26 @@ var observeDOM = (function(){
 		if( MutationObserver ){
 			// define a new observer
 			var obs = new MutationObserver(function(mutations, observer){
+				var shouldBeHandled=0;
 				var len=mutations.length;
 				for(var i=0; i<len; i++){
-					//TODO: гонять проверялку только по тем нодам, которые добавились
-					//Сложность в том, что добавиться могло целое дерево
-					if(mutations[i].addedNodes.length){
-						callback();
-						break;
+					for(var j=0; j<mutations[i].addedNodes.length; j++){
+						extractTextNodesFrom(mutations[i].addedNodes[j]);
 					}
+					//Гоняем проверялку только по тем нодам, которые добавились
+					//Сложность в том, что добавиться могло целое дерево
+					shouldBeHandled+=mutations[i].addedNodes.length;
+				}
+				if(shouldBeHandled){
+					domChangedHandler();
+				}else{
+					correct.log("Изменение DOM, не добавляющее ноды");
 				}
 			});
-			// have the observer observe foo for changes in children
 			obs.observe( obj, { childList:true, subtree:true });
 		}
 		else if( eventListenerSupported ){
-			obj.addEventListener('DOMNodeInserted', callback, false);
+			obj.addEventListener('DOMNodeInserted', domChangedHandler, false);
 		}
 	}
 })();
@@ -196,8 +201,9 @@ var flagFirstTimeFixLaunch=1;
 var firstChangingNode,lastChangingNode;
 var timeBeforeMain;
 
-function fixMistakes(){
-/*	if(!flagAsyncFixLoopFinished){
+function fixMistakes() {
+/*
+	if(!flagAsyncFixLoopFinished){
 		if(!flagFixMistakesScheduled){
 			setTimeout(fixMistakes,20);
 			flagFixMistakesScheduled=1;
@@ -205,8 +211,6 @@ function fixMistakes(){
 		return;
 	}
 */
-	extractAllTextNodes();
-
 	var len=textNodes.length-1;
 	var i=0;
 
@@ -247,7 +251,13 @@ function fixMistakes(){
 	flagEchoMessageDomChanged=1;
 }
 
-fixMistakes();
+function firstRun() {
+	extractAllTextNodes();
+	fixMistakes();
+	setTimeout(cacheRemoveOutdated,4000);//TODO: кэширование вообще растащить
+}
+
+firstRun();
 
 var asyncFixLoopStartTime;
 var asyncCount=0;
@@ -339,16 +349,8 @@ function cacheTypicalNodes(){
 
 	//Здесь и далее ограничиваем кэш - по длине и по количеству нод
 	//Считаем количество нод в кэше
-	var cacheNodesCount=0;
+	var cacheNodesCount=Object.keys(typicalNodes.nodes).length;
 	var lastNode;
-	//И попутно выкидываем не встречавшиеся более 20 страниц
-	for(var text in typicalNodes.nodes){
-		cacheNodesCount++;
-		typicalNodes.nodes[text]--;
-		if(typicalNodes.nodes[text] < 0){
-			delete typicalNodes.nodes[text];
-		}
-	}
 
 	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
 
@@ -391,6 +393,15 @@ function cacheTypicalNodes(){
 	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
 
 	storageWrapper.setKey("chas-correct-typical-nodes",typicalNodes);
+}
+
+function cacheRemoveOutdated() {
+	for(var text in typicalNodes.nodes){
+		typicalNodes.nodes[text]--;
+		if(typicalNodes.nodes[text] < 0){
+			delete typicalNodes.nodes[text];
+		}
+	}
 }
 
 
