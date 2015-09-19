@@ -129,7 +129,7 @@ var correct={
 		this.logArray.push(param);
 	},
 	logToConsole: function(){
-		console.log(this.logArray.join("\n\r"));
+		console.log("chas-correct: "+this.logArray.join("\n\r"));
 		this.logArray=[];
 	},
 	replacedPairs:[],
@@ -146,6 +146,9 @@ var correct={
 		}
 		this.replacedPairs=[];
 		return rez;
+	},
+	logTimestamp: function(text, timestamp){
+		correct.log(text+" (мс): "+(new Date().getTime() - timestamp));
 	},
 };
 

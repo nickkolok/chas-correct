@@ -175,8 +175,7 @@ function extractAllTextNodes() {
 	var timeBeforeNodesExtracting=new Date().getTime();
 	textNodes=[];
 	extractTextNodesFrom(document.body);
-	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+
-		(new Date().getTime() - timeBeforeNodesExtracting));
+	correct.logTimestamp("На подготовку массива текстовых нод затрачено", timeBeforeNodesExtracting);
 }
 
 var regKnown;
@@ -228,7 +227,7 @@ function fixMistakes(){
 	len++;//Иначе глючит :(
 	var cachedNodes=i+textNodes.length-len;
 	correct.log("Нод отнесено к шапке: "+cachedNodes+"("+(cachedNodes/textNodes.length*100)+"%), до "+i+"-й и после "+(len-1)+"-й");
-	correct.log("Выделение шаблона (мс): "+(new Date().getTime() - timeBeforeHeader));
+	correct.logTimestamp("Выделение шаблона", timeBeforeHeader);
 
 
 	selectRegs(i,len);
@@ -282,7 +281,7 @@ function asyncFixLoop(){
 		}
 */
 	}
-	correct.log("Основной цикл (мс): "+(new Date().getTime() - timeBeforeMain));
+	correct.logTimestamp("Основной цикл", timeBeforeMain);
 	flagAsyncFixLoopFinished=1;
 	actionsAfterFixLoop();
 }
@@ -290,7 +289,7 @@ function actionsAfterFixLoop(){
 //	setTimeout(analizeFreq,1000);
 	observeDOM(document.body, domChangedHandler);
 	setTimeout(cacheTypicalNodes,3000);
-	correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
+	correct.logTimestamp("chas-correct отработал. Времени затрачено", oldTime);
 	correct.logToConsole();
 }
 
@@ -319,12 +318,11 @@ function domChangedHandler(){
 //		}
 		return;
 	}
-//	console.log(newt);
 	domChangedLastTime=new Date().getTime();
 	domChangedScheduled=0;
 	fixMistakes();
 	domChangeTimes++;
-	correct.log("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз: "+(new Date().getTime() - newt)+" мс");
+	correct.logTimestamp("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз", newt);
 	correct.logToConsole();
 }
 
@@ -398,25 +396,24 @@ function cacheTypicalNodes(){
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
 
-//var textArr;//=[];
 var text="";
 function selectRegs(i,len){
-//	textArr=[];
+//	var textArr=[];
 //	megaexpressionParts=[];
 	text="";
 	var megaexpressionSource="(";
 	var delimiter=")|(";
 	var t=new Date().getTime();
-	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
 //			textArr.push(textNodes[i].data);
 			text+=" "+textNodes[i].data;
 	}
+	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
 //	var text=textArr.join(" ");
 //	correct.log(text);
 
-//{{Экспериментальное выкидывание регэкспов парами
+//{{Экспериментальное выкидывание регэкспов парами - медленнее
 /*	var l=actionArray.length;
 	for(var j=1; j<l; j+=2){
 		if(
@@ -447,11 +444,9 @@ function selectRegs(i,len){
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(text)){
-//				correct.log(actionArray[j][2]);
-				actionArray.spliceWithLast(j);
+				actionArray.spliceWithLast(j);//Это быстрее, чем забивать нулями
 				l--;
 				j--;
-//				actionArray[j]=0;
 			}else{
 				megaexpressionParts.push(actionArray[j][2].source);
 //				megaexpressionSource+=actionArray[j][3]+delimiter;
@@ -461,7 +456,7 @@ function selectRegs(i,len){
 //	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 	megaexpression=new RegExp(megaexpressionSource.replace(/\)\|\($/,"")+")","im");
 //	correct.log(megaexpression);
-	correct.log("Выбор регэкспов, мс: "+(new Date().getTime()-t));
+	correct.logTimestamp("Выбор регэкспов", t);
 }
 
 //Сбросить кэш
