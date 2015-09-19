@@ -39,12 +39,15 @@ This file is part of CHAS-CORRECT.
 'use strict';
 
 Array.prototype.spliceWithLast=function(index){
+	///Заменить элемент под номером index последним, последний удалить
+	///Это, очевидно, эффективнее, чем сдвигать весь массив и даже чем просто заменять на null
 	'use strict';
 	this[index]=this[this.length-1];
 	this.length--;
 };
 
 var storageWrapper={
+	///Обёртка над хранилищем, в данном случае - localStorage. Для адаптации под GreaseMonkey править тут
 	getKey: function(key,defaultValue){
 		return JSON.parse(localStorage.getItem(key)) || defaultValue;
 	},
@@ -54,6 +57,7 @@ var storageWrapper={
 };
 
 var observeDOM = (function(){
+	///Наблюдение за DOM и вызок корректора при добавлении новых нод
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
 		eventListenerSupported = window.addEventListener;
 
@@ -99,13 +103,6 @@ var reg3podryad=/([А-Яа-яЁё])\1{3,}/g;
 function specialWork(ih){
 	ih=ih.replace(reg3podryad,"$1$1$1");//Это не выносится из-за сигнатуры
 
-/*//Перенесено в словарь
-	ih=ih.replace(/ньч/gi,"нч");
-	ih=ih.replace(/ньщ/gi,"нщ");
-	ih=ih.replace(/чьн/gi,"чн");
-	ih=ih.replace(/щьн/gi,"щн");
-	ih=ih.replace(/чьк/gi,"чк");
-*/	
 	return ih;
 }
 
@@ -149,20 +146,19 @@ function notContainsCyrillic(str){
 	return !regCyr.test(str);
 }
 
-var textNodesText=[];
 var textNodes=[];
 var kuch=3;
 
-function updateTextNodes() {
+function extractTextNodesFrom(rootNode) {
+	///Добавить все текстовые ноды-потомки rootNode в масссив textNodes
 	var walker = document.createTreeWalker(
-		document.body,
+		rootNode,
 		NodeFilter.SHOW_TEXT,
 		null,
 		false
 	);
 
 	var node;
-	textNodes = [];
 
 	while(node = walker.nextNode()) {
 		if(node.data!="" && node.data.trim()!=""){
@@ -172,6 +168,15 @@ function updateTextNodes() {
 			}
 		}
 	}
+}
+
+function extractAllTextNodes() {
+	///Заменить textNodes на список
+	var timeBeforeNodesExtracting=new Date().getTime();
+	textNodes=[];
+	extractTextNodesFrom(document.body);
+	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+
+		(new Date().getTime() - timeBeforeNodesExtracting));
 }
 
 var regKnown;
@@ -193,8 +198,6 @@ var firstChangingNode,lastChangingNode;
 var timeBeforeMain;
 
 function fixMistakes(){
-	var oldTime2=new Date().getTime();
-
 /*	if(!flagAsyncFixLoopFinished){
 		if(!flagFixMistakesScheduled){
 			setTimeout(fixMistakes,20);
@@ -203,8 +206,7 @@ function fixMistakes(){
 		return;
 	}
 */
-	updateTextNodes();
-	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
+	extractAllTextNodes();
 
 	var len=textNodes.length-1;
 	var i=0;
@@ -480,7 +482,7 @@ function keydownHandler(e) {
 }
 
 function forceTypo(){
-	updateTextNodes();
+	extractAllTextNodes();
 	var len=textNodes.length;
 	for(var i=0; i<len; i++)
 		textNodes[i].data=forceTypoInString(textNodes[i].data);
