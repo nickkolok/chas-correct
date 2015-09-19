@@ -395,7 +395,6 @@ function cacheTypicalNodes(){
 
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
-
 var text="";
 function selectRegs(i,len){
 //	var textArr=[];
@@ -409,7 +408,12 @@ function selectRegs(i,len){
 //			textArr.push(textNodes[i].data);
 			text+=" "+textNodes[i].data;
 	}
-	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
+	if(text.trim()!=""){
+		actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
+	}else{
+		correct.log("Все ноды в кэше - незачем делать копию словаря");
+		actionArray=[];
+	}
 //	var text=textArr.join(" ");
 //	correct.log(text);
 
