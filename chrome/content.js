@@ -56,6 +56,13 @@ var storageWrapper={
 	},
 };
 
+var notCyrillicToTrim=/^[^а-яё]+|[^а-яё]+$/gi
+function trimNotCyrillic(text) {
+	//Да, быстрее так, а не методом-членом
+	return text.replace(notCyrillicToTrim,"");
+	//TODO: проверить, быстрее одной регуляркой или двумя
+}
+
 var observeDOM = (function(){
 	///Наблюдение за DOM и вызов корректора при добавлении новых нод
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
@@ -426,7 +433,7 @@ function selectRegs(i,len){
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
 //			textArr.push(textNodes[i].data);
-			text+=" "+textNodes[i].data;
+			text+=" "+trimNotCyrillic(textNodes[i].data);
 	}
 	if(text.trim()!=""){
 		actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
