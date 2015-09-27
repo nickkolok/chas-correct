@@ -56,7 +56,7 @@ var storageWrapper={
 	},
 };
 
-var notCyrillicToTrim=/^[^а-яё]+|[^а-яё]+$/gi
+var notCyrillicToTrim=/^[^а-яё]+|[^а-яё]+$/i;
 function trimNotCyrillic(text) {
 	//Да, быстрее так, а не методом-членом
 	return text.replace(notCyrillicToTrim,"");
@@ -430,11 +430,16 @@ function selectRegs(i,len){
 	var megaexpressionSource="(";
 	var delimiter=")|(";
 	var t=new Date().getTime();
+	var notCyrTest=/^[^а-яё]{2,}|[^а-яё]{2,}$/i
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
 //			textArr.push(textNodes[i].data);
-			text+=" "+trimNotCyrillic(textNodes[i].data);
+//			if(notCyrTest.test(text))
+//				text+=" "+trimNotCyrillic(textNodes[i].data);
+//			else
+				text+=" "+textNodes[i].data;
 	}
+	text=text.replace(/[^а-яё]{4,}/gi," ");
 	if(text.trim()!=""){
 		actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
 	}else{
