@@ -13,6 +13,7 @@
 		"*://apis.google.com/se/0/_/+1/fastbutton*"
       ],
       "js": [
+		  "apiwrapper.js",
 		  "dictionary.js",
 		  "prepareDictionary.js",
 		  "content.js"

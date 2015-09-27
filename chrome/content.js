@@ -46,16 +46,6 @@ Array.prototype.spliceWithLast=function(index){
 	this.length--;
 };
 
-var storageWrapper={
-	///Обёртка над хранилищем, в данном случае - localStorage. Для адаптации под GreaseMonkey править тут
-	getKey: function(key,defaultValue){
-		return JSON.parse(localStorage.getItem(key)) || defaultValue;
-	},
-	setKey: function(key,value){
-		localStorage.setItem(key,JSON.stringify(value));
-	},
-};
-
 var notCyrillicToTrim=/^[^а-яё]+|[^а-яё]+$/i;
 function trimNotCyrillic(text) {
 	//Да, быстрее так, а не методом-членом
