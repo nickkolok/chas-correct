@@ -46,6 +46,9 @@ Array.prototype.spliceWithLast=function(index){
 	this.length--;
 };
 
+Object.defineProperty(Array.prototype, 'spliceWithLast', {enumerable: false});
+
+
 var notCyrillicToTrim=/^[^а-яё]+|[^а-яё]+$/i;
 function trimNotCyrillic(text) {
 	//Да, быстрее так, а не методом-членом
