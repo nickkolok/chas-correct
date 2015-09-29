@@ -18,10 +18,12 @@ cd ..
 if [ -f chrome.pem ]; then
   ./crxmake.sh chrome chrome.pem
   mv chrome.crx bin/chas-correct-chrome-desktop.crx
-  cp bin/chas-correct-chrome-desktop.crx bin/chas-correct.zip
 else
   echo '"chrome.pem" file not found. Skipping Chrome ext build.'
 fi
+
+#И zip-архив для хрома
+zip -qr -9 -X  bin/chas-correct-chrome.zip chrome
 
 #По просьбам трудящихся - юзерскрипт
 cat jquery-2.1.0.min.js jstorage.min.js dictionary.js prepareDictionary.js content.js > bin/chas-correct-userscript.js
