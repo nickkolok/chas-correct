@@ -26,4 +26,10 @@ fi
 zip -qr -9 -X  bin/chas-correct-chrome.zip chrome
 
 #По просьбам трудящихся - юзерскрипт
-cat jquery-2.1.0.min.js jstorage.min.js dictionary.js prepareDictionary.js content.js > bin/chas-correct-userscript.js
+cat \
+	gm/userscript.meta \
+	gm/apiwrapper.js \
+	dictionary.js \
+	prepareDictionary.js \
+	content.js \
+> bin/chas-correct-userscript.user.js
