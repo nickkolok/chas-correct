@@ -1,3 +1,60 @@
+// ==UserScript==
+// @name          ЧАС-коррект
+// @namespace     http://www.example.com/gmscripts
+// @description   Исправление наиболее частотных ошибок на просматриваемых страницах
+// @include       http://*
+// @include       https://*
+// @version       0.2.0.3
+// ==/UserScript==
+/*
+Copyright Nikolay Avdeev aka NickKolok aka Николай Авдеев 2015
+
+Всем привет из снежного Воронежа! 
+
+This file is part of CHAS-CORRECT.
+
+    CHAS-CORRECT is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    CHAS-CORRECT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CHAS-CORRECT.  If not, see <http://www.gnu.org/licenses/>.
+
+  (Этот файл — часть CHAS-CORRECT.
+
+   CHAS-CORRECT - свободная программа: вы можете перераспространять её и/или
+   изменять её на условиях Стандартной общественной лицензии GNU в том виде,
+   в каком она была опубликована Фондом свободного программного обеспечения;
+   либо версии 3 лицензии, либо (по вашему выбору) любой более поздней
+   версии.
+
+   CHAS-CORRECT распространяется в надежде, что она будет полезной,
+   но БЕЗО ВСЯКИХ ГАРАНТИЙ; даже без неявной гарантии ТОВАРНОГО ВИДА
+   или ПРИГОДНОСТИ ДЛЯ ОПРЕДЕЛЕННЫХ ЦЕЛЕЙ. Подробнее см. в Стандартной
+   общественной лицензии GNU.
+
+   Вы должны были получить копию Стандартной общественной лицензии GNU
+   вместе с этой программой. Если это не так, см.
+   <http://www.gnu.org/licenses/>.)
+*/
+
+var storageWrapper={
+	///Обёртка над хранилищем, в данном случае - GreaseMonkey
+	getKey: function(key,defaultValue){
+		return JSON.parse(GM_getValue(key,defaultValue)) || defaultValue;
+	},
+	setKey: function(key,value){
+		GM_setValue(key,JSON.stringify(value));
+	},
+};
+
+
 /*
 Copyright Nikolay Avdeev aka NickKolok aka Николай Авдеев 2015
 
@@ -49,8 +106,13 @@ var orphoWordsToCorrect=[
 	["",""],
 	["",""],
 	["",""],
-	["",""],
 */
+	["как-*правило","как правило"],
+	["по-*которой","по которой"],//Да, и такое бывает. TODO: просклонять
+	["про-*запас","про запас"],
+	["свечь","свеч"],
+	["по-*крайней","по крайней"],
+	["н[ао]-*[ао]б[ао]рот","наоборот"],
 	["грю","говорю"],//TODO: проспрягать
 	["тол*ь*к[ао]-*что","только что"],
 	["по-круче","покруче"],
@@ -206,7 +268,7 @@ var orphoWordsToCorrect=[
 	["по-тихоньку","потихоньку"],
 	["по-полной","по полной"],
 	["ес+-н+о","естественно"],
-	["по-старинке","по старинке"],
+	["по-*старинке","по старинке"],
 	["по-ходу","походу"],
 	["дада","да-да"],
 	["занят*"+ca,"заняться"],
@@ -311,7 +373,7 @@ var orphoWordsToCorrect=[
 	["яб","я б"],
 	["етими","этими"],//TODO: просклонять, не обидев йети!
 	["такойже","такой же"],//TODO: просклонять
-	["поидее","по идее"],
+	["по-*идее","по идее"],
 	["жалбы","жал бы"],
 	["былобы","было бы"],
 	["невлезает","не влезает"],
@@ -322,7 +384,7 @@ var orphoWordsToCorrect=[
 	["в-*зад[еи]","сзади"],
 	["с-*зад[еи]","сзади"],
 	["з-*зад[еи]","сзади"],
-	["на р[ао]вне","наравне"],
+	["на[\s-]*р[ао]вне","наравне"],
 	["серебреного","серебряного"],//TODO: просклонять
 	["сомной","со мной"],
 	["сначало","сначала"],
@@ -347,7 +409,7 @@ var orphoWordsToCorrect=[
 //	["безплатно","бесплатно"],
 	["досвидание","до свидания"],
 	["вс[её]таки","всё-таки"],
-	["в кратце","вкратце"],
+	["в[\s-]кратце","вкратце"],
 	["ключь","ключ"],
 	["староной","стороной"],
 	["немогу","не могу"],
@@ -375,7 +437,7 @@ var orphoWordsToCorrect=[
 	["ложите","кладёте"],
 	["лож[ау]т","кладут"],
 	["лож[ие]т","кладёт"],
-	["светой","святой"],//TODO: склонять
+//	["светой","святой"],//TODO: склонять
 	["немогу","не могу"],
 	["ноч","ночь"],
 	["вкантакте","вконтакте"],
@@ -484,7 +546,14 @@ var orphoPrefixToCorrect=[
 	["",""],
 	["",""],
 	["",""],
+	["",""],
+	["",""],
+	["",""],
 */
+	["сонц","солнц"],
+	["выстовк","выставк"],
+	["ковычь*к","кавычк"],
+	["к[оа]выч[еи]к","кавычек"],
 	["корысн","корыстн"],
 	["д[еи][ао]лект","диалект"],
 	["спорт*цмен","спортсмен"],
@@ -715,7 +784,7 @@ var orphoPrefixToCorrect=[
 	["вздыхн","вздохн"],
 	["чательн","тщательн"],
 	["малчуган","мальчуган"],
-	["немнога","немного"],
+	["не-*многа","немного"],
 	["р[ао][зс]д[оа][ёе]т","раздаёт"],
 	["р[ие]п[ао]з[ие]т[ао]ри","репозитори"],
 	["пр[ие]з[ие]нтац","презентац"],
@@ -902,8 +971,8 @@ var orphoFragmentsToCorrect=[
 	["",""],
 	["",""],
 	["",""],
-	["",""],
 */
+	["матер[еи]ял","материал"],
 	["с[ие]р[ьъ][её]з","серьёз"],
 	["елемент","элемент"],
 	["тренажор","тренажёр"],
@@ -1149,7 +1218,7 @@ var correct={
 		this.logArray.push(param);
 	},
 	logToConsole: function(){
-		console.log(this.logArray.join("\n\r"));
+		console.log("chas-correct: "+this.logArray.join("\n\r"));
 		this.logArray=[];
 	},
 	replacedPairs:[],
@@ -1167,7 +1236,14 @@ var correct={
 		this.replacedPairs=[];
 		return rez;
 	},
+	logTimestamp: function(text, timestamp){
+		correct.log(text+" (мс): "+(new Date().getTime() - timestamp));
+	},
 };
+
+//Теперь удаляем исходные словари - они больше не нужны, все слова уже обработаны, только память занимают
+//TODO: делать это вообще при сборке. Когда она будет
+orphoWordsToCorrect=orphoPrefixToCorrect=orphoPostfixToCorrect=orphoFragmentsToCorrect=globalArray=null;
 
 try{
 	module.exports.actionArray = actionArray;
@@ -1216,21 +1292,25 @@ This file is part of CHAS-CORRECT.
 'use strict';
 
 Array.prototype.spliceWithLast=function(index){
+	///Заменить элемент под номером index последним, последний удалить
+	///Это, очевидно, эффективнее, чем сдвигать весь массив и даже чем просто заменять на null
 	'use strict';
 	this[index]=this[this.length-1];
 	this.length--;
 };
 
-var storageWrapper={
-	getKey: function(key,defaultValue){
-		return JSON.parse(localStorage.getItem(key)) || defaultValue;
-	},
-	setKey: function(key,value){
-		localStorage.setItem(key,JSON.stringify(value));
-	},
-};
+Object.defineProperty(Array.prototype, 'spliceWithLast', {enumerable: false});
+
+
+var notCyrillicToTrim=/^[^а-яё]+|[^а-яё]+$/i;
+function trimNotCyrillic(text) {
+	//Да, быстрее так, а не методом-членом
+	return text.replace(notCyrillicToTrim,"");
+	//TODO: проверить, быстрее одной регуляркой или двумя
+}
 
 var observeDOM = (function(){
+	///Наблюдение за DOM и вызов корректора при добавлении новых нод
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
 		eventListenerSupported = window.addEventListener;
 
@@ -1238,21 +1318,26 @@ var observeDOM = (function(){
 		if( MutationObserver ){
 			// define a new observer
 			var obs = new MutationObserver(function(mutations, observer){
+				var shouldBeHandled=0;
 				var len=mutations.length;
 				for(var i=0; i<len; i++){
-					//TODO: гонять проверялку только по тем нодам, которые добавились
-					//Сложность в том, что добавиться могло целое дерево
-					if(mutations[i].addedNodes.length){
-						callback();
-						break;
+					for(var j=0; j<mutations[i].addedNodes.length; j++){
+						extractTextNodesFrom(mutations[i].addedNodes[j]);
 					}
+					//Гоняем проверялку только по тем нодам, которые добавились
+					//Сложность в том, что добавиться могло целое дерево
+					shouldBeHandled+=mutations[i].addedNodes.length;
+				}
+				if(shouldBeHandled){
+					domChangedHandler();
+				}else{
+					correct.log("Изменение DOM, не добавляющее ноды");
 				}
 			});
-			// have the observer observe foo for changes in children
 			obs.observe( obj, { childList:true, subtree:true });
 		}
 		else if( eventListenerSupported ){
-			obj.addEventListener('DOMNodeInserted', callback, false);
+			obj.addEventListener('DOMNodeInserted', domChangedHandler, false);
 		}
 	}
 })();
@@ -1276,13 +1361,6 @@ var reg3podryad=/([А-Яа-яЁё])\1{3,}/g;
 function specialWork(ih){
 	ih=ih.replace(reg3podryad,"$1$1$1");//Это не выносится из-за сигнатуры
 
-/*//Перенесено в словарь
-	ih=ih.replace(/ньч/gi,"нч");
-	ih=ih.replace(/ньщ/gi,"нщ");
-	ih=ih.replace(/чьн/gi,"чн");
-	ih=ih.replace(/щьн/gi,"щн");
-	ih=ih.replace(/чьк/gi,"чк");
-*/	
 	return ih;
 }
 
@@ -1326,20 +1404,19 @@ function notContainsCyrillic(str){
 	return !regCyr.test(str);
 }
 
-var textNodesText=[];
 var textNodes=[];
 var kuch=3;
 
-function updateTextNodes() {
+function extractTextNodesFrom(rootNode) {
+	///Добавить все текстовые ноды-потомки rootNode в масссив textNodes
 	var walker = document.createTreeWalker(
-		document.body,
+		rootNode,
 		NodeFilter.SHOW_TEXT,
 		null,
 		false
 	);
 
 	var node;
-	textNodes = [];
 
 	while(node = walker.nextNode()) {
 		if(node.data!="" && node.data.trim()!=""){
@@ -1349,6 +1426,14 @@ function updateTextNodes() {
 			}
 		}
 	}
+}
+
+function extractAllTextNodes() {
+	///Заменить textNodes на список
+	var timeBeforeNodesExtracting=new Date().getTime();
+	textNodes=[];
+	extractTextNodesFrom(document.body);
+	correct.logTimestamp("На подготовку массива текстовых нод затрачено", timeBeforeNodesExtracting);
 }
 
 var regKnown;
@@ -1369,10 +1454,9 @@ var flagFirstTimeFixLaunch=1;
 var firstChangingNode,lastChangingNode;
 var timeBeforeMain;
 
-function fixMistakes(){
-	var oldTime2=new Date().getTime();
-
-/*	if(!flagAsyncFixLoopFinished){
+function fixMistakes() {
+/*
+	if(!flagAsyncFixLoopFinished){
 		if(!flagFixMistakesScheduled){
 			setTimeout(fixMistakes,20);
 			flagFixMistakesScheduled=1;
@@ -1380,9 +1464,6 @@ function fixMistakes(){
 		return;
 	}
 */
-	updateTextNodes();
-	correct.log("chas-correct: на подготовку массива текстовых нод затрачено (мс): "+(new Date().getTime() - oldTime2));
-
 	var len=textNodes.length-1;
 	var i=0;
 
@@ -1403,7 +1484,7 @@ function fixMistakes(){
 	len++;//Иначе глючит :(
 	var cachedNodes=i+textNodes.length-len;
 	correct.log("Нод отнесено к шапке: "+cachedNodes+"("+(cachedNodes/textNodes.length*100)+"%), до "+i+"-й и после "+(len-1)+"-й");
-	correct.log("Выделение шаблона (мс): "+(new Date().getTime() - timeBeforeHeader));
+	correct.logTimestamp("Выделение шаблона", timeBeforeHeader);
 
 
 	selectRegs(i,len);
@@ -1423,7 +1504,14 @@ function fixMistakes(){
 	flagEchoMessageDomChanged=1;
 }
 
-fixMistakes();
+function firstRun() {
+	extractAllTextNodes();
+	fixMistakes();
+	typicalNodes.totalPages++;//Логично, считаем настоящее количество страниц
+	setTimeout(cacheRemoveOutdated,4000);//TODO: кэширование вообще растащить
+}
+
+firstRun();
 
 var asyncFixLoopStartTime;
 var asyncCount=0;
@@ -1443,10 +1531,16 @@ function asyncFixLoop(){
 			}
 		}
 	*/	
-		if(textNodes[firstChangingNode] && !(textNodes[firstChangingNode].data in typicalNodes.nodes))
-			textNodes[firstChangingNode].data=mainWork(textNodes[firstChangingNode].data);
-//		else
-//			correct.log(textNodes[i].data);
+		var currentNode=textNodes[firstChangingNode];
+		if(!currentNode)//Не знаю, что имеется в виду
+			continue;
+		if(currentNode.data in typicalNodes.nodes){
+			typicalNodes.nodes[currentNode.data]+=20;
+		}else{
+			currentNode.data=mainWork(currentNode.data);
+			typicalNodes.nodes[currentNode.data]=20;
+		}
+
 /*		if(
 		(firstChangingNode % 100 == 0)
 			// || (new Date().getTime() - asyncFixLoopStartTime > 146)
@@ -1457,15 +1551,19 @@ function asyncFixLoop(){
 		}
 */
 	}
-	correct.log("Основной цикл (мс): "+(new Date().getTime() - timeBeforeMain));
+	correct.logTimestamp("Основной цикл", timeBeforeMain);
 	flagAsyncFixLoopFinished=1;
 	actionsAfterFixLoop();
 }
 function actionsAfterFixLoop(){
-//	setTimeout(analizeFreq,1000);
 	observeDOM(document.body, domChangedHandler);
-	setTimeout(cacheTypicalNodes,3000);
-	correct.log("chas-correct отработал. Времени затрачено (мс): "+(new Date().getTime() - oldTime));
+
+	//Нечего память кушать! Надо будет - новые нагенерятся
+	textNodes=[];
+	//Кэш не резиновый
+	setTimeout(cacheCrop,3000);
+
+	correct.logTimestamp("chas-correct отработал. С момента запуска", oldTime);
 	correct.logToConsole();
 }
 
@@ -1494,101 +1592,110 @@ function domChangedHandler(){
 //		}
 		return;
 	}
-//	console.log(newt);
 	domChangedLastTime=new Date().getTime();
 	domChangedScheduled=0;
 	fixMistakes();
 	domChangeTimes++;
-	correct.log("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз: "+(new Date().getTime() - newt)+" мс");
+	correct.logTimestamp("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз", newt);
 	correct.logToConsole();
 }
 
-
 //Кэширование типичных нод
-function cacheTypicalNodes(){
-	typicalNodes.totalPages++;
-	//Добавляем найденные ноды
-	for(var i=0; i<textNodes.length; i++){
-		var t=textNodes[i].data;
-		typicalNodes.nodes[t]||(typicalNodes.nodes[t]=0);
-		typicalNodes.nodes[t]+=20;
-	}
 
-	//Здесь и далее ограничиваем кэш - по длине и по количеству нод
+function cacheMetrika(text) {
+	return Math.pow(typicalNodes.nodes[text],2)/( typicalNodes.nodes[text].length + 6);
+}
+
+function cacheCrop() {
+	///Удаление из кэша лишних (по некоторой метрике) нод
 	//Считаем количество нод в кэше
-	var cacheNodesCount=0;
-	var lastNode;
-	//И попутно выкидываем не встречавшиеся более 20 страниц
-	for(var text in typicalNodes.nodes){
-		cacheNodesCount++;
-		typicalNodes.nodes[text]--;
-		if(typicalNodes.nodes[text] < 0){
-			delete typicalNodes.nodes[text];
-		}
-	}
+	var cacheNodesCount=Object.keys(typicalNodes.nodes).length;
+	var timeBefore=new Date().getTime();
 
 	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
-
 	var currentMin;
-	for(;
+	var deletedNodes=0;
+	var deletedNodesLength=0;
+	var lastNode;
+
+	while(
 		//Ограничиваем кэш 100 килобайтами на сайт (или 200, т. к. юникод? Не важно)
 		cacheLength > 102400
 	||
 		//Не более 1024 нод
 		cacheNodesCount > 1024
-	;){
-//	console.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength);
+	){
 		for(var text in typicalNodes.nodes){
 			break;
 		}
 		//Да, это так мы получаем первую ноду из кэша
 		//Считаем её минимальной
-		currentMin = Math.pow(typicalNodes.nodes[text ],2)/( typicalNodes.nodes[text ].length + 6);
+		currentMin = cacheMetrika(text);
 		//Ищем ноду с минимальным отношением квадрата повторяемости к длине
 		for(var text2 in typicalNodes.nodes){
-			if( Math.pow(typicalNodes.nodes[text2],2)/( typicalNodes.nodes[text2].length + 6) < currentMin ){
+			var otherMetrika = cacheMetrika(text2);
+			if( otherMetrika < currentMin ){
 				text = text2;
-				currentMin = Math.pow(typicalNodes.nodes[text ],2)/( typicalNodes.nodes[text ].length + 6);
+				currentMin = otherMetrika;
 			}
 		}
 		//Удаляем одну ноду
+		deletedNodes++;
+		deletedNodesLength+=text.length;
 		delete typicalNodes.nodes[text];
 
 		//Пересчитываем показатели
 		cacheNodesCount--;
-		cacheLength -= text.length-6;
+		cacheLength -= text.length+6;
 
 		//Эталонной нодой снова становится последняя
 		text = lastNode;
+		//TODO: метрики тоже куда-то кэшировать
 	}
-
-	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
-
 	storageWrapper.setKey("chas-correct-typical-nodes",typicalNodes);
+	correct.logTimestamp("Редукция кэша (нод: "+deletedNodes+", сумма длин удалённых нод: "+deletedNodesLength+")",timeBefore);
+	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
+}
+
+function cacheRemoveOutdated() {
+	for(var text in typicalNodes.nodes){
+		typicalNodes.nodes[text]--;
+		if(typicalNodes.nodes[text] < 0){
+			delete typicalNodes.nodes[text];
+		}
+	}
 }
 
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
-
-//var textArr;//=[];
 var text="";
 function selectRegs(i,len){
-//	textArr=[];
+//	var textArr=[];
 //	megaexpressionParts=[];
 	text="";
 	var megaexpressionSource="(";
 	var delimiter=")|(";
 	var t=new Date().getTime();
-	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
+	var notCyrTest=/^[^а-яё]{2,}|[^а-яё]{2,}$/i
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
 //			textArr.push(textNodes[i].data);
-			text+=" "+textNodes[i].data;
+//			if(notCyrTest.test(text))
+//				text+=" "+trimNotCyrillic(textNodes[i].data);
+//			else
+				text+=" "+textNodes[i].data;
+	}
+	text=text.replace(/[^а-яё]{4,}/gi," ");
+	if(text.trim()!=""){
+		actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
+	}else{
+		correct.log("Все ноды в кэше - незачем делать копию словаря");
+		actionArray=[];
 	}
 //	var text=textArr.join(" ");
 //	correct.log(text);
 
-//{{Экспериментальное выкидывание регэкспов парами
+//{{Экспериментальное выкидывание регэкспов парами - медленнее
 /*	var l=actionArray.length;
 	for(var j=1; j<l; j+=2){
 		if(
@@ -1619,11 +1726,9 @@ function selectRegs(i,len){
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(text)){
-//				correct.log(actionArray[j][2]);
-				actionArray.spliceWithLast(j);
+				actionArray.spliceWithLast(j);//Это быстрее, чем забивать нулями
 				l--;
 				j--;
-//				actionArray[j]=0;
 			}else{
 				megaexpressionParts.push(actionArray[j][2].source);
 //				megaexpressionSource+=actionArray[j][3]+delimiter;
@@ -1633,7 +1738,7 @@ function selectRegs(i,len){
 //	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 	megaexpression=new RegExp(megaexpressionSource.replace(/\)\|\($/,"")+")","im");
 //	correct.log(megaexpression);
-	correct.log("Выбор регэкспов, мс: "+(new Date().getTime()-t));
+	correct.logTimestamp("Выбор регэкспов", t);
 }
 
 //Сбросить кэш
@@ -1654,7 +1759,7 @@ function keydownHandler(e) {
 }
 
 function forceTypo(){
-	updateTextNodes();
+	extractAllTextNodes();
 	var len=textNodes.length;
 	for(var i=0; i<len; i++)
 		textNodes[i].data=forceTypoInString(textNodes[i].data);
