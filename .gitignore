@@ -4,4 +4,6 @@
 nohup.out
 npm-debug.log
 
+*.orig
+
 chrome.pem
