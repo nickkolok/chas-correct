@@ -9,6 +9,14 @@ var wordm=/[\s\[\].,;:?!<>\(\)&…*«»%№""'']|^|$/gm;//А то IDE смуща
 var tsya=/ть*ся/;
 var oldTime;
 
+function deleteOddFromSentenceArray(a){
+	return a.filter(function(sentence){
+			return !/^\s*$/.test(sentence) && /[А-ЯЁа-яё]/.test(sentence);
+	}).map(function(sentence){
+		return sentence.replace(/([\s*]{2,})/g," ").replace(/(^[^А-ЯЁа-яё]+)|([^А-ЯЁа-яё]+$)/g,"");
+	});
+}
+
 function loadPage(page,pagelim,urlPrefix,urlPostfix,filename){
 	if(page>pagelim){
 		resultToJSON(filename+page);
@@ -138,6 +146,7 @@ first:		номер, с которого начать
 last:		номер, на котором остановиться
 step:		шаг, с которым увеличивать номер
 threads:	количество потоков
+dest:		куда складывать (или откуда брать) файлы
 */
 
 var absentFiles=[];
@@ -167,14 +176,8 @@ function downloadTextFiles(o){
 		{maxBuffer: 2048*1024},
 		function(error, stdout, stderror) {
 			console.log(o.first);
-			downloadTextFiles({
-				prefix:  o.prefix,
-				postfix: o.postfix,
-				first:   o.first+o.step,
-				last:    o.last,
-				step:    o.step,
-				dest:    o.dest,
-			});
+			o.first+=o.step;
+			downloadTextFiles(o);
 	});
 }
 
@@ -184,13 +187,24 @@ function readFilesToSentences(o, sentencesArray){
 		return sentencesArray;
 	}
 	try{
-		sentencesArray=sentencesArray.concat(fs.readFileSync(o.dest+o.first, 'utf-8').split("."));
+		sentencesArray=sentencesArray.concat(fs.readFileSync(o.dest+o.first, 'utf-8').split(/[.\r\n]/g));
 	}catch(e){
 		console.log("Не удалось прочесть файл "+o.dest+o.first);
 		absentFiles.push(o.first);
 	}
 	o.first+=o.step;
 	return readFilesToSentences(o, sentencesArray);
+}
+
+function makeCorpusFromFiles(o, corpusDest){
+	var sentencesArray=[];
+	fs.writeFileSync(
+		corpusDest,JSON.stringify(
+			deleteOddFromSentenceArray(
+				readFilesToSentences(o, [])
+			).sort()
+		)
+	);
 }
 
 function countErrorsInTextFileDump(o){
@@ -231,10 +245,15 @@ module.exports.downloadTextFiles=downloadTextFiles;
 module.exports.loadPage=loadPage;
 module.exports.sumJSON=sumJSON;
 module.exports.countReplacableInJSON=countReplacableInJSON;
+module.exports.readFilesToSentences=readFilesToSentences;
+module.exports.makeCorpusFromFiles=makeCorpusFromFiles;
+
 
 /* Примеры использования
 
-var parseLib=require('./parse-lib.js'); parseLib.startDownloadTextFiles({prefix:'https://ficbook.net/ajax/download_fic?fanfic_id=',postfix:'',first:1,last:313,step:100,threads:1,dest:"../../jsons/ficbook/"});
-
+var parseLib=require('./parser/parse-lib.js');
+parseLib.startDownloadTextFiles({prefix:'https://ficbook.net/ajax/download_fic?fanfic_id=',postfix:'',first:1,last:313,step:100,threads:1,dest:"../../jsons/ficbook/"});
+parseLib.readFilesToSentences({first:100,last:310000,step:100,threads:1,dest:"../jsons/ficbook/"},[]);
+parseLib.makeCorpusFromFiles({first:1,last:3101,step:100,threads:1,dest:"../jsons/ficbook/"},"../ficbook-corpus.json");
 
 */
