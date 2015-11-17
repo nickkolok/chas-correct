@@ -413,20 +413,14 @@ function cacheRemoveOutdated() {
 //Объединение текста всех нод и выкидывание ненужных регулярок
 var text="";
 function selectRegs(i,len){
-//	var textArr=[];
-//	megaexpressionParts=[];
 	text="";
-	var megaexpressionSource="(";
-	var delimiter=")|(";
+	var megaexpressionSource="";
+	var delimiter="|";
 	var t=Date.now();
 	var notCyrTest=/^[^а-яё]{2,}|[^а-яё]{2,}$/i
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
-//			textArr.push(textNodes[i].data);
-//			if(notCyrTest.test(text))
-//				text+=" "+trimNotCyrillic(textNodes[i].data);
-//			else
-				text+=" "+textNodes[i].data;
+			text+=" "+textNodes[i].data;
 	}
 
 	//Да, так быстрее, чем обрезать каждую по отдельности.
@@ -439,8 +433,6 @@ function selectRegs(i,len){
 		correct.log("Все ноды в кэше - незачем делать копию словаря");
 		actionArray=[];
 	}
-//	var text=textArr.join(" ");
-//	correct.log(text);
 
 //{{Экспериментальное выкидывание регэкспов парами - медленнее
 /*	var l=actionArray.length;
@@ -468,6 +460,7 @@ function selectRegs(i,len){
 	console.log(l);
 */
 //}}
+
 	var l=actionArray.length;
 
 	for(var j=0; j<l; j++){
@@ -482,8 +475,7 @@ function selectRegs(i,len){
 			}
 		}
 	}
-//	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
-	megaexpression=new RegExp(megaexpressionSource.replace(/\)\|\($/,"")+")","im");
+	megaexpression=new RegExp(megaexpressionSource.replace(/\|$/,""),"im");
 	correct.logTimestamp("Выбор регэкспов", t);
 }
 
