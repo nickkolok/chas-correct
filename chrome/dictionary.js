@@ -37,7 +37,7 @@ This file is part of CHAS-CORRECT.
 */
 'use strict';
 
-var oldTime = new Date().getTime();
+var oldTime = Date.now();
 
 var sya="(?=(?:ся|)(?:[^А-Яа-яЁёA-Za-z]|^|$))";
 var ca="[цc]+[ао]";

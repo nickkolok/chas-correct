@@ -148,7 +148,7 @@ var correct={
 		return rez;
 	},
 	logTimestamp: function(text, timestamp){
-		correct.log(text+" (мс): "+(new Date().getTime() - timestamp));
+		correct.log(text+" (мс): "+(Date.now() - timestamp));
 	},
 };
 
@@ -160,5 +160,5 @@ try{
 	module.exports.actionArray = actionArray;
 }catch(e){
 	//Значит, не node.js
-	correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
+	correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(Date.now() - oldTime));
 }

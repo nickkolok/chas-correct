@@ -177,7 +177,7 @@ function extractTextNodesFrom(rootNode) {
 
 function extractAllTextNodes() {
 	///Заменить textNodes на список
-	var timeBeforeNodesExtracting=new Date().getTime();
+	var timeBeforeNodesExtracting=Date.now();
 	textNodes=[];
 	extractTextNodesFrom(document.body);
 	correct.logTimestamp("На подготовку массива текстовых нод затрачено", timeBeforeNodesExtracting);
@@ -214,10 +214,10 @@ function fixMistakes() {
 	var len=textNodes.length-1;
 	var i=0;
 
-	var oldTime3=new Date().getTime();
+	var oldTime3=Date.now();
 
 
-	var timeBeforeHeader=new Date().getTime();
+	var timeBeforeHeader=Date.now();
 	if(typicalNodes.nodes){
 		//Пропускаем "шапку" страницы
 		while(i<=len && textNodes[i].data in typicalNodes.nodes){
@@ -235,7 +235,7 @@ function fixMistakes() {
 
 
 	selectRegs(i,len);
-	timeBeforeMain=new Date().getTime();
+	timeBeforeMain=Date.now();
 	
 	firstChangingNode=i;//TODO: зарефакторить
 	lastChangingNode=len;
@@ -264,7 +264,7 @@ var asyncFixLoopStartTime;
 var asyncCount=0;
 function asyncFixLoop(){
 	asyncCount++;
-	asyncFixLoopStartTime=new Date().getTime();
+	asyncFixLoopStartTime=Date.now();
 	flagEchoMessageDomChanged=1;
 	for(;firstChangingNode<=lastChangingNode;firstChangingNode++){
 	/*	var textArr=[];
@@ -290,7 +290,7 @@ function asyncFixLoop(){
 
 /*		if(
 		(firstChangingNode % 100 == 0)
-			// || (new Date().getTime() - asyncFixLoopStartTime > 146)
+			// || (Date.now() - asyncFixLoopStartTime > 146)
 		){
 			firstChangingNode++;
 			setTimeout(asyncFixLoop,10);
@@ -314,8 +314,8 @@ function actionsAfterFixLoop(){
 	correct.logToConsole();
 }
 
-var domChangedLastTime=new Date().getTime();
-var keydownLastTime=new Date().getTime();
+var domChangedLastTime=Date.now();
+var keydownLastTime=Date.now();
 var domChangedScheduled=0;
 var domChangeTimes=0;
 
@@ -327,7 +327,7 @@ function scheduleDomChangeHandler(time){
 }
 
 function domChangedHandler(){
-	var newt=new Date().getTime();
+	var newt=Date.now();
 	if(flagEchoMessageDomChanged){
 		flagEchoMessageDomChanged=0;
 		return;
@@ -339,7 +339,7 @@ function domChangedHandler(){
 //		}
 		return;
 	}
-	domChangedLastTime=new Date().getTime();
+	domChangedLastTime=Date.now();
 	domChangedScheduled=0;
 	fixMistakes();
 	domChangeTimes++;
@@ -357,7 +357,7 @@ function cacheCrop() {
 	///Удаление из кэша лишних (по некоторой метрике) нод
 	//Считаем количество нод в кэше
 	var cacheNodesCount=Object.keys(typicalNodes.nodes).length;
-	var timeBefore=new Date().getTime();
+	var timeBefore=Date.now();
 
 	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
 	var currentMin;
@@ -422,7 +422,7 @@ function selectRegs(i,len){
 	text="";
 	var megaexpressionSource="(";
 	var delimiter=")|(";
-	var t=new Date().getTime();
+	var t=Date.now();
 	var notCyrTest=/^[^а-яё]{2,}|[^а-яё]{2,}$/i
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
@@ -497,7 +497,7 @@ function clearNodeCache(){
 document.onkeydown = keydownHandler;
 
 function keydownHandler(e) {
-	keydownLastTime=new Date().getTime();
+	keydownLastTime=Date.now();
     e = e || event;
 	if ((e.ctrlKey && e.shiftKey && e.keyCode == "A".charCodeAt(0))) {
         forceTypo();
