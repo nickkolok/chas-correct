@@ -316,7 +316,6 @@ function actionsAfterFixLoop(){
 
 var domChangedLastTime=Date.now();
 var keydownLastTime=Date.now();
-var domChangedScheduled=0;
 var domChangeTimes=0;
 
 var domChangingTimeout=0;
@@ -327,23 +326,36 @@ function scheduleDomChangeHandler(time){
 }
 
 function domChangedHandler(){
-	var newt=Date.now();
-	if(flagEchoMessageDomChanged){
-		flagEchoMessageDomChanged=0;
+	var thisTime=Date.now();
+
+	// Если поднят флаг эхо-события (то есть мы сами только что поменяли DOM, внеся исправления),
+	// то флаг опустить и ничего не делать.
+	if( flagEchoMessageDomChanged ){
+		flagEchoMessageDomChanged = 0;
 		return;
 	}
-	if(newt - domChangedLastTime < 1468 || newt - keydownLastTime < 2*1468){
-//		if(!domChangedScheduled){
-//			domChangedScheduled=1;
-			scheduleDomChangeHandler(1468);
-//		}
+
+	if( thisTime < keydownLastTime + 2*1468 ){
+		// Ещё идёт набор текста пользователем - последний раз клавиша нажата менее 3 секунд назад.
+		// Если сейчас начать исправлять текст, есть риск помешать набору, что нехорошо.
+		// Да, был такой баг.
+		scheduleDomChangeHandler(keydownLastTime + 2 * 1468);
 		return;
 	}
+
+	if(thisTime - domChangedLastTime < 1468 ){
+		// Если недавно мы уже обрабатывали изменения DOM, то лучше дальнейшую обработку слегка отложить.
+		// Возможно, следом прилетят ещё события. А то повиснем!
+		scheduleDomChangeHandler(1468);
+		return;
+	}
+
+	// Теперь ничто не мешает взять список добавленных или изменённых нод и провести в нём исправления
+
 	domChangedLastTime=Date.now();
-	domChangedScheduled=0;
 	fixMistakes();
 	domChangeTimes++;
-	correct.logTimestamp("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз", newt);
+	correct.logTimestamp("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз", thisTime);
 	correct.logToConsole();
 }
 
@@ -504,6 +516,11 @@ function keydownHandler(e) {
         return false;
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ниже - кусок, который отвечает только за типографические красоты - пробелы вокруг запятых и прочее.
+// Так как он вызывается по требованию пользователя, оптимизация не критична (хотя никогда не лишняя).
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function forceTypo(){
 	extractAllTextNodes();
