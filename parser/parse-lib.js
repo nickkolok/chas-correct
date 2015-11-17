@@ -183,11 +183,12 @@ function downloadTextFiles(o){
 
 function readFilesToSentences(o, sentencesArray){
 	lastSettings=o;
+	o.postfix||(o.postfix='');
 	if(o.first>o.last){
 		return sentencesArray;
 	}
 	try{
-		sentencesArray=sentencesArray.concat(fs.readFileSync(o.dest+o.first, 'utf-8').split(/[.\r\n]/g));
+		sentencesArray=sentencesArray.concat(fs.readFileSync(o.dest+o.first+o.postfix, 'utf-8').split(/[.\r\n]/g));
 	}catch(e){
 		console.log("Не удалось прочесть файл "+o.dest+o.first);
 		absentFiles.push(o.first);
@@ -207,7 +208,22 @@ function makeCorpusFromFiles(o, corpusDest){
 	);
 }
 
-function countErrorsInTextFileDump(o){
+function countErrorsInCorpus(corpusDest){
+	var corpus=JSON.parse(fs.readFileSync(corpusDest, 'utf-8'));
+	var errorCount=0;
+	for(var i=0, il=actionArray.length; i<il; i++){
+		for(var j=0, jl=corpus.length; j<jl; j++){
+			var stringBefore=corpus[j];
+			corpus[j]=corpus[j].replace(actionArray[0],actionArray[1]);
+			if(stringBefore != corpus[j]){
+				errorCount++;
+			}
+		}
+	}
+	console.log(errorCount);
+}
+
+function countErrorsInTextFileDump(o, /*ref*/errorsArray){
 	var realFirst=o.first;
 	readActionArray();
 	var sentencesArray=[];
@@ -217,6 +233,7 @@ function countErrorsInTextFileDump(o){
 	for(var sentencesProcessed=0; sentencesProcessed<sentencesCount; sentencesProcessed++){
 		if(!isReplacable(sentencesArray[sentencesProcessed])){
 			totalErrorsCount++;
+			errorsArray.push(sentencesArray[sentencesProcessed]);
 		}
 		if(!(totalErrorsCount%100)){
 	//		console.log(totalErrorsCount);
@@ -247,13 +264,17 @@ module.exports.sumJSON=sumJSON;
 module.exports.countReplacableInJSON=countReplacableInJSON;
 module.exports.readFilesToSentences=readFilesToSentences;
 module.exports.makeCorpusFromFiles=makeCorpusFromFiles;
-
+module.exports.countErrorsInCorpus=countErrorsInCorpus;
 
 /* Примеры использования
 
 var parseLib=require('./parser/parse-lib.js');
+
 parseLib.startDownloadTextFiles({prefix:'https://ficbook.net/ajax/download_fic?fanfic_id=',postfix:'',first:1,last:313,step:100,threads:1,dest:"../../jsons/ficbook/"});
 parseLib.readFilesToSentences({first:100,last:310000,step:100,threads:1,dest:"../jsons/ficbook/"},[]);
-parseLib.makeCorpusFromFiles({first:1,last:3101,step:100,threads:1,dest:"../jsons/ficbook/"},"../ficbook-corpus.json");
+parseLib.countErrorsInCorpus('../ficbook-corpus.json');
 
+var errors=[];
+parseLib.countErrorsInTextFileDump({postfix:'',first:100001,last:131001,step:100,threads:1,dest:"../jsons/ficbook/"},errors);
+parseLib.countErrorsInTextFileDump({postfix:'',first:100001,last:131001,step:100,threads:1,dest:"../jsons/habr/habr"},errors);
 */
