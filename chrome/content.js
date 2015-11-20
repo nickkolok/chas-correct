@@ -228,9 +228,7 @@ function selectRegs(i,len){
 
 	if(text.trim()==""){
 		correct.log("Все ноды в кэше - незачем делать копию словаря и выбирать регэкспы");
-		actionArray=[];
-		megaexpression=new RegExp("");
-		textNodes=[];
+		clearTemporaryData();
 		return 0;
 	}
 	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
@@ -323,15 +321,25 @@ function asyncFixLoop(){
 	correct.logTimestamp("Основной цикл", timeBeforeMain);
 	actionsAfterFixLoop();
 }
+
 function actionsAfterFixLoop(){
 
 	//Нечего память кушать! Надо будет - новые нагенерятся
-	textNodes=[];
+	clearTemporaryData();
+
 	//Кэш не резиновый
 	setTimeout(cacheCrop,3000);
 
 	correct.logTimestamp("chas-correct отработал. С момента запуска", oldTime);
 	correct.logToConsole();
+}
+
+function clearTemporaryData(){
+	///Очищаем временные переменные, чтобы не кушали память в простое
+	textNodes = [];
+	actionArray = [];
+	text = "";
+	megaexpression = new RegExp("");
 }
 
 
