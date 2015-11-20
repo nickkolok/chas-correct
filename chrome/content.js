@@ -154,16 +154,6 @@ function extractAllTextNodes() {
 	correct.logTimestamp("На подготовку массива текстовых нод затрачено", timeBeforeNodesExtracting);
 }
 
-var typicalNodes;
-var lastActionArrayLength=storageWrapper.getKey("lastActionArrayLength",0);
-if(lastActionArrayLength==actionArrayCopy.length){
-	typicalNodes=storageWrapper.getKey("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
-}else{
-	typicalNodes={totalPages:0,nodes:{}};
-	storageWrapper.setKey("lastActionArrayLength",actionArrayCopy.length);
-	correct.log("Длина словаря изменилась - сбрасываем кэш");
-}
-
 var firstChangingNode,lastChangingNode;
 var timeBeforeMain;
 
@@ -349,6 +339,16 @@ function clearTemporaryData(){
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Блок работы с кэшем типичных нод
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var typicalNodes;
+var lastActionArrayLength=storageWrapper.getKey("lastActionArrayLength",0);
+if(lastActionArrayLength==actionArrayCopy.length){
+	typicalNodes=storageWrapper.getKey("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+}else{
+	typicalNodes={totalPages:0,nodes:{}};
+	storageWrapper.setKey("lastActionArrayLength",actionArrayCopy.length);
+	correct.log("Длина словаря изменилась - сбрасываем кэш");
+}
 
 function cacheMetrika(text) {
 	return Math.pow(typicalNodes.nodes[text],2)/( typicalNodes.nodes[text].length + 6);
