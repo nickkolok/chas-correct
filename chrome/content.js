@@ -38,6 +38,22 @@ This file is part of CHAS-CORRECT.
 
 'use strict';
 
+////////////////////////////////////////////////////////////////////////
+// ПРЕФИКСЫ
+//
+// Функции:
+// string - получает строку и возвращает строку
+// cache  - работа с кэшем
+//
+// Переменные:
+// reg    - регулярное выражение
+// str    - строка
+// flag   - флаг
+//
+// В блоке типографики пока префиксов нет
+// TODO: сделать!
+////////////////////////////////////////////////////////////////////////
+
 Array.prototype.spliceWithLast=function(index){
 	///Заменить элемент под номером index последним, последний удалить
 	///Это, очевидно, эффективнее, чем сдвигать весь массив и даже чем просто заменять на null
@@ -49,41 +65,39 @@ Array.prototype.spliceWithLast=function(index){
 Object.defineProperty(Array.prototype, 'spliceWithLast', {enumerable: false});
 
 
-var notCyrillicToTrim=/^[^а-яё]+|[^а-яё]+$/i;
-function trimNotCyrillic(text) {
+//Сейчас эта функция не используется, но, возможно, очень скоро пригодится для оптимизаций
+var regNotCyrillicToTrim=/^[^а-яё]+|[^а-яё]+$/i;
+function stringTrimNotCyrillic(ih) {
 	//Да, быстрее так, а не методом-членом
-	return text.replace(notCyrillicToTrim,"");
+	return ih.replace(regNotCyrillicToTrim,"");
 	//TODO: проверить, быстрее одной регуляркой или двумя
 }
 
 //Кэшируем строки и регэкспы. Вроде как помогает.
-var reun1=/[(]{6,}/g		, stun1="(((";
-var reun2=/[)]{6,}/g		, stun2=")))";
-var reun3=/[!]1+/g			, stun3="!";
-var reun4=/[?]7+/g			, stun4="?";
-var reun5=/([.?!])\1{3,}/g	, stun5="$1$1$1";
-function replaceUniversal(ih){
+var regUn1=/[(]{6,}/g		, strUn1="(((";
+var regUn2=/[)]{6,}/g		, strUn2=")))";
+var regUn3=/[!]1+/g			, strUn3="!";
+var regUn4=/[?]7+/g			, strUn4="?";
+var regUn5=/([.?!])\1{3,}/g	, strUn5="$1$1$1";
+function stringReplaceUniversal(ih){
 	return ih.
-		replace(reun1,stun1).
-		replace(reun2,stun2).
-		replace(reun3,stun3).
-		replace(reun4,stun4).
-		replace(reun5,stun5);
+		replace(regUn1,strUn1).
+		replace(regUn2,strUn2).
+		replace(regUn3,strUn3).
+		replace(regUn4,strUn4).
+		replace(regUn5,strUn5);
 }
 
 var reg3podryad=/([А-Яа-яЁё])\1{3,}/g;
-function specialWork(ih){
-	ih=ih.replace(reg3podryad,"$1$1$1");//Это не выносится из-за сигнатуры
-
-	return ih;
+function stringSpecialWork(ih){
+	return ih.replace(reg3podryad,"$1$1$1");//Это не выносится из-за сигнатуры
 }
 
-var lAr=[];
 var totalNodes=0;
 var errorNodes=0;
 
-function mainWork(ih){
-	ih=specialWork(ih);
+function stringMainWork(ih){
+	ih=stringSpecialWork(ih);
 
 	totalNodes++;
 
@@ -123,7 +137,7 @@ function extractTextNodesFrom(rootNode) {
 
 	while(node = walker.nextNode()) {
 		if(node.data!="" && node.data.trim()!=""){
-			node.data=replaceUniversal(node.data);
+			node.data=stringReplaceUniversal(node.data);
 			if(!notContainsCyrillic(node.data)){
 				textNodes.push(node);
 			}
@@ -139,7 +153,6 @@ function extractAllTextNodes() {
 	correct.logTimestamp("На подготовку массива текстовых нод затрачено", timeBeforeNodesExtracting);
 }
 
-var regKnown;
 var typicalNodes;
 var lastActionArrayLength=storageWrapper.getKey("lastActionArrayLength",0);
 if(lastActionArrayLength==actionArrayCopy.length){
@@ -293,7 +306,7 @@ function asyncFixLoop(){
 		if(currentNode.data in typicalNodes.nodes){
 			typicalNodes.nodes[currentNode.data]+=20;
 		}else{
-			currentNode.data=mainWork(currentNode.data);
+			currentNode.data=stringMainWork(currentNode.data);
 			typicalNodes.nodes[currentNode.data]=20;
 		}
 
