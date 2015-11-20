@@ -202,15 +202,6 @@ var firstChangingNode,lastChangingNode;
 var timeBeforeMain;
 
 function fixMistakes() {
-/*
-	if(!flagAsyncFixLoopFinished){
-		if(!flagFixMistakesScheduled){
-			setTimeout(fixMistakes,20);
-			flagFixMistakesScheduled=1;
-		}
-		return;
-	}
-*/
 	var len=textNodes.length-1;
 	var i=0;
 
@@ -239,13 +230,6 @@ function fixMistakes() {
 	
 	firstChangingNode=i;//TODO: зарефакторить
 	lastChangingNode=len;
-/*	if(flagFirstTimeFixLaunch){
-		setTimeout(asyncFixLoop,0);
-	}else{
-		asyncFixLoop();
-	}
-*/
-//	flagFixMistakesScheduled=0;
 	asyncFixLoop();
 	flagFirstTimeFixLaunch=0;
 	flagEchoMessageDomChanged=1;
@@ -444,7 +428,11 @@ function selectRegs(i,len){
 //			else
 				text+=" "+textNodes[i].data;
 	}
+
+	//Да, так быстрее, чем обрезать каждую по отдельности.
+	//Это вообще парадокс: практически всегда быстрее работать с одной большой строкой, а не с несколькими маленькими
 	text=text.replace(/[^а-яё]{4,}/gi," ");
+
 	if(text.trim()!=""){
 		actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
 	}else{
@@ -496,7 +484,6 @@ function selectRegs(i,len){
 	}
 //	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
 	megaexpression=new RegExp(megaexpressionSource.replace(/\)\|\($/,"")+")","im");
-//	correct.log(megaexpression);
 	correct.logTimestamp("Выбор регэкспов", t);
 }
 
