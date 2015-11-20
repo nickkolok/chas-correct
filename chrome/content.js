@@ -42,13 +42,14 @@ This file is part of CHAS-CORRECT.
 // ПРЕФИКСЫ
 //
 // Функции:
-// string - получает строку и возвращает строку
-// cache  - работа с кэшем
+// string   - получает строку и возвращает строку
+// cache    - работа с кэшем
 //
 // Переменные:
-// reg    - регулярное выражение
-// str    - строка
-// flag   - флаг
+// reg      - регулярное выражение
+// str      - строка
+// flag     - флаг
+// concated - "слепленные": текст и регулярки
 //
 // В блоке типографики пока префиксов нет
 // TODO: сделать!
@@ -101,7 +102,7 @@ function stringMainWork(ih){
 
 	totalNodes++;
 
-	if(!megaexpression.test(ih))
+	if(!concatedRegexp.test(ih))
 		return ih;
 
 	errorNodes++;
@@ -210,23 +211,25 @@ function firstRun() {
 }
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
-var text="";
+var concatedText="";
+var concatedRegexp;
+
 function selectRegs(i,len){
-	text="";
-	var megaexpressionSource="";
+	concatedText="";
+	var concatedRegexpSource="";
 	var delimiter="|";
 	var t=Date.now();
 	var notCyrTest=/^[^а-яё]{2,}|[^а-яё]{2,}$/i
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
-			text+=" "+textNodes[i].data;
+			concatedText+=" "+textNodes[i].data;
 	}
 
 	//Да, так быстрее, чем обрезать каждую по отдельности.
 	//Это вообще парадокс: практически всегда быстрее работать с одной большой строкой, а не с несколькими маленькими
-	text=text.replace(/[^а-яё]{4,}/gi," ");
+	concatedText=concatedText.replace(/[^а-яё]{4,}/gi," ");
 
-	if(text.trim()==""){
+	if(concatedText.trim()==""){
 		correct.log("Все ноды в кэше - незачем делать копию словаря и выбирать регэкспы");
 		clearTemporaryData();
 		return 0;
@@ -247,7 +250,7 @@ function selectRegs(i,len){
 							actionArray[j-1][3]+
 						")"
 					)
-				).test(text))
+				).test(concatedText))
 			{
 				actionArray.spliceWithLast(j);
 				actionArray.spliceWithLast(j-1);
@@ -265,16 +268,16 @@ function selectRegs(i,len){
 	//TODO: аналогичный цикл, но идти с конца. А потом уже так.
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
-			if(!actionArray[j][2].test(text)){
+			if(!actionArray[j][2].test(concatedText)){
 				actionArray.spliceWithLast(j);//Это быстрее, чем забивать нулями
 				l--;
 				j--;
 			}else{
-				megaexpressionSource+=actionArray[j][2].source+delimiter;
+				concatedRegexpSource+=actionArray[j][2].source+delimiter;
 			}
 		}
 	}
-	megaexpression=new RegExp(megaexpressionSource.replace(/\|$/,""),"im");
+	concatedRegexp=new RegExp(concatedRegexpSource.replace(/\|$/,""),"im");
 	correct.logTimestamp("Выбор регэкспов", t);
 	return 1;
 }
@@ -292,7 +295,7 @@ function asyncFixLoop(){
 			for(var j=0; (i+j<len) && (j<kuch); j++){
 				textArr.push(textNodes[i+j].data);
 			}
-			if(!megaexpression.test(textArr.join(" "))){
+			if(!concatedRegexp.test(textArr.join(" "))){
 				i+=kuch;
 				continue;
 			}
@@ -338,8 +341,8 @@ function clearTemporaryData(){
 	///Очищаем временные переменные, чтобы не кушали память в простое
 	textNodes = [];
 	actionArray = [];
-	text = "";
-	megaexpression = new RegExp("");
+	concatedText = "";
+	concatedRegexp = new RegExp("");
 }
 
 

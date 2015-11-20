@@ -115,13 +115,9 @@ for(var i1=0; i1<=1;i1++)
 	for(var i2=0; i2<=1;i2++)
 		for(var i=0; i<globalArray[i1][i2].length; i++){
 			prepareExpression(globalArray[i1][i2][i][0],globalArray[i1][i2][i][1],i1,i2);
-//			megaexpressionParts.push(globalArray[i1][i2][i][0]);
 		}
 
 var actionArrayCopy=actionArray.slice();
-
-var megaexpression;//=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
-
 
 var correct={
 	logArray:[],
