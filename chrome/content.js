@@ -391,7 +391,7 @@ function cacheRemoveOutdated() {
 }
 
 //Сбросить кэш
-function clearNodeCache(){
+function cacheClear(){
 	storageWrapper.setKey("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
 }
 
