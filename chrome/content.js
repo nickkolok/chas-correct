@@ -144,7 +144,7 @@ var textNodes=[];
 var kuch=3;
 
 function extractTextNodesFrom(rootNode) {
-	///Добавить все текстовые ноды-потомки rootNode в масссив textNodes
+	///Добавить все текстовые ноды-потомки rootNode в массив textNodes
 	var walker = document.createTreeWalker(
 		rootNode,
 		NodeFilter.SHOW_TEXT,
@@ -183,10 +183,6 @@ if(lastActionArrayLength==actionArrayCopy.length){
 	correct.log("Длина словаря изменилась - сбрасываем кэш");
 }
 
-var flagEchoMessageDomChanged;
-var flagFixMistakesScheduled=0;
-var flagAsyncFixLoopFinished=1;
-var flagFirstTimeFixLaunch=1;
 var firstChangingNode,lastChangingNode;
 var timeBeforeMain;
 
@@ -214,7 +210,6 @@ function fixMistakes() {
 	correct.logTimestamp("Выделение шаблона", timeBeforeHeader);
 
 
-	flagFirstTimeFixLaunch=0;
 	if(!selectRegs(i,len)) //Нет регулярок, с которыми нужно работать
 		return;
 
@@ -236,169 +231,7 @@ function firstRun() {
 
 firstRun();
 
-var asyncFixLoopStartTime;
-var asyncCount=0;
-function asyncFixLoop(){
-	asyncCount++;
-	asyncFixLoopStartTime=Date.now();
-	flagEchoMessageDomChanged=1;
-	for(;firstChangingNode<=lastChangingNode;firstChangingNode++){
-	/*	var textArr=[];
-		if(i%kuch == 0){
-			for(var j=0; (i+j<len) && (j<kuch); j++){
-				textArr.push(textNodes[i+j].data);
-			}
-			if(!megaexpression.test(textArr.join(" "))){
-				i+=kuch;
-				continue;
-			}
-		}
-	*/	
-		var currentNode=textNodes[firstChangingNode];
-		if(!currentNode)//Не знаю, что имеется в виду
-			continue;
-		if(currentNode.data in typicalNodes.nodes){
-			typicalNodes.nodes[currentNode.data]+=20;
-		}else{
-			currentNode.data=mainWork(currentNode.data);
-			typicalNodes.nodes[currentNode.data]=20;
-		}
 
-/*		if(
-		(firstChangingNode % 100 == 0)
-			// || (Date.now() - asyncFixLoopStartTime > 146)
-		){
-			firstChangingNode++;
-			setTimeout(asyncFixLoop,10);
-			return;
-		}
-*/
-	}
-	correct.logTimestamp("Основной цикл", timeBeforeMain);
-	flagAsyncFixLoopFinished=1;
-	actionsAfterFixLoop();
-}
-function actionsAfterFixLoop(){
-
-	//Нечего память кушать! Надо будет - новые нагенерятся
-	textNodes=[];
-	//Кэш не резиновый
-	setTimeout(cacheCrop,3000);
-
-	correct.logTimestamp("chas-correct отработал. С момента запуска", oldTime);
-	correct.logToConsole();
-}
-
-var domChangedLastTime=Date.now();
-var keydownLastTime=Date.now();
-var domChangeTimes=0;
-
-var domChangingTimeout=0;
-
-function scheduleDomChangeHandler(time){
-	clearTimeout(domChangingTimeout);
-	domChangingTimeout=setTimeout(domChangedHandler,time);
-}
-
-function domChangedHandler(){
-	var thisTime=Date.now();
-
-	// Если поднят флаг эхо-события (то есть мы сами только что поменяли DOM, внеся исправления),
-	// то флаг опустить и ничего не делать.
-	if( flagEchoMessageDomChanged ){
-		flagEchoMessageDomChanged = 0;
-		return;
-	}
-
-	if( thisTime < keydownLastTime + 2*1468 ){
-		// Ещё идёт набор текста пользователем - последний раз клавиша нажата менее 3 секунд назад.
-		// Если сейчас начать исправлять текст, есть риск помешать набору, что нехорошо.
-		// Да, был такой баг.
-		scheduleDomChangeHandler(keydownLastTime + 2 * 1468);
-		return;
-	}
-
-	if(thisTime - domChangedLastTime < 1468 ){
-		// Если недавно мы уже обрабатывали изменения DOM, то лучше дальнейшую обработку слегка отложить.
-		// Возможно, следом прилетят ещё события. А то повиснем!
-		scheduleDomChangeHandler(1468);
-		return;
-	}
-
-	// Теперь ничто не мешает взять список добавленных или изменённых нод и провести в нём исправления
-
-	domChangedLastTime=Date.now();
-	fixMistakes();
-	domChangeTimes++;
-	correct.logTimestamp("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз", thisTime);
-	correct.logToConsole();
-}
-
-//Кэширование типичных нод
-
-function cacheMetrika(text) {
-	return Math.pow(typicalNodes.nodes[text],2)/( typicalNodes.nodes[text].length + 6);
-}
-
-function cacheCrop() {
-	///Удаление из кэша лишних (по некоторой метрике) нод
-	//Считаем количество нод в кэше
-	var cacheNodesCount=Object.keys(typicalNodes.nodes).length;
-	var timeBefore=Date.now();
-
-	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
-	var currentMin;
-	var deletedNodes=0;
-	var deletedNodesLength=0;
-	var lastNode;
-
-	while(
-		//Ограничиваем кэш 100 килобайтами на сайт (или 200, т. к. юникод? Не важно)
-		cacheLength > 102400
-	||
-		//Не более 1024 нод
-		cacheNodesCount > 1024
-	){
-		for(var text in typicalNodes.nodes){
-			break;
-		}
-		//Да, это так мы получаем первую ноду из кэша
-		//Считаем её минимальной
-		currentMin = cacheMetrika(text);
-		//Ищем ноду с минимальным отношением квадрата повторяемости к длине
-		for(var text2 in typicalNodes.nodes){
-			var otherMetrika = cacheMetrika(text2);
-			if( otherMetrika < currentMin ){
-				text = text2;
-				currentMin = otherMetrika;
-			}
-		}
-		//Удаляем одну ноду
-		deletedNodes++;
-		deletedNodesLength+=text.length;
-		delete typicalNodes.nodes[text];
-
-		//Пересчитываем показатели
-		cacheNodesCount--;
-		cacheLength -= text.length+6;
-
-		//Эталонной нодой снова становится последняя
-		text = lastNode;
-		//TODO: метрики тоже куда-то кэшировать
-	}
-	storageWrapper.setKey("chas-correct-typical-nodes",typicalNodes);
-	correct.logTimestamp("Редукция кэша (нод: "+deletedNodes+", сумма длин удалённых нод: "+deletedNodesLength+")",timeBefore);
-	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
-}
-
-function cacheRemoveOutdated() {
-	for(var text in typicalNodes.nodes){
-		typicalNodes.nodes[text]--;
-		if(typicalNodes.nodes[text] < 0){
-			delete typicalNodes.nodes[text];
-		}
-	}
-}
 
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
@@ -473,9 +306,181 @@ function selectRegs(i,len){
 	return 1;
 }
 
+
+var asyncFixLoopStartTime;
+var asyncCount=0;
+function asyncFixLoop(){
+	asyncCount++;
+	asyncFixLoopStartTime=Date.now();
+	flagEchoMessageDomChanged=1;
+	for(;firstChangingNode<=lastChangingNode;firstChangingNode++){
+	/*	var textArr=[];
+		if(i%kuch == 0){
+			for(var j=0; (i+j<len) && (j<kuch); j++){
+				textArr.push(textNodes[i+j].data);
+			}
+			if(!megaexpression.test(textArr.join(" "))){
+				i+=kuch;
+				continue;
+			}
+		}
+	*/	
+		var currentNode=textNodes[firstChangingNode];
+		if(!currentNode)//Не знаю, что имеется в виду
+			continue;
+		if(currentNode.data in typicalNodes.nodes){
+			typicalNodes.nodes[currentNode.data]+=20;
+		}else{
+			currentNode.data=mainWork(currentNode.data);
+			typicalNodes.nodes[currentNode.data]=20;
+		}
+
+/*		if(
+		(firstChangingNode % 100 == 0)
+			// || (Date.now() - asyncFixLoopStartTime > 146)
+		){
+			firstChangingNode++;
+			setTimeout(asyncFixLoop,10);
+			return;
+		}
+*/
+	}
+	correct.logTimestamp("Основной цикл", timeBeforeMain);
+	actionsAfterFixLoop();
+}
+function actionsAfterFixLoop(){
+
+	//Нечего память кушать! Надо будет - новые нагенерятся
+	textNodes=[];
+	//Кэш не резиновый
+	setTimeout(cacheCrop,3000);
+
+	correct.logTimestamp("chas-correct отработал. С момента запуска", oldTime);
+	correct.logToConsole();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Блок работы с кэшем типичных нод
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function cacheMetrika(text) {
+	return Math.pow(typicalNodes.nodes[text],2)/( typicalNodes.nodes[text].length + 6);
+}
+
+function cacheCrop() {
+	///Удаление из кэша лишних (по некоторой метрике) нод
+	//Считаем количество нод в кэше
+	var cacheNodesCount=Object.keys(typicalNodes.nodes).length;
+	var timeBefore=Date.now();
+
+	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
+	var currentMin;
+	var deletedNodes=0;
+	var deletedNodesLength=0;
+	var lastNode;
+
+	while(
+		//Ограничиваем кэш 100 килобайтами на сайт (или 200, т. к. юникод? Не важно)
+		cacheLength > 102400
+	||
+		//Не более 1024 нод
+		cacheNodesCount > 1024
+	){
+		for(var text in typicalNodes.nodes){
+			break;
+		}
+		//Да, это так мы получаем первую ноду из кэша
+		//Считаем её минимальной
+		currentMin = cacheMetrika(text);
+		//Ищем ноду с минимальным отношением квадрата повторяемости к длине
+		for(var text2 in typicalNodes.nodes){
+			var otherMetrika = cacheMetrika(text2);
+			if( otherMetrika < currentMin ){
+				text = text2;
+				currentMin = otherMetrika;
+			}
+		}
+		//Удаляем одну ноду
+		deletedNodes++;
+		deletedNodesLength+=text.length;
+		delete typicalNodes.nodes[text];
+
+		//Пересчитываем показатели
+		cacheNodesCount--;
+		cacheLength -= text.length+6;
+
+		//Эталонной нодой снова становится последняя
+		text = lastNode;
+		//TODO: метрики тоже куда-то кэшировать
+	}
+	storageWrapper.setKey("chas-correct-typical-nodes",typicalNodes);
+	correct.logTimestamp("Редукция кэша (нод: "+deletedNodes+", сумма длин удалённых нод: "+deletedNodesLength+")",timeBefore);
+	correct.log("В кэше нод: "+cacheNodesCount+" общей длиной "+cacheLength+", минимум метрики "+currentMin);
+}
+
+function cacheRemoveOutdated() {
+	for(var text in typicalNodes.nodes){
+		typicalNodes.nodes[text]--;
+		if(typicalNodes.nodes[text] < 0){
+			delete typicalNodes.nodes[text];
+		}
+	}
+}
+
 //Сбросить кэш
 function clearNodeCache(){
 	storageWrapper.setKey("chas-correct-typical-nodes",{totalPages:0,nodes:{}});
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Блок обработки событий: нажатия клавиш (ввода текста) и изменения DOM
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var domChangedLastTime=Date.now();
+var keydownLastTime=Date.now();
+var domChangeTimes=0; // Сколько раз менялся DOM? Служит только для логов
+var flagEchoMessageDomChanged=0;
+var domChangingTimeout=0; //Тут хранится идентификатор запланированного изменения DOM
+
+function scheduleDomChangeHandler(time){
+	clearTimeout(domChangingTimeout);
+	domChangingTimeout=setTimeout(domChangedHandler,time);
+}
+
+function domChangedHandler(){
+	var thisTime=Date.now();
+
+	// Если поднят флаг эхо-события (то есть мы сами только что поменяли DOM, внеся исправления),
+	// то флаг опустить и ничего не делать.
+	if( flagEchoMessageDomChanged ){
+		flagEchoMessageDomChanged = 0;
+		return;
+	}
+
+	if( thisTime < keydownLastTime + 2*1468 ){
+		// Ещё идёт набор текста пользователем - последний раз клавиша нажата менее 3 секунд назад.
+		// Если сейчас начать исправлять текст, есть риск помешать набору, что нехорошо.
+		// Да, был такой баг.
+		scheduleDomChangeHandler(keydownLastTime + 2 * 1468);
+		return;
+	}
+
+	if(thisTime - domChangedLastTime < 1468 ){
+		// Если недавно мы уже обрабатывали изменения DOM, то лучше дальнейшую обработку слегка отложить.
+		// Возможно, следом прилетят ещё события. А то повиснем!
+		scheduleDomChangeHandler(1468);
+		return;
+	}
+
+	// Теперь ничто не мешает взять список добавленных или изменённых нод и провести в нём исправления
+
+	domChangedLastTime=Date.now();
+	fixMistakes();
+	domChangeTimes++;
+	correct.logTimestamp("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз", thisTime);
+	correct.logToConsole();
 }
 
 //Расстановка типографики + откладывание автокоррекции при наборе
@@ -489,6 +494,7 @@ function keydownHandler(e) {
         return false;
     }
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Ниже - кусок, который отвечает только за типографические красоты - пробелы вокруг запятых и прочее.
