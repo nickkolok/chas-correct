@@ -4,7 +4,7 @@
 // @description   Исправление наиболее частотных ошибок на просматриваемых страницах
 // @include       http://*
 // @include       https://*
-// @version       0.2.0.3
+// @version       0.2.0.4
 // ==/UserScript==
 /*
 Copyright Nikolay Avdeev aka NickKolok aka Николай Авдеев 2015
@@ -94,13 +94,14 @@ This file is part of CHAS-CORRECT.
 */
 'use strict';
 
-var oldTime = new Date().getTime();
+var oldTime = Date.now();
 
 var sya="(?=(?:ся|)(?:[^А-Яа-яЁёA-Za-z]|^|$))";
 var ca="[цc]+[ао]";
 
 var orphoWordsToCorrect=[
 /*
+	["",""],
 	["",""],
 	["",""],
 	["",""],
@@ -113,11 +114,15 @@ var orphoWordsToCorrect=[
 	["свечь","свеч"],
 	["по-*крайней","по крайней"],
 	["н[ао]-*[ао]б[ао]рот","наоборот"],
-	["грю","говорю"],//TODO: проспрягать
+	["грю","говорю"],//TODO: проспрягать //[Katzen Gott]: грит не трогать — единица измерения зернистости	["тол*ь*к[ао]-*что","только что"],
 	["тол*ь*к[ао]-*что","только что"],
 	["по-круче","покруче"],
 	["по-началу","поначалу"],
 	["кое[\s]*где","кое-где"],//TODO: аналоги
+	["кое[\s]*кто","кое-кто"],
+	["кое[\s]*что","кое-что"],
+	["кое[\s]*кого","кое-кого"],
+	["кое[\s]*кому","кое-куда"],//[Katzen Gott]: может быть "кое-к", "кое-г" и "кое-ч" префиксами сделать? А то очень много получается.
 	["где-*угодно","где угодно"],
 	["луч[ёе]м","лучом"],
 	["куда-*как","куда как"],
@@ -138,7 +143,16 @@ var orphoWordsToCorrect=[
 	["помоч","помочь"],
 	["тем-*более","тем более"],
 	["так-*что","так что"],
-	["иметь в-*виду","иметь в виду"],//TODO: проспрягать
+	["иметь в-*виду","иметь в виду"],
+	["имею в-*виду","имею в виду"],
+	["имеем в-*виду","имеем в виду"],
+	["имеешь в-*виду","имешь в виду"],
+	["имеете в-*виду","имеете в виду"],
+	["имеет в-*виду","имеет в виду"],
+	["имел в-*виду","имел в виду"],
+	["имела в-*виду","имела в виду"],
+	["имели в-*виду","имели в виду"],
+	["имеешь в-*виду","имешь в виду"], //[Katzen Gott]: вроде всё
 	["как-*нить","как-нибудь"],
 	["измениш","изменишь"],
 	["в-*случае","в случае"],
@@ -196,8 +210,7 @@ var orphoWordsToCorrect=[
 	["ни-*черта","ни черта"],
 	["тыщи","тысячи"],
 	["в[\\s-]*кратце","вкратце"],
-	//[Katzen Gott]: может быть стоит вынести "команд" в префиксы? Нортон Командер с одной "м" вроде нормально выглядит
-	["комманды","команды"],//TODO: просклонять, не обидев Norton Commander. Или обидев.
+//	["комманды","команды"],////[Katzen Gott]: вынесено в префиксы. Norton Commander обижен.
 	["по\\s*аглийски","по-английски"],
 //?	["чесслово","честное слово"],
 	["какбы","как бы"],
@@ -238,7 +251,7 @@ var orphoWordsToCorrect=[
 	["граници","границы"],
 	["в-*принципе","в принципе"],
 	["те-*же","те же"],//TODO: допросклонять
-	["из за","из-за"], //[Katzen Gott]: Не уверена, что к этому нет противопоказаний. Если есть — убирайте.
+	["из за","из-за"],
 	["изза","из-за"],
 	["тыщ","тысяч"],
 	["по-*умолчанию","по умолчанию"],
@@ -248,7 +261,7 @@ var orphoWordsToCorrect=[
 	["поменятся","поменяться"],
 	["мерится","мериться"],
 	["мерятся","меряться"],
-	["имется","иметься"],//Поднимется [Katzen Gott]: может это было "имеется"?
+	["имется","иметься"],//Поднимется 
 	["грится","говорится"],
 	["учаться","учатся"],//Но обучаться
 	["пр[ие]д[её]ть*ся","придётся"],
@@ -268,7 +281,7 @@ var orphoWordsToCorrect=[
 	["по-тихоньку","потихоньку"],
 	["по-полной","по полной"],
 	["ес+-н+о","естественно"],
-	["по-*старинке","по старинке"],
+	["по-старинке","по старинке"],
 	["по-ходу","походу"],
 	["дада","да-да"],
 	["занят*"+ca,"заняться"],
@@ -304,7 +317,7 @@ var orphoWordsToCorrect=[
 	["поумолчанию","по умолчанию"],
 	["что нибу[дт]ь","что-нибудь"],
 	["по мимо","помимо"],
-	["кое как","кое-как"], //TODO: аналоги
+	["кое как","кое-как"], //TODO: аналоги //[Katzen Gott]: см. ~62 строку. Оно бы туда же ушло
 	["в[\\s-]*конце[\s-]*то[\\s-]*концов","в конце-то концов"],
 	["ни[\\s-]*при[\\s-]*ч[еёо]м","ни при чём"],//Да, это два разных!
 	["не[\\s-]*при[\\s-]*ч[еёо]м","не при чем"],
@@ -317,8 +330,8 @@ var orphoWordsToCorrect=[
 	["бе[сз]толоч","бестолочь"],
 	["во внутрь","вовнутрь"],
 	["что-*ль","что ль"],//TODO: просклонять
-	["грит","говорит"],//TODO: добить окончаниями
-	["шо","что"],// [Katzen Gott]: а если это стилистический прием? (для передачи акцента например)
+//	["грит","говорит"],//TODO: добить окончаниями [Katzen Gott]: грит — единица измерения зернистости
+	["шо","что"],
 	["бля","эх"],//Ибо сил моих больше нет
 	["шт*об","чтоб"],
 	["знач","значит"],
@@ -384,7 +397,7 @@ var orphoWordsToCorrect=[
 	["в-*зад[еи]","сзади"],
 	["с-*зад[еи]","сзади"],
 	["з-*зад[еи]","сзади"],
-	["на[\s-]*р[ао]вне","наравне"],
+	["на[\\s-]*р[ао]вне","наравне"],
 	["серебреного","серебряного"],//TODO: просклонять
 	["сомной","со мной"],
 	["сначало","сначала"],
@@ -409,7 +422,7 @@ var orphoWordsToCorrect=[
 //	["безплатно","бесплатно"],
 	["досвидание","до свидания"],
 	["вс[её]таки","всё-таки"],
-	["в[\s-]кратце","вкратце"],
+	["в[\\s-]кратце","вкратце"],
 	["ключь","ключ"],
 	["староной","стороной"],
 	["немогу","не могу"],
@@ -476,15 +489,16 @@ var orphoWordsToCorrect=[
 	["потому-что","потому что"],
 	["что-бы","чтобы"],
 	["што-бы","чтобы"],
-	["видете","видите"],//TODO: проспрягать
+	["видете","видите"],
 	["видешь","видишь"],
 	["видет","видит"],
+	["видют","видят"],
 	["видем","видим"], //[Katzen Gott]: тут вроде все. Может быть можно как-то их "склеить"?
 	["в догонку","вдогонку"],
 	["сп[оа]сиб[оа]","спасибо"],
 	["типо","типа"],
 	["граммот","грамот"],
-	["к[ао]не[шч]но","конечно"], //[Katzen Gott]: надеюсь, я все правильно сделала...
+	["к[ао]не[шч]но","конечно"],
 	["ключ[её]м","ключом"],
 	["недай","не дай"],
 	["нович[ёе]к","новичок"],
@@ -538,7 +552,7 @@ var orphoWordsToCorrect=[
 	["по-*порядку","по порядку"],
 	["молодожённых","молодожён"],//TODO: просклонять
 	["не-*спеша","не спеша"],
-	//["амбула",??], // [Katzen Gott]: хочется уже убивать за "амбулу", но надо придумать на что ее менять.
+	["амбула","фабула"], // [Katzen Gott]: "фабула" подойдет, но если у кого-то есть версия лучше — welcome.
 ];
 
 var orphoPrefixToCorrect=[
@@ -554,6 +568,9 @@ var orphoPrefixToCorrect=[
 	["выстовк","выставк"],
 	["ковычь*к","кавычк"],
 	["к[оа]выч[еи]к","кавычек"],
+	["подчерп","почерп"],//[Katzen Gott]: подчерпнуть и иже с ним.
+	["комманд","команд"],
+	["тюрм","тюрьм"],
 	["корысн","корыстн"],
 	["д[еи][ао]лект","диалект"],
 	["спорт*цмен","спортсмен"],
@@ -971,6 +988,7 @@ var orphoFragmentsToCorrect=[
 	["",""],
 	["",""],
 	["",""],
+	["",""],
 */
 	["матер[еи]ял","материал"],
 	["с[ие]р[ьъ][её]з","серьёз"],
@@ -1237,7 +1255,7 @@ var correct={
 		return rez;
 	},
 	logTimestamp: function(text, timestamp){
-		correct.log(text+" (мс): "+(new Date().getTime() - timestamp));
+		correct.log(text+" (мс): "+(Date.now() - timestamp));
 	},
 };
 
@@ -1249,7 +1267,7 @@ try{
 	module.exports.actionArray = actionArray;
 }catch(e){
 	//Значит, не node.js
-	correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(new Date().getTime() - oldTime));
+	correct.log("chas-correct: на подготовку массива регулярных выражений затрачено (мс): "+(Date.now() - oldTime));
 }
 /*
 Copyright Nikolay Avdeev aka NickKolok aka Николай Авдеев 2015
@@ -1380,17 +1398,6 @@ function mainWork(ih){
 
 	correct.replacedPairs.push(ih);
 	for(var i=0; i<actionArray.length;i++){
-//		if(actionArray[i])
-	/*	if(ih.length>50 && /\./.test(ih)){
-			var temparr=ih.split(".");
-			var len=temparr.length;
-			for(var j=0; j<len; j++){
-				if(actionArray[i][2].test(temparr[j]))
-					temparr[j]=temparr[j].replace(actionArray[i][0],actionArray[i][1]);
-			}
-			ih=temparr.join(".");
-		}else
-	*/	
 		if(actionArray[i][2].test(ih))
 			ih=ih.replace(actionArray[i][0],actionArray[i][1]);
 	}
@@ -1430,7 +1437,7 @@ function extractTextNodesFrom(rootNode) {
 
 function extractAllTextNodes() {
 	///Заменить textNodes на список
-	var timeBeforeNodesExtracting=new Date().getTime();
+	var timeBeforeNodesExtracting=Date.now();
 	textNodes=[];
 	extractTextNodesFrom(document.body);
 	correct.logTimestamp("На подготовку массива текстовых нод затрачено", timeBeforeNodesExtracting);
@@ -1455,22 +1462,13 @@ var firstChangingNode,lastChangingNode;
 var timeBeforeMain;
 
 function fixMistakes() {
-/*
-	if(!flagAsyncFixLoopFinished){
-		if(!flagFixMistakesScheduled){
-			setTimeout(fixMistakes,20);
-			flagFixMistakesScheduled=1;
-		}
-		return;
-	}
-*/
 	var len=textNodes.length-1;
 	var i=0;
 
-	var oldTime3=new Date().getTime();
+	var oldTime3=Date.now();
 
 
-	var timeBeforeHeader=new Date().getTime();
+	var timeBeforeHeader=Date.now();
 	if(typicalNodes.nodes){
 		//Пропускаем "шапку" страницы
 		while(i<=len && textNodes[i].data in typicalNodes.nodes){
@@ -1488,17 +1486,10 @@ function fixMistakes() {
 
 
 	selectRegs(i,len);
-	timeBeforeMain=new Date().getTime();
+	timeBeforeMain=Date.now();
 	
 	firstChangingNode=i;//TODO: зарефакторить
 	lastChangingNode=len;
-/*	if(flagFirstTimeFixLaunch){
-		setTimeout(asyncFixLoop,0);
-	}else{
-		asyncFixLoop();
-	}
-*/
-//	flagFixMistakesScheduled=0;
 	asyncFixLoop();
 	flagFirstTimeFixLaunch=0;
 	flagEchoMessageDomChanged=1;
@@ -1509,6 +1500,7 @@ function firstRun() {
 	fixMistakes();
 	typicalNodes.totalPages++;//Логично, считаем настоящее количество страниц
 	setTimeout(cacheRemoveOutdated,4000);//TODO: кэширование вообще растащить
+	observeDOM(document.body, domChangedHandler);//Ставим обработчик изменений DOM
 }
 
 firstRun();
@@ -1517,7 +1509,7 @@ var asyncFixLoopStartTime;
 var asyncCount=0;
 function asyncFixLoop(){
 	asyncCount++;
-	asyncFixLoopStartTime=new Date().getTime();
+	asyncFixLoopStartTime=Date.now();
 	flagEchoMessageDomChanged=1;
 	for(;firstChangingNode<=lastChangingNode;firstChangingNode++){
 	/*	var textArr=[];
@@ -1543,7 +1535,7 @@ function asyncFixLoop(){
 
 /*		if(
 		(firstChangingNode % 100 == 0)
-			// || (new Date().getTime() - asyncFixLoopStartTime > 146)
+			// || (Date.now() - asyncFixLoopStartTime > 146)
 		){
 			firstChangingNode++;
 			setTimeout(asyncFixLoop,10);
@@ -1556,7 +1548,6 @@ function asyncFixLoop(){
 	actionsAfterFixLoop();
 }
 function actionsAfterFixLoop(){
-	observeDOM(document.body, domChangedHandler);
 
 	//Нечего память кушать! Надо будет - новые нагенерятся
 	textNodes=[];
@@ -1567,9 +1558,8 @@ function actionsAfterFixLoop(){
 	correct.logToConsole();
 }
 
-var domChangedLastTime=new Date().getTime();
-var keydownLastTime=new Date().getTime();
-var domChangedScheduled=0;
+var domChangedLastTime=Date.now();
+var keydownLastTime=Date.now();
 var domChangeTimes=0;
 
 var domChangingTimeout=0;
@@ -1580,23 +1570,36 @@ function scheduleDomChangeHandler(time){
 }
 
 function domChangedHandler(){
-	var newt=new Date().getTime();
-	if(flagEchoMessageDomChanged){
-		flagEchoMessageDomChanged=0;
+	var thisTime=Date.now();
+
+	// Если поднят флаг эхо-события (то есть мы сами только что поменяли DOM, внеся исправления),
+	// то флаг опустить и ничего не делать.
+	if( flagEchoMessageDomChanged ){
+		flagEchoMessageDomChanged = 0;
 		return;
 	}
-	if(newt - domChangedLastTime < 1468 || newt - keydownLastTime < 2*1468){
-//		if(!domChangedScheduled){
-//			domChangedScheduled=1;
-			scheduleDomChangeHandler(1468);
-//		}
+
+	if( thisTime < keydownLastTime + 2*1468 ){
+		// Ещё идёт набор текста пользователем - последний раз клавиша нажата менее 3 секунд назад.
+		// Если сейчас начать исправлять текст, есть риск помешать набору, что нехорошо.
+		// Да, был такой баг.
+		scheduleDomChangeHandler(keydownLastTime + 2 * 1468);
 		return;
 	}
-	domChangedLastTime=new Date().getTime();
-	domChangedScheduled=0;
+
+	if(thisTime - domChangedLastTime < 1468 ){
+		// Если недавно мы уже обрабатывали изменения DOM, то лучше дальнейшую обработку слегка отложить.
+		// Возможно, следом прилетят ещё события. А то повиснем!
+		scheduleDomChangeHandler(1468);
+		return;
+	}
+
+	// Теперь ничто не мешает взять список добавленных или изменённых нод и провести в нём исправления
+
+	domChangedLastTime=Date.now();
 	fixMistakes();
 	domChangeTimes++;
-	correct.logTimestamp("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз", newt);
+	correct.logTimestamp("Вызов chas-correct по смене DOM "+domChangeTimes+"-й раз", thisTime);
 	correct.logToConsole();
 }
 
@@ -1610,7 +1613,7 @@ function cacheCrop() {
 	///Удаление из кэша лишних (по некоторой метрике) нод
 	//Считаем количество нод в кэше
 	var cacheNodesCount=Object.keys(typicalNodes.nodes).length;
-	var timeBefore=new Date().getTime();
+	var timeBefore=Date.now();
 
 	var cacheLength=JSON.stringify(typicalNodes.nodes).length;
 	var currentMin;
@@ -1670,30 +1673,26 @@ function cacheRemoveOutdated() {
 //Объединение текста всех нод и выкидывание ненужных регулярок
 var text="";
 function selectRegs(i,len){
-//	var textArr=[];
-//	megaexpressionParts=[];
 	text="";
-	var megaexpressionSource="(";
-	var delimiter=")|(";
-	var t=new Date().getTime();
+	var megaexpressionSource="";
+	var delimiter="|";
+	var t=Date.now();
 	var notCyrTest=/^[^а-яё]{2,}|[^а-яё]{2,}$/i
 	for(;i<len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
-//			textArr.push(textNodes[i].data);
-//			if(notCyrTest.test(text))
-//				text+=" "+trimNotCyrillic(textNodes[i].data);
-//			else
-				text+=" "+textNodes[i].data;
+			text+=" "+textNodes[i].data;
 	}
+
+	//Да, так быстрее, чем обрезать каждую по отдельности.
+	//Это вообще парадокс: практически всегда быстрее работать с одной большой строкой, а не с несколькими маленькими
 	text=text.replace(/[^а-яё]{4,}/gi," ");
+
 	if(text.trim()!=""){
 		actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
 	}else{
 		correct.log("Все ноды в кэше - незачем делать копию словаря");
 		actionArray=[];
 	}
-//	var text=textArr.join(" ");
-//	correct.log(text);
 
 //{{Экспериментальное выкидывание регэкспов парами - медленнее
 /*	var l=actionArray.length;
@@ -1721,8 +1720,10 @@ function selectRegs(i,len){
 	console.log(l);
 */
 //}}
+
 	var l=actionArray.length;
 
+	//TODO: аналогичный цикл, но идти с конца. А потом уже так.
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(text)){
@@ -1730,14 +1731,11 @@ function selectRegs(i,len){
 				l--;
 				j--;
 			}else{
-				megaexpressionParts.push(actionArray[j][2].source);
-//				megaexpressionSource+=actionArray[j][3]+delimiter;
+				megaexpressionSource+=actionArray[j][2].source+delimiter;
 			}
 		}
 	}
-//	megaexpression=new RegExp("("+megaexpressionParts.join(")|(")+")","im");
-	megaexpression=new RegExp(megaexpressionSource.replace(/\)\|\($/,"")+")","im");
-//	correct.log(megaexpression);
+	megaexpression=new RegExp(megaexpressionSource.replace(/\|$/,""),"im");
 	correct.logTimestamp("Выбор регэкспов", t);
 }
 
@@ -1750,13 +1748,18 @@ function clearNodeCache(){
 document.onkeydown = keydownHandler;
 
 function keydownHandler(e) {
-	keydownLastTime=new Date().getTime();
+	keydownLastTime=Date.now();
     e = e || event;
 	if ((e.ctrlKey && e.shiftKey && e.keyCode == "A".charCodeAt(0))) {
         forceTypo();
         return false;
     }
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ниже - кусок, который отвечает только за типографические красоты - пробелы вокруг запятых и прочее.
+// Так как он вызывается по требованию пользователя, оптимизация не критична (хотя никогда не лишняя).
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function forceTypo(){
 	extractAllTextNodes();
