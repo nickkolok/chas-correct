@@ -256,6 +256,7 @@ function firstRun() {
 	fixMistakes();
 	typicalNodes.totalPages++;//Логично, считаем настоящее количество страниц
 	setTimeout(cacheRemoveOutdated,4000);//TODO: кэширование вообще растащить
+	observeDOM(document.body, domChangedHandler);//Ставим обработчик изменений DOM
 }
 
 firstRun();
@@ -303,7 +304,6 @@ function asyncFixLoop(){
 	actionsAfterFixLoop();
 }
 function actionsAfterFixLoop(){
-	observeDOM(document.body, domChangedHandler);
 
 	//Нечего память кушать! Надо будет - новые нагенерятся
 	textNodes=[];
