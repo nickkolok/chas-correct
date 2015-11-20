@@ -157,37 +157,57 @@ function extractAllTextNodes() {
 var firstChangingNode,lastChangingNode;
 var timeBeforeMain;
 
-function fixMistakes() {
-	var len=textNodes.length-1;
-	var i=0;
-
-	var oldTime3=Date.now();
-
+function selectNodes() {
+	firstChangingNode = 0;
+	lastChangingNode  = textNodes.length-1;
 
 	var timeBeforeHeader=Date.now();
 	if(typicalNodes.nodes){
 		//Пропускаем "шапку" страницы
-		while(i<=len && textNodes[i].data in typicalNodes.nodes){
-			i++;
+		while(
+				firstChangingNode <= lastChangingNode
+			&&
+				textNodes[firstChangingNode].data in typicalNodes.nodes
+		){
+			firstChangingNode++;
 		};
 		//И низушку
-		while(i<=len && textNodes[len].data in typicalNodes.nodes){
-			len--;
+		while(
+				firstChangingNode <= lastChangingNode
+			&&
+				textNodes[lastChangingNode].data in typicalNodes.nodes
+		){
+			lastChangingNode--;
 		};
 	}
-	len++;//Иначе глючит :(
-	var cachedNodes=i+textNodes.length-len;
-	correct.log("Нод отнесено к шапке: "+cachedNodes+"("+(cachedNodes/textNodes.length*100)+"%), до "+i+"-й и после "+(len-1)+"-й");
+
+	var cachedNodes=firstChangingNode+textNodes.length-lastChangingNode-1; //TODO: проверить, в какую там сторону единичка
+	correct.log("Нод отнесено к шапке: "+cachedNodes+"("+(cachedNodes/textNodes.length*100)+"%), до "+firstChangingNode+"-й и после "+lastChangingNode+"-й");
 	correct.logTimestamp("Выделение шаблона", timeBeforeHeader);
 
+	var timeBeforeNotCachedNodesSelecting=Date.now();
+	// Теперь выкидываем ноды, которые в кэше
+	for(var i=firstChangingNode+1; i<=lastChangingNode; i++){
+		if(textNodes[i].data in typicalNodes.nodes){ // Наша нода уже закэширована
+			// Заменяем её на ту, которая должна быть последней
+			textNodes[i] = textNodes[lastChangingNode];
+			lastChangingNode--;
+			//И потом снова изучаем полученное
+			i--;
+		}
+	}
+	correct.logTimestamp("Выбор незакэшированных нод", timeBeforeNotCachedNodesSelecting);
+}
 
-	if(!selectRegs(i,len)) //Нет регулярок, с которыми нужно работать
+
+function fixMistakes() {
+
+	selectNodes();
+	if(!selectRegs(firstChangingNode,lastChangingNode)) //Нет регулярок, с которыми нужно работать
 		return;
 
 	timeBeforeMain=Date.now();
 
-	firstChangingNode=i;//TODO: зарефакторить
-	lastChangingNode=len;
 	asyncFixLoop();
 	flagEchoMessageDomChanged=1;
 }
@@ -210,7 +230,7 @@ function selectRegs(i,len){
 	var delimiter="|";
 	var t=Date.now();
 	var notCyrTest=/^[^а-яё]{2,}|[^а-яё]{2,}$/i
-	for(;i<len;i++){
+	for(;i<=len;i++){
 		if(!(textNodes[i].data in typicalNodes.nodes))
 			concatedText+=" "+textNodes[i].data;
 	}
