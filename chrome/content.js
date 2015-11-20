@@ -56,39 +56,6 @@ function trimNotCyrillic(text) {
 	//TODO: проверить, быстрее одной регуляркой или двумя
 }
 
-var observeDOM = (function(){
-	///Наблюдение за DOM и вызов корректора при добавлении новых нод
-	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
-		eventListenerSupported = window.addEventListener;
-
-	return function(obj, callback){
-		if( MutationObserver ){
-			// define a new observer
-			var obs = new MutationObserver(function(mutations, observer){
-				var shouldBeHandled=0;
-				var len=mutations.length;
-				for(var i=0; i<len; i++){
-					for(var j=0; j<mutations[i].addedNodes.length; j++){
-						extractTextNodesFrom(mutations[i].addedNodes[j]);
-					}
-					//Гоняем проверялку только по тем нодам, которые добавились
-					//Сложность в том, что добавиться могло целое дерево
-					shouldBeHandled+=mutations[i].addedNodes.length;
-				}
-				if(shouldBeHandled){
-					domChangedHandler();
-				}else{
-					correct.log("Изменение DOM, не добавляющее ноды");
-				}
-			});
-			obs.observe( obj, { childList:true, subtree:true });
-		}
-		else if( eventListenerSupported ){
-			obj.addEventListener('DOMNodeInserted', domChangedHandler, false);
-		}
-	}
-})();
-
 //Кэшируем строки и регэкспы. Вроде как помогает.
 var reun1=/[(]{6,}/g		, stun1="(((";
 var reun2=/[)]{6,}/g		, stun2=")))";
@@ -228,11 +195,6 @@ function firstRun() {
 	setTimeout(cacheRemoveOutdated,4000);//TODO: кэширование вообще растащить
 	observeDOM(document.body, domChangedHandler);//Ставим обработчик изменений DOM
 }
-
-firstRun();
-
-
-
 
 //Объединение текста всех нод и выкидывание ненужных регулярок
 var text="";
@@ -444,6 +406,39 @@ var domChangeTimes=0; // Сколько раз менялся DOM? Служит 
 var flagEchoMessageDomChanged=0;
 var domChangingTimeout=0; //Тут хранится идентификатор запланированного изменения DOM
 
+var observeDOM = (function(){
+	///Наблюдение за DOM и вызов корректора при добавлении новых нод
+	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
+		eventListenerSupported = window.addEventListener;
+
+	return function(obj, callback){
+		if( MutationObserver ){
+			// define a new observer
+			var obs = new MutationObserver(function(mutations, observer){
+				var shouldBeHandled=0;
+				var len=mutations.length;
+				for(var i=0; i<len; i++){
+					for(var j=0; j<mutations[i].addedNodes.length; j++){
+						extractTextNodesFrom(mutations[i].addedNodes[j]);
+					}
+					//Гоняем проверялку только по тем нодам, которые добавились
+					//Сложность в том, что добавиться могло целое дерево
+					shouldBeHandled+=mutations[i].addedNodes.length;
+				}
+				if(shouldBeHandled){
+					domChangedHandler();
+				}else{
+					correct.log("Изменение DOM, не добавляющее ноды");
+				}
+			});
+			obs.observe( obj, { childList:true, subtree:true });
+		}
+		else if( eventListenerSupported ){
+			obj.addEventListener('DOMNodeInserted', domChangedHandler, false);
+		}
+	}
+})();
+
 function scheduleDomChangeHandler(time){
 	clearTimeout(domChangingTimeout);
 	domChangingTimeout=setTimeout(domChangedHandler,time);
@@ -497,7 +492,7 @@ function keydownHandler(e) {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Ниже - кусок, который отвечает только за типографические красоты - пробелы вокруг запятых и прочее.
+// Блок, который отвечает только за типографические красоты - пробелы вокруг запятых и прочее.
 // Так как он вызывается по требованию пользователя, оптимизация не критична (хотя никогда не лишняя).
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -527,3 +522,12 @@ function forceTypoInString(ih){
 			replace(typoSmallLetter,replaceSmallLetter)
 			;
 }
+
+
+////////////////////////////////////////////////////////////////////////
+// Наконец, запускаем впервые коррекцию
+// В самом конце, когда все функции уже определены
+// На всякий случай
+////////////////////////////////////////////////////////////////////////
+
+firstRun();
