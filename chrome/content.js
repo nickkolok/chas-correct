@@ -214,13 +214,15 @@ function fixMistakes() {
 	correct.logTimestamp("Выделение шаблона", timeBeforeHeader);
 
 
-	selectRegs(i,len);
+	flagFirstTimeFixLaunch=0;
+	if(!selectRegs(i,len)) //Нет регулярок, с которыми нужно работать
+		return;
+
 	timeBeforeMain=Date.now();
-	
+
 	firstChangingNode=i;//TODO: зарефакторить
 	lastChangingNode=len;
 	asyncFixLoop();
-	flagFirstTimeFixLaunch=0;
 	flagEchoMessageDomChanged=1;
 }
 
@@ -416,12 +418,14 @@ function selectRegs(i,len){
 	//Это вообще парадокс: практически всегда быстрее работать с одной большой строкой, а не с несколькими маленькими
 	text=text.replace(/[^а-яё]{4,}/gi," ");
 
-	if(text.trim()!=""){
-		actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
-	}else{
-		correct.log("Все ноды в кэше - незачем делать копию словаря");
+	if(text.trim()==""){
+		correct.log("Все ноды в кэше - незачем делать копию словаря и выбирать регэкспы");
 		actionArray=[];
+		megaexpression=new RegExp("");
+		textNodes=[];
+		return 0;
 	}
+	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
 
 //{{Экспериментальное выкидывание регэкспов парами - медленнее
 /*	var l=actionArray.length;
@@ -466,6 +470,7 @@ function selectRegs(i,len){
 	}
 	megaexpression=new RegExp(megaexpressionSource.replace(/\|$/,""),"im");
 	correct.logTimestamp("Выбор регэкспов", t);
+	return 1;
 }
 
 //Сбросить кэш
