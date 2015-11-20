@@ -127,17 +127,6 @@ function mainWork(ih){
 
 	correct.replacedPairs.push(ih);
 	for(var i=0; i<actionArray.length;i++){
-//		if(actionArray[i])
-	/*	if(ih.length>50 && /\./.test(ih)){
-			var temparr=ih.split(".");
-			var len=temparr.length;
-			for(var j=0; j<len; j++){
-				if(actionArray[i][2].test(temparr[j]))
-					temparr[j]=temparr[j].replace(actionArray[i][0],actionArray[i][1]);
-			}
-			ih=temparr.join(".");
-		}else
-	*/	
 		if(actionArray[i][2].test(ih))
 			ih=ih.replace(actionArray[i][0],actionArray[i][1]);
 	}
@@ -463,6 +452,7 @@ function selectRegs(i,len){
 
 	var l=actionArray.length;
 
+	//TODO: аналогичный цикл, но идти с конца. А потом уже так.
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(text)){
@@ -470,8 +460,7 @@ function selectRegs(i,len){
 				l--;
 				j--;
 			}else{
-				megaexpressionParts.push(actionArray[j][2].source);
-//				megaexpressionSource+=actionArray[j][3]+delimiter;
+				megaexpressionSource+=actionArray[j][2].source+delimiter;
 			}
 		}
 	}
