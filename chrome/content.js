@@ -167,7 +167,7 @@ function selectNodes() {
 		while(
 				firstChangingNode <= lastChangingNode
 			&&
-				textNodes[firstChangingNode].data in typicalNodes.nodes
+				cacheIncreaseIfExists(textNodes[firstChangingNode].data)
 		){
 			firstChangingNode++;
 		};
@@ -175,7 +175,7 @@ function selectNodes() {
 		while(
 				firstChangingNode <= lastChangingNode
 			&&
-				textNodes[lastChangingNode].data in typicalNodes.nodes
+				cacheIncreaseIfExists(textNodes[lastChangingNode].data )
 		){
 			lastChangingNode--;
 		};
@@ -186,25 +186,44 @@ function selectNodes() {
 	correct.logTimestamp("Выделение шаблона", timeBeforeHeader);
 
 	var timeBeforeNotCachedNodesSelecting=Date.now();
+
+	concatedText="";
+
 	// Теперь выкидываем ноды, которые в кэше
 	for(var i=firstChangingNode+1; i<=lastChangingNode; i++){
-		if(textNodes[i].data in typicalNodes.nodes){ // Наша нода уже закэширована
+		if(cacheIncreaseIfExists(textNodes[i].data)){ // Наша нода уже закэширована
 			// Заменяем её на ту, которая должна быть последней
 			textNodes[i] = textNodes[lastChangingNode];
 			lastChangingNode--;
 			//И потом снова изучаем полученное
 			i--;
+		} else {
+			concatedText+=" "+textNodes[i].data;
 		}
 	}
+
+	//Да, так быстрее, чем обрезать каждую по отдельности.
+	//Это вообще парадокс: практически всегда быстрее работать с одной большой строкой, а не с несколькими маленькими
+	concatedText=concatedText.replace(/[^а-яё]{4,}/gi," ");
+
+	// TODO: вынести это в selectNodes
+	if(concatedText.trim()==""){
+		correct.log("Все ноды в кэше - нечего делать");
+		clearTemporaryData();
+		return 0;
+	}
 	correct.logTimestamp("Выбор незакэшированных нод", timeBeforeNotCachedNodesSelecting);
+	return 1;
 }
 
 
 function fixMistakes() {
 
-	selectNodes();
-	if(!selectRegs(firstChangingNode,lastChangingNode)) //Нет регулярок, с которыми нужно работать
-		return;
+	if(!selectNodes()){
+		return 0;
+	}
+	if(!selectRegs()) //Нет регулярок, с которыми нужно работать
+		return 0;
 
 	timeBeforeMain=Date.now();
 
@@ -224,26 +243,11 @@ function firstRun() {
 var concatedText="";
 var concatedRegexp;
 
-function selectRegs(i,len){
-	concatedText="";
+function selectRegs(){
 	var concatedRegexpSource="";
 	var delimiter="|";
 	var t=Date.now();
-	var notCyrTest=/^[^а-яё]{2,}|[^а-яё]{2,}$/i
-	for(;i<=len;i++){
-		if(!(textNodes[i].data in typicalNodes.nodes))
-			concatedText+=" "+textNodes[i].data;
-	}
 
-	//Да, так быстрее, чем обрезать каждую по отдельности.
-	//Это вообще парадокс: практически всегда быстрее работать с одной большой строкой, а не с несколькими маленькими
-	concatedText=concatedText.replace(/[^а-яё]{4,}/gi," ");
-
-	if(concatedText.trim()==""){
-		correct.log("Все ноды в кэше - незачем делать копию словаря и выбирать регэкспы");
-		clearTemporaryData();
-		return 0;
-	}
 	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
 
 //{{Экспериментальное выкидывание регэкспов парами - медленнее
@@ -275,7 +279,7 @@ function selectRegs(i,len){
 
 	var l=actionArray.length;
 
-	//TODO: аналогичный цикл, но идти с конца. А потом уже так.
+	//TODO: аналогичный цикл, но идти с конца. А потом уже так. Как в selectNodes
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(concatedText)){
@@ -287,7 +291,15 @@ function selectRegs(i,len){
 			}
 		}
 	}
-	concatedRegexp=new RegExp(concatedRegexpSource.replace(/\|$/,""),"im");
+
+	concatedRegexpSource=concatedRegexpSource.replace(/\|$/,"")
+	if(!concatedRegexpSource){
+		correct.log("Нет обнаруживаемых ошибок");
+		clearTemporaryData();
+		correct.logTimestamp("Выбор регэкспов", t);
+		return 0;
+	}
+	concatedRegexp=new RegExp(concatedRegexpSource,"im");
 	correct.logTimestamp("Выбор регэкспов", t);
 	return 1;
 }
@@ -314,11 +326,9 @@ function asyncFixLoop(){
 		var currentNode=textNodes[firstChangingNode];
 		if(!currentNode)//Не знаю, что имеется в виду
 			continue;
-		if(currentNode.data in typicalNodes.nodes){
-			typicalNodes.nodes[currentNode.data]+=20;
-		}else{
-			currentNode.data=stringMainWork(currentNode.data);
-			typicalNodes.nodes[currentNode.data]=20;
+		if(!cacheIncreaseIfExists(currentNode.data)){
+			currentNode.data = stringMainWork(currentNode.data);
+			typicalNodes.nodes[currentNode.data] = 20;
 		}
 
 /*		if(
@@ -373,6 +383,15 @@ if(lastActionArrayLength==actionArrayCopy.length){
 function cacheMetrika(text) {
 	return Math.pow(typicalNodes.nodes[text],2)/( typicalNodes.nodes[text].length + 6);
 }
+
+function cacheIncreaseIfExists(text){
+	if(text in typicalNodes.nodes){
+		typicalNodes.nodes[text]+=20;
+		return 1;
+	}
+	return 0;
+}
+
 
 function cacheCrop() {
 	///Удаление из кэша лишних (по некоторой метрике) нод
