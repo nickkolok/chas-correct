@@ -38,7 +38,13 @@ function getFileFromGit(filename, revision, callback, callbackParam){
 
 function parseFileFromGit(o){
 	var obj=vm.createContext();
-	vm.runInContext(o.stdout, obj);
+	try{
+		vm.runInContext(o.stdout, obj);
+	}catch(e){
+		console.log("Не удалось прочесть словарь в ревизии "+o.revision);
+		console.log(o.stdout);
+		return;
+	}
 	buffer[o.revision]={};
 	for(var i=0; i<targetObjectNames.length; i++){
 		buffer[o.revision][targetObjectNames[i]]=arrayToObject(obj[targetObjectNames[i]],0);
