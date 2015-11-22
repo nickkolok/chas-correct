@@ -63,7 +63,14 @@ Array.prototype.spliceWithLast=function(index){
 	this.length--;
 };
 
+Array.prototype.replaceWith=function(index,replacerIndex){
+	///Заменить элемент под номером index элементом под номером replacerIndex
+	'use strict';
+	this[index]=this[replacerIndex];
+};
+
 Object.defineProperty(Array.prototype, 'spliceWithLast', {enumerable: false});
+Object.defineProperty(Array.prototype, 'replaceWith'   , {enumerable: false});
 
 
 //Сейчас эта функция не используется, но, возможно, очень скоро пригодится для оптимизаций
@@ -219,11 +226,12 @@ function selectNodes() {
 
 function fixMistakes() {
 
-	if(!selectNodes()){
+	if(!selectNodes()){ // Все ноды закешированы
 		return 0;
 	}
-	if(!selectRegs()) //Нет регулярок, с которыми нужно работать
+	if(!selectRegs()){ // Нет регулярок, с которыми нужно работать
 		return 0;
+	}
 
 	timeBeforeMain=Date.now();
 
@@ -248,7 +256,7 @@ function selectRegs(){
 	var delimiter="|";
 	var t=Date.now();
 
-	actionArray=actionArrayCopy.slice();//Да, так быстрее: http://jsperf.com/array-slice-vs-push
+	actionArray=actionArrayCopy.slice();//Да, так быстрее: https://jsperf.com/array-slice-vs-push/3
 
 //{{Экспериментальное выкидывание регэкспов парами - медленнее
 /*	var l=actionArray.length;
@@ -283,7 +291,7 @@ function selectRegs(){
 	for(var j=0; j<l; j++){
 		if(actionArray[j] && actionArray[j][2]){
 			if(!actionArray[j][2].test(concatedText)){
-				actionArray.spliceWithLast(j);//Это быстрее, чем забивать нулями
+				actionArray.replaceWith(j,l-1);//Это быстрее, чем забивать нулями
 				l--;
 				j--;
 			}else{
@@ -291,6 +299,7 @@ function selectRegs(){
 			}
 		}
 	}
+	actionArray.length=l+1;
 
 	concatedRegexpSource=concatedRegexpSource.replace(/\|$/,"")
 	if(!concatedRegexpSource){
