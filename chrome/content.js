@@ -550,14 +550,20 @@ function domChangedHandler(){
 	correct.logToConsole();
 }
 
-//Расстановка типографики + откладывание автокоррекции при наборе
+//Расстановка типографики + откладывание автокоррекции при наборе + коррекция раскладки собеседника
 document.onkeydown = keydownHandler;
 
 function keydownHandler(e) {
 	keydownLastTime=Date.now();
     e = e || event;
-	if ((e.ctrlKey && e.shiftKey && e.keyCode == "A".charCodeAt(0))) {
+	if (e.ctrlKey && e.shiftKey && e.keyCode == "A".charCodeAt(0)) {
         forceTypo();
+        return false;
+    } if (e.ctrlKey && e.shiftKey && e.keyCode == 109) {
+        handleLayoutFix(regLayoutArrayCyr);
+        return false;
+    } if (e.ctrlKey && e.shiftKey && e.keyCode == 107) {
+        handleLayoutFix(regLayoutArrayLat);
         return false;
     }
 }
@@ -594,6 +600,39 @@ function forceTypoInString(ih){
 			replace(typoSmallLetter,replaceSmallLetter)
 			;
 }
+
+////////////////////////////////////////////////////////////////////////
+// По просьбам трудящихся - принудтранслит по Ctrl+Shift+?
+////////////////////////////////////////////////////////////////////////
+
+var strCyr="ёйцукенгшщзхъфывапролджэячсмитьбю"+'.Ё"№;:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,';
+var strLat="`qwertyuiop[]asdfghjkl;'zxcvbnm,."+'/~@#$^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?';
+var regLayoutArrayCyr=[], regLayoutArrayLat=[];
+var cyrArray=strCyr.split("");
+var latArray=strLat.split("");
+
+
+for(var i=0; i<cyrArray.length; i++){
+	regLayoutArrayCyr.push([cyrArray[i],latArray[i]]);
+	regLayoutArrayLat.push([latArray[i],cyrArray[i]]);
+}
+
+function stringFixLayout(ih,arr){
+	var rez="";
+	for(var i=0; i<ih.length; i++){
+		var letter=ih.substr(i,1);
+		for(var j=0; j<arr.length; j++)
+			letter=letter.replace(arr[j][0],arr[j][1]);
+		rez+=letter;
+	}
+	return rez;
+}
+
+function handleLayoutFix(arr){
+	var selectedText = window.getSelection().toString();
+	alert(stringFixLayout(selectedText,arr));
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////
