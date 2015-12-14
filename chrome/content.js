@@ -551,7 +551,8 @@ function domChangedHandler(){
 }
 
 //Расстановка типографики + откладывание автокоррекции при наборе + коррекция раскладки собеседника
-document.onkeydown = keydownHandler;
+document.addEventListener("keydown", keydownHandler, true);
+//document.onkeydown = keydownHandler;
 
 function keydownHandler(e) {
 	keydownLastTime=Date.now();
