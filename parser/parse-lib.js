@@ -2,6 +2,8 @@ var fs = require('fs');
 var exec = require('child_process').exec;
 var http = require('http');
 var https = require('https');
+var request = require('request');
+
 
 var words = {};
 var regCyr=/[А-Яа-яЁё]/;
@@ -100,6 +102,10 @@ function readWordsFromJSON(filename){
 	words=JSON.parse(fs.readFileSync(filename, 'utf-8'));
 }
 
+function readJSONfromFile(filename){
+	return JSON.parse(fs.readFileSync(filename, 'utf-8'));
+}
+
 function bruteReplace(ih){
 	for(var i=0; i<actionArray.length;i++){
 		if(actionArray[i][2].test(ih))
@@ -122,7 +128,16 @@ function isReplacable(chto){
 }
 
 function readActionArray(){
-	actionArray = require('../prepareDictionary.js').actionArray;
+	return actionArray = require('../prepareDictionary.js').actionArray;
+}
+
+function makeGlobalExpression(){
+	readActionArray();
+	var globalExpressionSrc=actionArray[0][0].source;
+	for(var i=1; i<actionArray.length; i++){
+		globalExpressionSrc+="|"+actionArray[i][0].source;
+	}
+	return new RegExp(globalExpressionSrc,"g");
 }
 
 function selectReplacable(){
@@ -255,6 +270,25 @@ function repairAbsentFiles(o){
 	repairAbsentFiles();
 }
 
+function getHTMLfromURL(url,callback,options){
+	request(url, function (error, response, body) {
+	  if (!error && response.statusCode == 200) {
+		callback(body,options);
+	  }
+	});
+}
+
+function getChunkFromURL(url,callback,beginning,ending,options){
+	getHTMLfromURL(url,function(body){
+//		console.log(body);
+		callback(
+			body.substr(0,body.search(ending)).substr(body.search(beginning)),
+			options
+		);
+	})
+}
+
+
 module.exports.repairAbsentFiles=repairAbsentFiles;
 module.exports.countErrorsInTextFileDump=countErrorsInTextFileDump;
 module.exports.startDownloadTextFiles=startDownloadTextFiles;
@@ -265,6 +299,17 @@ module.exports.countReplacableInJSON=countReplacableInJSON;
 module.exports.readFilesToSentences=readFilesToSentences;
 module.exports.makeCorpusFromFiles=makeCorpusFromFiles;
 module.exports.countErrorsInCorpus=countErrorsInCorpus;
+module.exports.getHTMLfromURL=getHTMLfromURL;
+module.exports.getChunkFromURL=getChunkFromURL;
+module.exports.readJSONfromFile=readJSONfromFile;
+module.exports. makeGlobalExpression = makeGlobalExpression ;
+module.exports. readActionArray = readActionArray ;
+
+/*
+module.exports.  =  ;
+module.exports.  =  ;
+*/
+
 
 /* Примеры использования
 
