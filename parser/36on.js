@@ -4,26 +4,27 @@ var request = require('request');
 var fs = require('fs');
 
 
+//36on.ru - удобнее с мобильной версии
 //urllist.countErrorsInURLlist('m36on.json',1000,"<div class='mobile_title l-page__content text'>","<div class='share_block'>");
 
 //urllist.countErrorsInURLlist('abireg2.urllist.json',10000,'<td class=news>','<div class=print>');
-
+/*
 var abireglinks=[]
 for(var i=3; i<50585; i++){
 	abireglinks.push('http://www.abireg.ru/n_'+i+'.html');
 }
 urllist.countErrorsInURLarray(abireglinks,100000,'<td class=news>','<div class=print>');
 
-
+*/
 
 //urllist.countErrorsInURLlist('abireg.urllist.json',1000,'Комментарии на Abireg.ru','Комментарии на Facebook.com');//Не пашет
 //urllist.countErrorsInURLlist('bloknot.urllist.json',100000,'<div id="social-top"','<div id="social-bottom"');
 
-//urllist.countErrorsInURLlist('bloknot-voronezh.urllist.json',100000,'<body>','</body>');
+//urllist.countErrorsInURLlist('bloknot-voronezh.urllist.json',100,'<body>','</body>');
 //urllist.countErrorsInURLlist('moe-online.urllist.json',1000000,'<li id="toc">','<div id="orphus1" title="Система Orphus">');
 //urllist.countErrorsInURLlist('kp.urllist.json',1000000,'<body','</body>');
 //urllist.countErrorsInURLlist('region.kp.urllist.json',1000000,'a_leftcol','a_broadcast'/*'<!-- Блок подписки - НАЧАЛО -->'*/);
-//urllist.countErrorsInURLlist('region.kp.urllist.json',1000000,'<body','</body>');
+urllist.countErrorsInURLlist('region.kp.urllist.json',500000000,'<body','</body>');
 //urllist.countErrorsInURLlist('vrn.kp_daily.urllist.json',1000000,'<body','</body>');
 //urllist.countErrorsInURLlist('vrn.kp_daily.urllist.json',1000000,'main-article_title','see-also-container');
 
