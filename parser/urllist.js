@@ -13,7 +13,6 @@ var pagesWithErrors;
 var name="log";
 var log404="";
 
-var textBuffer="";
 var wordcounter;
 
 function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
@@ -36,10 +35,6 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 
 	wordcounter=new Worker(wordcountWorker);
 	wordcounter.onmessage=function(m){console.log(m.data)};
-/*	worker = new Worker(ali);
-	worker.onmessage = function(m) {
-	  console.log(m.data);
-	};*/
 }
 
 function countErrorsInURLlist(filename,maxlength,beginFrom,endWith,options){
@@ -52,12 +47,7 @@ function normalize(text){
 	return text.replace(/ё/gi,"е").replace(/\s+/gi," ");
 }
 
-function workWithChunk(text,options){
-	pagesProceeded++;
-	if(pagesProceeded==length){
-		finishCheck();
-		return;
-	}
+function workWithGoodChunk(text,options){
 	text=text.replace(/[^а-яё]{4,}/gi,";");
 	if(!text.length){
 		log404+=(options.url+" : целевой текст не выделен\n");
@@ -70,14 +60,7 @@ function workWithChunk(text,options){
 		text: text,
 		parser: parser,
 	});
-/*	
-	if(textBuffer.length>32*1024*1024){
-		console.error('Сброс слов');
-		parser.addTextToWords(textBuffer);
-		textBuffer=text;
-	}
-	textBuffer+=';'+text;
-*/	
+
 	var possibleMistakes=text.match(globalExpression);
 	if(!possibleMistakes){
 		return;
@@ -92,10 +75,15 @@ function workWithChunk(text,options){
 			console.log(options.url+" : "+possibleMistakes[i]);
 			errors++;
 		}
+	}	
+}
+function workWithChunk(text,options){
+	workWithGoodChunk(text,options);
+	pagesProceeded++;
+	if(pagesProceeded==length){
+		finishCheck();
 	}
 }
-
-var worker;
 
 function finishCheck(){
 	var successPages=pagesProceeded-pagesWithErrors;
@@ -104,13 +92,7 @@ function finishCheck(){
 	console.log("Ошибок обнаружено: "+errors);
 	console.log("Ошибок обнаружено на страницу: "+(errors/successPages));
 	fs.writeFileSync("results/"+name+".404.log",log404);
-//	ali.f=function(a){return a+1;}
-//	worker.postMessage({type:'ali',f:new String(function(a){return a+1;})});
 
-/*	wordcounter.onmessage = function(m) {
-	  console.log(m.data);
-	};
-*/
 	wordcounter.onmessage=function(m){
 		parser.setWords(m.data);
 		console.log("Словоупотреблений обработано: "+ m.data.wordsCount);
@@ -122,16 +104,6 @@ function finishCheck(){
 	wordcounter.postMessage({
 		type: 'finish',
 	});
-
-	
-	
-/*	parser.addTextToWords(textBuffer);
-	var wordsCount=parser.countWords();
-	console.log("Словоупотреблений обработано: "+ wordsCount);
-	console.log("Ошибок на 1000 словоупотреблений обнаружено: "+(errors/wordsCount*1000))
-	parser.resultToJSON('results/'+name+'.words');
-	console.error("Завершено: "+name);
-*/
 }
 
 
@@ -161,21 +133,7 @@ function extractURLlistFromURLsequence(o){
 	}
 
 }
-/*
-function ali(){
-	this.textBuffer="";
-	postMessage("I'm working before postMessage('ali').");
-	this.onmessage = function(event) {
-		var m=event.data;
-		if(m.type=='ali'){
-			//var f='';//new Function(m.f);
-			postMessage('Hi ' + event.data.type + ' ' +f(1));
-			self.close();
-		}
-	};
-	this.f=f;
-}
-*/
+
 function wordcountWorker(){
 	this.textBuffer="";
 	this.words={};
@@ -184,14 +142,15 @@ function wordcountWorker(){
 	this.regCyr=/[А-Яа-яЁё]/;
 	this.addText=function(text){//TODO: найти способ избежать повторений с parse-lib
 		var localWords=text.split(wordm);
-		for(var i1=0; i1 < localWords.length; i1++){
-			if(regCyr.test(localWords[i1]) && localWords[i1].length > 1){
-				localWords[i1]=localWords[i1].toLowerCase();
+		for(var i = 0; i < localWords.length; i++){
+			var word = localWords[i];
+			if(regCyr.test(word) && word.length > 1){
+				word = word.toLowerCase();
 				wordsCount++;
-				if(words[localWords[i1]]){
-					words[localWords[i1]]++;
+				if(words[word]){
+					words[word]++;
 				}else{
-					words[localWords[i1]]=1;
+					words[word]=1;
 				}
 			}
 		}
@@ -202,8 +161,10 @@ function wordcountWorker(){
 			if(textBuffer.length>32*1024*1024){
 				addText(textBuffer);
 				textBuffer=m.text;
+			} else {
+				textBuffer+=';'+m.text;
 			}
-			textBuffer+=';'+m.text;
+			
 		}else if(m.type=='countWords'){
 			postMessage(wordsCount);	
 		}else if(m.type=='getWords'){
