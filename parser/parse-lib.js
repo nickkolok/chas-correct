@@ -3,11 +3,14 @@ var exec = require('child_process').exec;
 var http = require('http');
 var https = require('https');
 var request = require('request');
-
+var iconv = require('iconv-lite');
+iconv.skipDecodeWarning = true;
+var totalWords=0;
 
 var words = {};
 var regCyr=/[А-Яа-яЁё]/;
-var wordm=/[\s\[\].,;:?!<>\(\)&…*«»%№""'']|^|$/gm;//А то IDE смущается
+//var wordm=/[\s\[\].,;:?!<>\(\)&…*«»%№""'']|^|$/gm;//А то IDE смущается
+var wordm=/[^А-Яа-яЁё\-]/gm;//А то IDE смущается
 var tsya=/ть*ся/;
 var oldTime;
 
@@ -39,11 +42,16 @@ function loadPage(page,pagelim,urlPrefix,urlPostfix,filename){
 	});
 }
 
+function makeWordsEmpty(){
+	words={};
+}
+
 function addTextToWords(text){
 	var localWords=text.split(wordm);
 	for(var i1=0; i1 < localWords.length; i1++){
 		if(regCyr.test(localWords[i1]) && localWords[i1].length > 1){
 			localWords[i1]=localWords[i1].toLowerCase();
+			totalWords++;
 			if(words[localWords[i1]]){
 				words[localWords[i1]]++;
 			}else{
@@ -51,6 +59,11 @@ function addTextToWords(text){
 			}
 		}
 	}
+}
+
+function countWords(){
+//	return Object.keys(words).length;
+	return totalWords;
 }
 
 function resultToJSON(filename){
@@ -151,6 +164,11 @@ function selectReplacable(){
 		}
 	}
 	return totalWords;
+}
+
+function setWords(o){
+	words=o.words;
+	totalWords=o.wordsCount;
 }
 
 /*
@@ -271,15 +289,25 @@ function repairAbsentFiles(o){
 }
 
 function getHTMLfromURL(url,callback,options){
-	request(url, function (error, response, body) {
-	  if (!error && response.statusCode == 200) {
-		callback(body,options);
-	  }
+	request.get({
+		uri: url,
+		encoding: null,
+	}, function (error, response, body) {
+		if (!error && response.statusCode == 200) {
+			callback(body,options);
+		} else {
+			options || (options = {});
+			options.error=error;
+			callback("",options);
+		}
 	});
 }
 
 function getChunkFromURL(url,callback,beginning,ending,options){
 	getHTMLfromURL(url,function(body){
+
+		body = iconv.decode(body, options.encoding || 'utf8');
+
 //		console.log(body);
 		callback(
 			body.substr(0,body.search(ending)).substr(body.search(beginning)),
@@ -305,7 +333,18 @@ module.exports.readJSONfromFile=readJSONfromFile;
 module.exports. makeGlobalExpression = makeGlobalExpression ;
 module.exports. readActionArray = readActionArray ;
 
+module.exports.makeWordsEmpty  =  makeWordsEmpty;
+module.exports.addTextToWords  =  addTextToWords;
+module.exports.resultToJSON =  resultToJSON;
+module.exports. countWords = countWords ;
+module.exports. setWords = setWords ;
+
+
+
 /*
+module.exports.  =  ;
+module.exports.  =  ;
+module.exports.  =  ;
 module.exports.  =  ;
 module.exports.  =  ;
 */
