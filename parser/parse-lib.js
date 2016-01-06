@@ -292,6 +292,7 @@ function getHTMLfromURL(url,callback,options){
 	request.get({
 		uri: url,
 		encoding: null,
+		followRedirects : true,
 	}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			callback(body,options);

@@ -78,6 +78,7 @@ function workWithGoodChunk(text,options){
 	}	
 }
 function workWithChunk(text,options){
+	console.error(pagesProceeded,text.length,options);
 	workWithGoodChunk(text,options);
 	pagesProceeded++;
 	if(pagesProceeded==length){
@@ -99,8 +100,7 @@ function finishCheck(){
 		console.log("Ошибок на 1000 словоупотреблений обнаружено: "+(errors/m.data.wordsCount*1000))
 		parser.resultToJSON('results/'+name+'.words');
 		console.error("Завершено: "+name);
-	}	
-	
+	}
 	wordcounter.postMessage({
 		type: 'finish',
 	});
@@ -108,7 +108,7 @@ function finishCheck(){
 
 
 function extractURLlistFromURLsequence(o){
-	var linksObject={};
+	var linksObject=o.linksObject || {};
 	var pagesCount=o.pagesCount||5000;
 	var pagesParsed=0;
 	
@@ -127,11 +127,12 @@ function extractURLlistFromURLsequence(o){
 		pagesParsed++;
 		if(pagesParsed==pagesCount){
 			fs.writeFileSync("urllists/"+o.name+".urllist.json",JSON.stringify(Object.keys(linksObject)));
-		} else if(!(i%20)){
+		} else if(!(i%(o.reportEvery||20))){
 			console.log(i);
 		}
+//		console.log(linksObject);
 	}
-
+	return linksObject;
 }
 
 function wordcountWorker(){
