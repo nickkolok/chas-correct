@@ -197,7 +197,7 @@ function selectNodes() {
 	concatedText="";
 
 	// Теперь выкидываем ноды, которые в кэше
-	for(var i=firstChangingNode+1; i<=lastChangingNode; i++){
+	for(var i=firstChangingNode; i<=lastChangingNode; i++){
 		if(cacheIncreaseIfExists(textNodes[i].data)){ // Наша нода уже закэширована
 			// Заменяем её на ту, которая должна быть последней
 			textNodes[i] = textNodes[lastChangingNode];
