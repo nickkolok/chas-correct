@@ -1,6 +1,9 @@
 var fs = require('fs');
 var parser = require('./parse-lib.js');
-var Worker = require('webworker-threads').Worker;
+var childProcess=require('child_process');
+var wordcounterProcess = childProcess.fork(__dirname+'/wordcounterProcess.js');
+
+//var Worker = require('webworker-threads').Worker;
 
 var globalExpression=parser.makeGlobalExpression();
 var actionArray=parser.readActionArray();
@@ -12,8 +15,6 @@ var pagesWithErrors;
 
 var name="log";
 var log404="";
-
-var wordcounter;
 
 function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 	errors=0;
@@ -32,9 +33,6 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 		newopts.url=urls[i];
 		parser.getChunkFromURL(urls[i],workWithChunk,beginFrom,endWith,newopts);
 	}
-
-	wordcounter=new Worker(wordcountWorker);
-	wordcounter.onmessage=function(m){console.log(m.data)};
 }
 
 function countErrorsInURLlist(filename,maxlength,beginFrom,endWith,options){
@@ -55,10 +53,9 @@ function workWithGoodChunk(text,options){
 		return;
 	}
 	
-	wordcounter.postMessage({
+	wordcounterProcess.send({
 		type: 'newtext',
 		text: text,
-		parser: parser,
 	});
 
 	var possibleMistakes=text.match(globalExpression);
@@ -92,17 +89,16 @@ function finishCheck(){
 	console.log("Страниц обработано неуспешно: "+pagesWithErrors);
 	console.log("Ошибок обнаружено: "+errors);
 	console.log("Ошибок обнаружено на страницу: "+(errors/successPages));
-	fs.writeFileSync("results/"+name+".404.log",log404);
+	fs.writeFile("results/"+name+".404.log",log404);
 
-	wordcounter.onmessage=function(m){
-		parser.setWords(m.data);
-		console.log("Словоупотреблений обработано: "+ m.data.wordsCount);
-		console.log("Ошибок на 1000 словоупотреблений обнаружено: "+(errors/m.data.wordsCount*1000))
-		parser.resultToJSON('results/'+name+'.words');
+	wordcounterProcess.on('message', function (count) {
+		console.log("Словоупотреблений обработано: "+ count);
+		console.log("Ошибок на 1000 словоупотреблений обнаружено: "+(errors/count*1000))
 		console.error("Завершено: "+name);
-	}
-	wordcounter.postMessage({
+	});
+	wordcounterProcess.send({
 		type: 'finish',
+		filename: 'results/'+name,
 	});
 }
 
@@ -134,7 +130,7 @@ function extractURLlistFromURLsequence(o){
 	}
 	return linksObject;
 }
-
+/*
 function wordcountWorker(){
 	this.textBuffer="";
 	this.words={};
@@ -180,7 +176,7 @@ function wordcountWorker(){
 		}
 	}
 }
-
+*/
 
 module.exports.extractURLlistFromURLsequence = extractURLlistFromURLsequence;
 
