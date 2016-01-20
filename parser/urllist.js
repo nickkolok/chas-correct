@@ -3,8 +3,6 @@ var parser = require('./parse-lib.js');
 var childProcess=require('child_process');
 var wordcounterProcess = childProcess.fork(__dirname+'/wordcounterProcess.js');
 
-//var Worker = require('webworker-threads').Worker;
-
 var globalExpression=parser.makeGlobalExpression();
 var actionArray=parser.readActionArray();
 var length;
@@ -126,57 +124,9 @@ function extractURLlistFromURLsequence(o){
 		} else if(!(i%(o.reportEvery||20))){
 			console.log(i);
 		}
-//		console.log(linksObject);
 	}
 	return linksObject;
 }
-/*
-function wordcountWorker(){
-	this.textBuffer="";
-	this.words={};
-	this.wordsCount=0;
-	this.wordm=/[^А-Яа-яЁё\-]/gm;
-	this.regCyr=/[А-Яа-яЁё]/;
-	this.addText=function(text){//TODO: найти способ избежать повторений с parse-lib
-		var localWords=text.split(wordm);
-		for(var i = 0; i < localWords.length; i++){
-			var word = localWords[i];
-			if(regCyr.test(word) && word.length > 1){
-				word = word.toLowerCase();
-				wordsCount++;
-				if(words[word]){
-					words[word]++;
-				}else{
-					words[word]=1;
-				}
-			}
-		}
-	}
-	this.onmessage=function(message){
-		var m=message.data;
-		if(m.type=='newtext'){
-			if(textBuffer.length>32*1024*1024){
-				addText(textBuffer);
-				textBuffer=m.text;
-			} else {
-				textBuffer+=';'+m.text;
-			}
-			
-		}else if(m.type=='countWords'){
-			postMessage(wordsCount);	
-		}else if(m.type=='getWords'){
-			postMessage(words);	
-		}else if(m.type=='finish'){
-			addText(textBuffer);
-			postMessage({
-				words:words,
-				wordsCount:wordsCount,
-			});
-			self.close();
-		}
-	}
-}
-*/
 
 module.exports.extractURLlistFromURLsequence = extractURLlistFromURLsequence;
 
