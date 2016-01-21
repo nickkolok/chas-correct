@@ -1,4 +1,5 @@
 #!/bin/bash
+ulimit -n 4096 #Костыль
 mkdir results
 for script in `cd scripts && ls *.js && cd ..`
 do
