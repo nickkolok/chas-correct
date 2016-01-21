@@ -5,6 +5,7 @@ var https = require('https');
 var request = require('request');
 var iconv = require('iconv-lite');
 iconv.skipDecodeWarning = true;
+var iconvH = require('iconv');
 var totalWords=0;
 
 var words = {};
@@ -288,11 +289,14 @@ function repairAbsentFiles(o){
 	repairAbsentFiles();
 }
 
+var thePool={maxSockets: 512};//Из гуманитарных соображений
+
 function getHTMLfromURL(url,callback,options){
 	request.get({
 		uri: url,
 		encoding: null,
 		followRedirects : true,
+		pool: thePool,
 	}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			callback(body,options);
@@ -306,10 +310,9 @@ function getHTMLfromURL(url,callback,options){
 
 function getChunkFromURL(url,callback,beginning,ending,options){
 	getHTMLfromURL(url,function(body){
-
-		body = iconv.decode(body, options.encoding || 'utf8');
-
-//		console.log(body);
+		body = new Buffer(body, 'binary');
+		conv = new iconvH.Iconv(options.encoding || 'utf8', 'utf8');
+		body = conv.convert(body).toString();
 		callback(
 			body.substr(0,body.search(ending)).substr(body.search(beginning)),
 			options
