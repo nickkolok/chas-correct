@@ -4,9 +4,13 @@ var globalExpression,
 	globalExpressionExt,
 	globalExpressionLess;
 
+var leftExt,rightExt;
+
 function initGlobalExpression(left,right){
 	left  || ( left = '');
 	right || (right = '');
+	leftExt = left;
+	rightExt = right;
 	var globalExpressionSrc = actionArray[0][0].source;
 	var globalExpressionLessSrc = actionArray[0][2];
 	for(var i=1; i<actionArray.length; i++){

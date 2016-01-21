@@ -17,6 +17,8 @@ var pagesWithErrors;
 var name="log";
 var log404="";
 
+var htmlTable='';
+
 var dump={};
 
 function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
@@ -45,6 +47,14 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 		switch(m.type){
 			case 'mistake':
 				console.log(m.options.url+' : '+m.text+' : '+m.signatures);
+				for(var i=0; i<m.signatures.length; i++){
+					m.text = m.text.replace(m.signatures[i],'<b>' + m.signatures[i] + '</b>');
+				}
+				htmlTable+='<tr>'+
+					'<td><a href="'+m.options.url+'">'+m.options.url.replace(/^https+\:\/\//,'')+'</a></td>'+
+					'<td>'+m.text+'</td>'+
+					'<td>'+m.signatures.join(' ; ')+'</td>'+
+				'</tr>';
 			break;
 			case 'quantity':
 				printNumbers(m.quantity);
@@ -113,14 +123,27 @@ function finishCheck(){
 }
 
 function printNumbers(mistakes){
+	function bothLog(text){
+		console.log(text);
+		html+='<br/>'+text;
+	}
+
+	var html='<html><head><meta charset="utf-8"/></head><body>';
 	var successPages=pagesProceeded-pagesWithErrors;
-	console.log("Страниц обработано успешно: "+successPages);
-	console.log("Страниц обработано неуспешно: "+pagesWithErrors);
-	console.log("Ошибок обнаружено: "+mistakes);
-	console.log("Ошибок обнаружено на страницу: "+(mistakes/successPages));
-	console.log("Словоупотреблений обработано: "+ wordsCount);
-	console.log("Ошибок на 1000 словоупотреблений обнаружено: "+(mistakes/wordsCount*1000))
+	bothLog("Страниц обработано успешно: "+successPages);
+	bothLog("Страниц обработано неуспешно: "+pagesWithErrors);
+	bothLog("Ошибок обнаружено: "+mistakes);
+	bothLog("Ошибок обнаружено на страницу: "+(mistakes/successPages));
+	bothLog("Словоупотреблений обработано: "+ wordsCount);
+	bothLog("Ошибок на 1000 словоупотреблений обнаружено: "+(mistakes/wordsCount*1000));
+	bothLog("В среднем одна ошибка на "+(wordsCount/mistakes)+" словоупотреблений");
+	html+='<table cellpadding="5" cellspacing="0" border="1">'+
+		'<tr><th>Адрес</th><th>Контекст</th><th>Сигнатуры</th></tr>'+
+		htmlTable+
+		'</table></body></html>';
+	fs.writeFileSync('results/'+name+'.report.html',html);
 	console.error("Завершено: "+name);
+
 }
 
 
