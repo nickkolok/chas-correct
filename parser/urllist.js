@@ -3,6 +3,8 @@ var parser = require('./parse-lib.js');
 var childProcess=require('child_process');
 var wordcounterProcess = childProcess.fork(__dirname+'/wordcounterProcess.js');
 
+var zlib=require('zlib');
+
 var globalExpression=parser.makeGlobalExpression();
 var actionArray=parser.readActionArray();
 var length;
@@ -13,6 +15,8 @@ var pagesWithErrors;
 
 var name="log";
 var log404="";
+
+var dump={};
 
 function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 	errors=0;
@@ -74,6 +78,7 @@ function workWithGoodChunk(text,options){
 }
 function workWithChunk(text,options){
 	console.error(pagesProceeded,text.length,options);
+//	dump[options.url]=text;
 	workWithGoodChunk(text,options);
 	pagesProceeded++;
 	if(pagesProceeded==length){
@@ -98,6 +103,14 @@ function finishCheck(){
 		type: 'finish',
 		filename: 'results/'+name,
 	});
+//	fs.writeFile("results/"+name+".dump.json",JSON.stringify(dump));
+/*
+	zlib.deflate(JSON.stringify(dump), function(err, buffer) {
+		if (!err) {
+			console.log(buffer.length);
+		}
+	});
+*/
 }
 
 
