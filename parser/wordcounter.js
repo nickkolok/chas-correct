@@ -4,6 +4,7 @@ function Wordcounter(){
 	this.textBuffer="";
 	this.words={};
 	this.wordsCount=0;
+	this.wordsDifferent=0;
 	this.wordm=/[^А-Яа-яЁё\-]/gm;
 	this.regCyr=/[А-Яа-яЁё]/;
 }
@@ -19,6 +20,7 @@ Wordcounter.prototype.addText=function(text){//TODO: найти способ и�
 				this.words[word]++;
 			}else{
 				this.words[word]=1;
+				this.wordsDifferent++;
 			}
 		}
 	}
@@ -64,7 +66,11 @@ Wordcounter.prototype.writeFiles=function(filename){
 
 	fs.writeFileSync(filename+'.words.txt',text);
 	fs.writeFileSync(filename+'.words.html',
-		'<html><head><meta charset="utf-8"/></head><body><table border="1" cellspacing="0" cellpadding="5">\n'+html+'</table></body></html>'
+		'<html><head><meta charset="utf-8"/></head><body>\n'+
+		'Всего слов: '+this.wordsCount+'<br/>\n'+
+		'Различных слов: '+this.wordsDifferent+'<br/>\n'+
+		'<table border="1" cellspacing="0" cellpadding="5">\n'+
+		html+'</table></body></html>'
 	);
 }
 
