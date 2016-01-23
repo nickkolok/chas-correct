@@ -10,6 +10,14 @@ function LinkExtractor(o){
 	if(o.flushEvery){
 		setInterval(this.writeExtractedURLs.bind(this),o.flushEvery);
 	}
+
+	if(!o.dontReadPrevious){
+		var urlArray=JSON.parse(fs.readFileSync("urllists/"+this.name+".urllist.json",'utf-8'));
+		console.log('Ссылок прочитано из файла: '+urlArray.length);
+		for(var i=0; i<urlArray.length; i++){
+			this.linksObject[urlArray[i]]=0;
+		}
+	}
 }
 
 LinkExtractor.prototype.defaultParameters={
@@ -47,7 +55,7 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 
 LinkExtractor.prototype.writeExtractedURLs = function(){
 	var keys=Object.keys(this.linksObject);
-	fs.writeFileSync(
+	fs.writeFile(
 		"urllists/"+this.name+".urllist.json",
 		JSON.stringify(keys).replace(/^\[/,'[\r\n').replace(/,"/g,',\r\n"').replace(/\]$/,'\r\n]')
 	);
