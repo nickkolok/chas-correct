@@ -28,7 +28,7 @@ Wordcounter.prototype.addText=function(text){//TODO: найти способ и�
 
 Wordcounter.prototype.addBufferedText=function(text){
 	if(this.textBuffer.length>32*1024*1024){
-		this.addText(textBuffer);
+		this.addText(this.textBuffer);
 		this.textBuffer=text;
 	} else {
 		this.textBuffer+=';'+text;
