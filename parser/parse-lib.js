@@ -5,7 +5,7 @@ var https = require('https');
 var request = require('request');
 var iconv = require('iconv-lite');
 iconv.skipDecodeWarning = true;
-var iconvH = require('iconv');
+//var iconvH = require('iconv');//Не встаёт, матюки малопонятны
 var totalWords=0;
 
 var words = {};
