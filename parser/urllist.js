@@ -36,7 +36,11 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 		for(var prop in options)
 			newopts[prop]=options[prop];
 		newopts.url=urls[i];
-		parser.getChunkFromURL(urls[i],workWithChunk,beginFrom,endWith,newopts);
+		(function(i,newopts){
+			setTimeout(function(){
+				parser.getChunkFromURL(urls[i],workWithChunk,beginFrom,endWith,newopts);
+			},(newopts.pause||100)*i);
+		})(i,newopts);//Замыкание, в рот ему ноги!
 	}
 	checkerProcess.send({
 		type:  'init',
