@@ -310,9 +310,12 @@ function getHTMLfromURL(url,callback,options){
 
 function getChunkFromURL(url,callback,beginning,ending,options){
 	getHTMLfromURL(url,function(body){
+		body = iconv.decode(body, options.encoding || 'utf8');
+	/*
 		body = new Buffer(body, 'binary');
 		conv = new iconvH.Iconv(options.encoding || 'utf8', 'utf8');
 		body = conv.convert(body).toString();
+	*/
 		callback(
 			body.substr(0,body.search(ending)).substr(body.search(beginning)),
 			options
