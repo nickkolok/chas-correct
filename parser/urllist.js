@@ -147,34 +147,5 @@ function printNumbers(mistakes){
 }
 
 
-function extractURLlistFromURLsequence(o){
-	var linksObject=o.linksObject || {};
-	var pagesCount=o.pagesCount||5000;
-	var pagesParsed=0;
-	
-	for(var i=0; i<pagesCount; i++){
-		parser.getHTMLfromURL(o.prefix+i+(o.postfix||""),getUrls,i);
-	}
-
-	var linkRegExp=new RegExp('<a href="'+o.linkpattern+'[^"#]+',"g"); 
-	function getUrls(html,i){
-		var urlsOnPage=(''+html).match(linkRegExp);
-		if(urlsOnPage){
-			for(var j=0; j<urlsOnPage.length; j++){
-				linksObject[urlsOnPage[j].replace('<a href="',o.linkprefix)]=0;
-			}
-		}
-		pagesParsed++;
-		if(pagesParsed==pagesCount){
-			fs.writeFileSync("urllists/"+o.name+".urllist.json",JSON.stringify(Object.keys(linksObject)));
-		} else if(!(i%(o.reportEvery||20))){
-			console.log(i);
-		}
-	}
-	return linksObject;
-}
-
-module.exports.extractURLlistFromURLsequence = extractURLlistFromURLsequence;
-
 module.exports.countErrorsInURLlist  = countErrorsInURLlist ;
 module.exports.countErrorsInURLarray = countErrorsInURLarray;

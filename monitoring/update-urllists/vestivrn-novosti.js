@@ -1,7 +1,11 @@
-var urllist = require('../../parser/urllist.js');
+var LinkExtractor = require('../../parser/linkExtractor.js').LinkExtractor;
 
-urllist.extractURLlistFromURLsequence({
+var extractor = new LinkExtractor({
+	flushEvery: 60*1000,
 	name:	'vestivrn-novosti',
+});
+
+extractor.extractURLlistFromURLsequence({
 	pagesCount:	5000,
 	prefix:	'http://vestivrn.ru/novosti?page=',
 	linkpattern:	'/novosti/',
