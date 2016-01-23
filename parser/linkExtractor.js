@@ -47,7 +47,10 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 
 LinkExtractor.prototype.writeExtractedURLs = function(){
 	var keys=Object.keys(this.linksObject);
-	fs.writeFileSync("urllists/"+this.name+".urllist.json",JSON.stringify(keys));
+	fs.writeFileSync(
+		"urllists/"+this.name+".urllist.json",
+		JSON.stringify(keys).replace(/^\[/,'[\r\n').replace(/,"/g,',\r\n"').replace(/\]$/,'\r\n]')
+	);
 	console.log('В файл записано адресов: '+keys.length);
 }
 

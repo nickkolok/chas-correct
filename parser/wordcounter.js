@@ -58,13 +58,13 @@ Wordcounter.prototype.writeFiles=function(filename){
 	var html='';
 	for(var i=0;i<freqs.length; i++){
 		text += freqs[i][0]+ ' : '+freqs[i][1]+'\r\n';
-		html += '<tr><td>'+freqs[i][0]+ '</td><td>'+freqs[i][1]+'</td></tr>';
+		html += '<tr><td>'+freqs[i][0]+ '</td><td>'+freqs[i][1]+'</td></tr>\n';
 	}
 
 
 	fs.writeFileSync(filename+'.words.txt',text);
 	fs.writeFileSync(filename+'.words.html',
-		'<html><head><meta charset="utf-8"/></head><body><table border="1" cellspacing="0" cellpadding="5">'+html+'</table></body></html>'
+		'<html><head><meta charset="utf-8"/></head><body><table border="1" cellspacing="0" cellpadding="5">\n'+html+'</table></body></html>'
 	);
 }
 
