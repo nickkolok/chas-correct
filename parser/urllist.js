@@ -21,11 +21,16 @@ var htmlTable='';
 
 var dump={};
 
+function getURLfromDumpOrHttp(beginFrom,endWith,newopts){
+	setTimeout(function(){
+		parser.getChunkFromURL(newopts.url,workWithChunk,beginFrom,endWith,newopts);
+	},(newopts.pause||100)*newopts.i);
+}
+
 function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 	errors=0;
 	pagesProceeded=0;
 	pagesWithErrors=0;
-	parser.makeWordsEmpty();
 	length=Math.min(maxlength,urls.length);
 	if(options && options.name){
 		name=options.name;
@@ -36,11 +41,8 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 		for(var prop in options)
 			newopts[prop]=options[prop];
 		newopts.url=urls[i];
-		(function(i,newopts){
-			setTimeout(function(){
-				parser.getChunkFromURL(urls[i],workWithChunk,beginFrom,endWith,newopts);
-			},(newopts.pause||100)*i);
-		})(i,newopts);//Замыкание, в рот ему ноги!
+		newopts.i=i;
+		getURLfromDumpOrHttp(beginFrom,endWith,newopts);
 	}
 	checkerProcess.send({
 		type:  'init',
