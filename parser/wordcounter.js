@@ -48,7 +48,7 @@ Wordcounter.prototype.writeFiles=function(filename){
 	}
 
 	var freqsort=function(a,b){
-		return b[1]-a[1];
+		return b[1]-a[1] || [-1,1][1*(b[0]<a[0])];
 	}
 
 	freqs=freqs.sort(freqsort);
