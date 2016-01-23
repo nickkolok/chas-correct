@@ -289,7 +289,7 @@ function repairAbsentFiles(o){
 	repairAbsentFiles();
 }
 
-var thePool={maxSockets: 512};//Из гуманитарных соображений
+var thePool={maxSockets: 4096};//Из гуманитарных соображений
 
 function getHTMLfromURL(url,callback,options){
 	request.get({
