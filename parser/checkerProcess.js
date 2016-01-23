@@ -5,8 +5,9 @@ var globalExpression,
 	globalExpressionLess;
 
 var leftExt,rightExt;
-
+var timeElapsed=0;
 function initGlobalExpression(left,right){
+
 	left  || ( left = '');
 	right || (right = '');
 	leftExt = left;
@@ -30,30 +31,55 @@ function normalize(text){
 	return text.replace(/ё/gi,"е").replace(/\s+/gi," ");
 }
 
+function makeCustomGlobalExpression(actionArrayCopy){
+	var globalExpressionSrc = actionArrayCopy[0][0].source;
+	for(var i=1; i<actionArrayCopy.length; i++){
+		globalExpressionSrc += "|" + actionArrayCopy[i][0].source;
+	}
+	globalExpressionSrc = leftExt+'('+globalExpressionSrc+')'+rightExt;
+	return new RegExp(globalExpressionSrc,"g");
+}
+
+
 function checkText(text,options){
 	if(!globalExpressionLess.test(text)){
 		return;
 	}
-	
-	var possibleMistakes=text.match(globalExpressionExt);
+
+	var actionArrayCopy=[];
+	for(var j=0; j<actionArray.length; j++){
+		if(actionArray[j][0].test(text)){
+			actionArrayCopy.push(actionArray[j]);
+		}
+	}
+	if(!actionArrayCopy.length){
+		return;
+	}
+
+	var globalExpressionCustom=makeCustomGlobalExpression(actionArrayCopy,text);
+
+	var possibleMistakes=text.match(globalExpressionCustom);
 	if(!possibleMistakes){
 		return;
 	}
 
+
 	for(var i=0; i<possibleMistakes.length; i++){
 		var signatures = possibleMistakes[i].match(globalExpression);
 		var confirmedSignatures=[];
-		
+
 		for(var l=0; l<signatures.length; l++){
 			var buf=signatures[l];
-			for(var j=0; j<actionArray.length; j++){
-				buf=buf.replace(actionArray[j][0],actionArray[j][1]);
+			for(var j=0; j<actionArrayCopy.length; j++){
+//				if(actionArray[j][0].test(signatures[l])){
+					buf=buf.replace(actionArrayCopy[j][0],actionArrayCopy[j][1]);
+//				}
 			}
 			if(normalize(buf) != normalize(signatures[l])){
 				confirmedSignatures.push(signatures[l]);
 			}
 		}
-		
+
 		if(confirmedSignatures.length){
 			process.send({
 				type:       'mistake',
@@ -63,13 +89,15 @@ function checkText(text,options){
 			});
 			errors += confirmedSignatures.length;
 		}
-	}	
+	}
 }
 
 process.on('message', function (m) {
 	switch(m.type){
 		case 'checktext':
-			checkText(m.text,m.options);
+			timeElapsed-=new Date().getTime();
+				checkText(m.text,m.options);
+			timeElapsed+=new Date().getTime();
 		break;
 		case 'init':
 			initGlobalExpression(m.left,m.right)
@@ -79,6 +107,7 @@ process.on('message', function (m) {
 				type: 'quantity',
 				quantity: errors
 			});
+			console.log('Времени потрачено на проверку, мс: '+timeElapsed)
 			process.exit();
 		break;
 	}
