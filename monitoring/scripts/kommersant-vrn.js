@@ -4,6 +4,7 @@ urllist.countErrorsInURLlist(
 	'urllists/kommersant-vrn.urllist.json',
 	100000,
 	'<p class="b-article__text">',
-	'<p class="b-article__text document_authors">',
+	'<div class="b-socials_buttons">',
+	//'<p class="b-article__text document_authors">',
 	{encoding:'win1251',name:'kommersant-vrn'}
 );
