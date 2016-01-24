@@ -42,6 +42,17 @@ function makeCustomGlobalExpression(actionArrayCopy){
 
 
 function checkText(text,options){
+	//{{Костыли
+		text=text
+			.replace(/[^а-яё]г-же[^а-яё]/gi,'')
+			.replace(/[^а-яё]коммандитн/gi,'')//коммандитное товарищество, чтоб его
+			.replace(/([а-яёА-ЯёA-Za-z][«"\s,\-:;]+)[А-ЯЁ][а-яё\-]+/g,'$1X ')//Дважды, а то отсекает через одно
+			.replace(/([а-яёА-ЯёA-Za-z][«"\s,\-:;]+)[А-ЯЁ][а-яё\-]+/g,'$1X ')
+			.replace(/\s*(&nbsp;)+\s*/gi,' ')
+		;
+	//}}Костыли
+
+
 	if(!globalExpressionLess.test(text)){
 		return;
 	}
@@ -100,7 +111,7 @@ process.on('message', function (m) {
 			timeElapsed+=new Date().getTime();
 		break;
 		case 'init':
-			initGlobalExpression(m.left,m.right)
+			initGlobalExpression(m.left,m.right);
 		break;
 		case 'finish':
 			process.send({
