@@ -39,13 +39,14 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 		})(o,i);
 	}
 
-	var linkRegExp=new RegExp('<a href="'+o.linkpattern+'[^"#]+',"g"); 
+	var linkRegExp=new RegExp('<a[^>]+href="'+o.linkpattern+'[^"#]+',"g");
 	var self=this;
 	function getUrls(html,i){
+//		console.log(''+html);
 		var urlsOnPage=(''+html).match(linkRegExp);
 		if(urlsOnPage){
 			for(var j=0; j<urlsOnPage.length; j++){
-				self.linksObject[urlsOnPage[j].replace('<a href="',o.linkprefix)]=0;
+				self.linksObject[urlsOnPage[j].replace(/<a[^>]+href="/g,o.linkprefix)]=0;
 			}
 		}
 		self.pagesParsed++;
