@@ -32,7 +32,11 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 	this.pagesTotal+=o.pagesCount;
 
 	for(var i=0; i<o.pagesCount; i++){
-		parser.getHTMLfromURL(o.prefix+i+o.postfix,getUrls,i);
+		(function(o,i){
+			setTimeout(function(){
+				parser.getHTMLfromURL(o.prefix+i+o.postfix,getUrls,i);
+			},(o.pause||100)*i);
+		})(o,i);
 	}
 
 	var linkRegExp=new RegExp('<a href="'+o.linkpattern+'[^"#]+',"g"); 
