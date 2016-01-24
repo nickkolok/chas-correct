@@ -10,3 +10,7 @@ chrome.pem
 .project
 
 monitoring/temp
+monitoring/results
+monitoring/dumps
+
+node_modules
