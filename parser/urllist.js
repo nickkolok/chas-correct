@@ -3,7 +3,7 @@ var parser = require('./parse-lib.js');
 var childProcess=require('child_process');
 var zlib=require('zlib');
 var wordcounterProcess = childProcess.fork(__dirname+'/wordcounterProcess.js');
-var     checkerProcess = childProcess.fork(__dirname+    '/checkerProcess.js');
+var     checkerProcess = childProcess.fork(__dirname+   '/checkerBalancer.js');
 
 
 var dateRelative=1453576000000-40*1000; //Магическая константа, чтобы время в дампе меньше места занимало
