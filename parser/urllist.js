@@ -185,7 +185,7 @@ function printNumbers(mistakes){
 		'</table></body></html>';
 	fs.writeFileSync('results/'+name+'.report.html',html);
 	console.error("Завершено: "+name);
-
+	setTimeout(process.exit,10000);
 }
 
 
