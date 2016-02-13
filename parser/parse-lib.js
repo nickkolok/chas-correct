@@ -296,7 +296,7 @@ function getHTMLfromURL(url,callback,options){
 		uri: url,
 		encoding: null,
 		followRedirects : true,
-		pool: thePool,
+//		pool: thePool,
 	}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			callback(body,options);
