@@ -1,0 +1,31 @@
+{
+  "name": "chas-correct",
+  "version": "0.1.0",
+  "description": "Автоматическое обнаружение и исправление элементарных орфографических ошибок",
+  "main": "content.js",
+  "bin": {
+    "chas-correct": "chas-correct-userscript.user.js"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nickkolok/chas-correct.git"
+  },
+  "author": "Nikolay Avdeev <nickkolok@mail.ru>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/nickkolok/chas-correct/issues"
+  },
+  "homepage": "https://github.com/nickkolok/chas-correct#readme",
+  "devDependencies": {
+    "iconv-lite": "^0.4.13"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.4.13"
+  }
+}
