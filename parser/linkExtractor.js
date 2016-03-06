@@ -12,10 +12,14 @@ function LinkExtractor(o){
 	}
 
 	if(!o.dontReadPrevious){
-		var urlArray=JSON.parse(fs.readFileSync("urllists/"+this.name+".urllist.json",'utf-8'));
-		console.log('Ссылок прочитано из файла: '+urlArray.length);
-		for(var i=0; i<urlArray.length; i++){
-			this.linksObject[urlArray[i]]=0;
+		try{
+			var urlArray=JSON.parse(fs.readFileSync("urllists/"+this.name+".urllist.json",'utf-8'));
+			console.log('Ссылок прочитано из файла: '+urlArray.length);
+			for(var i=0; i<urlArray.length; i++){
+				this.linksObject[urlArray[i]]=0;
+			}
+		} catch (e) {
+			console.log('Не удалось открыть список URL-адресов '+"urllists/"+this.name+".urllist.json");
 		}
 	}
 }
