@@ -316,6 +316,7 @@ function getChunkFromURL(url,callback,beginning,ending,options){
 		conv = new iconvH.Iconv(options.encoding || 'utf8', 'utf8');
 		body = conv.convert(body).toString();
 	*/
+	//	console.log(body);
 		callback(
 			body.substr(0,body.search(ending)).substr(body.search(beginning)),
 			options
