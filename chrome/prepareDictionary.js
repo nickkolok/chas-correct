@@ -46,7 +46,7 @@ try{
 	//Значит, не node.js
 }
 
-var wordSplitSymbol="([^А-Яа-яЁёA-Za-z]|^|$)";
+var wordSplitSymbol="([^А-Яа-яЁёA-Za-z\u00AD]|^|$)"; // 0xAD - "мягкий перенос"
 //var wordSplitSymbolSafe="(?=[^А-Яа-яЁёA-Za-z]|^|$)";
 var leftEnd="(.|^)";//TODO: переписать так, чтобы стал не нужен
 //var rightEnd="(.|$)";
