@@ -331,6 +331,7 @@ module.exports.startDownloadTextFiles=startDownloadTextFiles;
 module.exports.downloadTextFiles=downloadTextFiles;
 module.exports.loadPage=loadPage;
 module.exports.sumJSON=sumJSON;
+module.exports.bruteReplace=bruteReplace;
 module.exports.countReplacableInJSON=countReplacableInJSON;
 module.exports.readFilesToSentences=readFilesToSentences;
 module.exports.makeCorpusFromFiles=makeCorpusFromFiles;
