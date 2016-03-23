@@ -1,0 +1,33 @@
+<html>
+<head>
+	<meta charset="UTF-8"/>
+</head>
+<body>
+
+Строчка словаря, например, <b>["м[ие]н[ие]рал","минерал"],</b>:
+<input id="expr" value='["",""],' oninput="fix()"/>
+<br/>
+(работает как фрагмент. TODO: сделать переключение)
+<br/>
+Текст, который исправляем:
+<input id="text" value='' oninput="fix()"/>
+<br/>
+Результат:
+<i id="result"></i>
+<!--
+<script src="chrome/apiwrapper.js"></script>
+<script src="chrome/dictionary.js"></script>
+<script src="chrome/prepareDictionary.js"></script>
+<script src="chrome/content.js"></script>
+-->
+
+<script>
+	function fix(){
+		var expr=JSON.parse(document.getElementById('expr').value.replace(/,$/,""));
+		var text=document.getElementById('text').value.replace(new RegExp(expr[0],"g"),expr[1]);
+		document.getElementById('result').innerHTML=text;
+	}
+</script>
+
+</body>
+</html>
