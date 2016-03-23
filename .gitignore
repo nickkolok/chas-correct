@@ -14,3 +14,5 @@ monitoring/results
 monitoring/dumps
 
 node_modules
+
+yaspeller_report*
