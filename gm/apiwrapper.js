@@ -35,11 +35,21 @@ This file is part of CHAS-CORRECT.
    вместе с этой программой. Если это не так, см.
    <http://www.gnu.org/licenses/>.)
 */
+'use strict';
 
 var storageWrapper={
 	///Обёртка над хранилищем, в данном случае - GreaseMonkey
 	getKey: function(key,defaultValue){
-		return JSON.parse(GM_getValue(key,defaultValue)) || defaultValue;
+		try {
+			var val = GM_getValue(key);
+			if (val === undefined) {
+				return defaultValue;
+			} else {
+				return JSON.parse(val);
+			};
+		} catch (e) { 
+			return defaultValue 
+		};
 	},
 	setKey: function(key,value){
 		GM_setValue(key,JSON.stringify(value));
