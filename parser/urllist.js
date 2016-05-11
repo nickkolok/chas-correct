@@ -25,6 +25,7 @@ var dump={data:{}};
 var dumpRO={data:{}};
 var requestsSent=0;
 
+var additionalDumpNumber=1; //Некошерно, но 0 оставим для служебных целей
 
 function readDump(o){
 	try{
@@ -40,21 +41,25 @@ function readDump(o){
 		console.error('Не удалось прочитать дамп '+'dumps/'+name+'.dump.json.gz');
 		console.error(e);
 	}
-	if(o.additionalDumps){
-		for(var i=0; i<o.additionalDumps.length;i++){
-			try{
-				var gz=fs.readFileSync('dumps/'+o.additionalDumps[i]+'.dump.json.gz');
-				var json=zlib.gunzipSync(gz);
-				dump2=JSON.parse(json);
-				for(var u in dump2.data){
-					dumpRO.data[u]=dump2.data[u];
-				}
-				console.log('Дополнительный дамп прочитан успешно, содержит URL: '+Object.keys(dump2.data).length);
-			}catch(e){
-				console.error('Не удалось прочитать дамп '+'dumps/'+name+'.dump.json.gz');
-				console.error(e);
+	try{
+		for(;true;additionalDumpNumber++){
+			var gz=fs.readFileSync('dumps/'+name+'.'+additionalDumpNumber+'.dump.json.gz');
+			var json=zlib.gunzipSync(gz);
+			dump2=JSON.parse(json);
+			var urlsInDump=0;
+			for(var u in dump2.data){
+				dumpRO.data[u]=dump2.data[u];
+				urlsInDump++;
 			}
+			console.log('Дополнительный дамп №' + additionalDumpNumber + ' прочитан успешно, содержит URL: ' + urlsInDump);
 		}
+	}catch(e){
+		console.error(
+			'Не удалось прочитать дополнительный дамп '+
+			'dumps/' + name + '.' + additionalDumpNumber + '.dump.json.gz'
+		);
+		console.error(e);
+		console.error('Возможно, его и нет в природе')
 	}
 }
 
@@ -141,7 +146,7 @@ function workWithGoodChunk(text,options){
 		pagesWithErrors++;
 		return;
 	}
-	
+
 	wordcounterProcess.send({
 		type: 'newtext',
 		text: text,
