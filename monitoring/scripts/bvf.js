@@ -1,7 +1,7 @@
 var urllist = require('../../parser/urllist.js');
 //bvf.ru - тут сплошная нумерация
 var bvflinks=[];
-for(var i=700; i<3700; i++){
+for(var i=0; i<6000; i++){
 	bvflinks.push('http://bvf.ru/forum/showthread.php?t='+i);
 }
 urllist.countErrorsInURLarray(bvflinks,100000,
@@ -13,6 +13,9 @@ urllist.countErrorsInURLarray(bvflinks,100000,
 		encoding:'win1251',
 		name:'bvf',
 		pause:500,
-		//additionalDumps:['abireg.1','abireg.2','abireg.3','abireg.4','abireg.5'],
+		additionalDumps:[
+			'bvf.1',
+			'bvf.2',
+		],
 	}
 );
