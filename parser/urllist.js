@@ -97,7 +97,14 @@ function countErrorsInURLlist(filename,maxlength,beginFrom,endWith,options){
 function workWithGoodChunk(text,options){
 //	console.log(text);
 //	text=text.replace(/[^а-яё]{4,}/gi,";");
-	text=text.replace(/<[^>]*>/gi,"|").replace(/<\s+>/g," ");
+	text=text
+		.replace(/<[^>]*>/gi,"|")
+		.replace(/<\s+>/g," ")
+		.replace(/&quot;/g,"\"")
+		.replace(/\s+/g," ")
+		.replace(/&nbsp;/g," ")
+		.replace(/[^А-Яа-я-]{20,}/g," | ")
+	;
 	if(!options.fromDump){
 		dumper.addURL(
 			options.url,
