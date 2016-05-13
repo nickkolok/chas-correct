@@ -39,15 +39,29 @@ function getUnknownWordsList(o){
 	getYaspellerJSON(writeUnknownWords,o);
 }
 
+function getJSONwithCounts(o){
+	return JSON.parse(fs.readFileSync(o.filename+'.words.json','utf8'));
+}
+
 
 function writeUnknownWords(array,o){
 	var data=array.data;
 	var text='';
+	var counts=getJSONwithCounts(o);
+
+	for(var i=0; i<data.length; i++){
+		data[i].count=counts[data[i].word];
+	}
+	data=data.sort(function(a,b){
+		return b.count-a.count;
+	});
+
 	for(var i=0; i<data.length; i++){
 		if(data[i].code==1){
-			text += data[i].word + '\r\n';
+			text += data[i].word + '\t' + data[i].count + '\r\n';
 		}
 	}
+
 	console.log(o.filename+'.words.unknown.txt');
 	fs.writeFileSync(
 		o.filename+'.words.unknown.txt',
