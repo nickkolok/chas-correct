@@ -23,46 +23,6 @@ var log404="";
 var htmlTable='';
 
 var requestsSent=0;
-
-
-/*
-var dump={data:{}};
-var dumpRO={data:{}};
-
-
-function readDump(o){
-	try{
-		var gz=fs.readFileSync('dumps/'+name+'.dump.json.gz');
-		var json=zlib.gunzipSync(gz);
-		dump=JSON.parse(json);
-		if(!dump.data){
-			dump.data={};
-		}
-		console.log('Дамп прочитан успешно, содержит URL: '+Object.keys(dump.data).length);
-	}catch(e){
-		dump.data={};
-		console.error('Не удалось прочитать дамп '+'dumps/'+name+'.dump.json.gz');
-		console.error(e);
-	}
-	if(o.additionalDumps){
-		for(var i=0; i<o.additionalDumps.length;i++){
-			try{
-				var gz=fs.readFileSync('dumps/'+o.additionalDumps[i]+'.dump.json.gz');
-				var json=zlib.gunzipSync(gz);
-				dump2=JSON.parse(json);
-				for(var u in dump2.data){
-					dumpRO.data[u]=dump2.data[u];
-				}
-				console.log('Дополнительный дамп прочитан успешно, содержит URL: '+Object.keys(dump2.data).length);
-			}catch(e){
-				console.error('Не удалось прочитать дамп '+'dumps/'+name+'.dump.json.gz');
-				console.error(e);
-			}
-		}
-	}
-}
-*/
-
 var dumper;
 
 function getURLfromDumpOrHttp(beginFrom,endWith,newopts){
@@ -81,24 +41,6 @@ function getURLfromDumpOrHttp(beginFrom,endWith,newopts){
 			requestsSent++;
 		}
 	);
-
-
-
-/*
-	if(dump.data[newopts.url] && (dump.data[newopts.url][0]!='')){
-		newopts.fromDump=1;
-		workWithChunk(dump.data[newopts.url][0],newopts);
-	} else if(dumpRO.data[newopts.url] && (dumpRO.data[newopts.url][0]!='')){
-		newopts.fromDumpRO=1;
-		workWithChunk(dumpRO.data[newopts.url][0],newopts);
-		delete dumpRO.data[newopts.url];//Экономия памяти
-	} else {
-		setTimeout(function(){
-			parser.getChunkFromURL(newopts.url,workWithChunk,beginFrom,endWith,newopts);
-		},(newopts.pause||100)*requestsSent);
-		requestsSent++;
-	}
-*/
 }
 
 function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
@@ -111,8 +53,6 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 		name=options.name;
 	}
 	console.log("Обрабатывается страниц: "+length);
-//	readDump(options);
-//	setInterval(flushDump,150*1000);
 	checkerProcess.send({
 		type:  'init',
 		left:  '[^\.!?|]*',
@@ -164,12 +104,6 @@ function workWithGoodChunk(text,options){
 			Math.round((Date.now()-dateRelative)/60000),//С точностью до минут и фиксированным смещением - тобы меньше места занимало
 			text
 		);
-/*
-		dump.data[options.url]=[//Массив - чтобы меньше места занимало
-			text,
-			Math.round((Date.now()-dateRelative)/60000),//С точностью до минут и фиксированным смещением - для того же
-		];
-*/
 	}
 	if(!text.length){
 		log404+=(options.url+" : целевой текст не выделен\n");
@@ -210,25 +144,7 @@ function finishCheck(){
 		type: 'finish',
 		filename: 'results/'+name,
 	});
-//	flushDump();
 }
-/*
-function flushDump(){
-	console.log('Начинаем записывать дамп...');
-	//console.error(typeof JSON.stringify(dump));
-	try{
-		zlib.gzip(new Buffer(JSON.stringify(dump),'utf-8'), function(err, buffer) {
-			if (!err) {
-				fs.writeFile("dumps/"+name+".dump.json.gz",buffer);
-				console.log('Размер дампа: '+buffer.length);
-			}
-		},{ windowBits: 16, memLevel: 8, level: 9, });
-	}catch(e){
-		console.error('Не удалось записать дамп '+'dumps/'+name+'.dump.json.gz');
-		console.error(e);
-	}
-}
-*/
 
 function printNumbers(mistakes){
 	function bothLog(text){
