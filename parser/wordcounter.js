@@ -40,6 +40,7 @@ Wordcounter.prototype.getJSON=function(){
 }
 
 Wordcounter.prototype.writeFiles=function(filename){
+	console.log('Начинаем записывать словарь...');
 	this.addText(this.textBuffer);
 	var json=this.getJSON();
 	fs.writeFileSync(filename+'.words.json',json);
