@@ -61,7 +61,7 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 	checkerProcess.on('message', function (m) {
 		switch(m.type){
 			case 'mistake':
-				console.log(m.options.url+' : '+m.text+' : '+m.signatures);
+				console.log(m.options.url+(m.options.fromDump?' (cached)':'')+' : '+m.text+' : '+m.signatures);
 				for(var i=0; i<m.signatures.length; i++){
 					m.text = m.text.replace(m.signatures[i],'<b>' + m.signatures[i] + '</b>');
 				}
