@@ -17,17 +17,56 @@ function dumpSqliteWrapper(o){
 			self.db.run("CREATE TABLE Dump (url TEXT, time NUMBER, content TEXT)");
 		}
 	});
-	
+
 	this.addURL = function(url,time,content){
-		self.db.serialize(function() {	
+		self.db.serialize(function() {
 			var stmt = self.db.prepare("INSERT INTO Dump VALUES (?, ?, ?)");
 			stmt.run(url,time,content);
 			stmt.finalize();
 		});
 	};
 
+	this.URLsQueued=980;
+	this.queue=[];
+	this.queueURL = function(url,time,content){
+		this.queue.push([url,time,content]);
+		this.URLsQueued++;
+		if(!(this.URLsQueued%10)){
+			this.flushQueue();
+		}
+	};
+
+	this.flushQueue = function(){
+		var command="INSERT INTO 'Dump' ('url', 'time', 'content') VALUES \n";
+		for(var i=0; i<self.queue.length; i++){
+			command+=
+				"('"+
+					self.queue[i][0].replace(/'/g,"''")+
+				"', '"+
+					self.queue[i][1]+
+				"', '"+
+					self.queue[i][2].replace(/'/g,"''")+
+				"'), ";
+		}
+//		console.log(command);
+		command=command.replace(/[,]\s*$/,"; ");
+//		console.log(command);
+		self.db.run(command);
+		console.log('Записи добавлены в дамп');
+/*
+		self.db.parallelize(function() {
+			var stmt = self.db.prepare("INSERT INTO Dump VALUES (?, ?, ?)");
+			for(var i=0; i<self.queue.length; i++){
+				stmt.run(self.queue[i][0],self.queue[i][1],self.queue[i][2]);
+			}
+			stmt.finalize();
+		});
+*/
+
+	};
+
 	this.extractURL = function(url, callbackIfFound, callbackIfNotFound) {
-		self.db.serialize(function() {	
+		self.db.serialize(function() {
 			self.db.all("SELECT rowid AS id, url, time, content FROM Dump WHERE url='"+url+"'", function(err, rows) {
 				if(rows.length){
 					callbackIfFound(rows);

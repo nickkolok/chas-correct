@@ -106,7 +106,7 @@ function workWithGoodChunk(text,options){
 		.replace(/[^А-Яа-я-]{20,}/g," | ")
 	;
 	if(!options.fromDump){
-		dumper.addURL(
+		dumper.queueURL(
 			options.url,
 			Math.round((Date.now()-dateRelative)/60000),//С точностью до минут и фиксированным смещением - тобы меньше места занимало
 			text
@@ -142,6 +142,7 @@ var wordsCount=0;
 
 function finishCheck(){
 	fs.writeFile("results/"+name+".404.log",log404);
+	dumper.flushQueue();
 
 	wordcounterProcess.on('message', function (count) {
 		wordsCount=count;
