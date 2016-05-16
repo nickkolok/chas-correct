@@ -48,21 +48,9 @@ function dumpSqliteWrapper(o){
 					self.queue[i][2].replace(/'/g,"''")+
 				"'), ";
 		}
-//		console.log(command);
 		command=command.replace(/[,]\s*$/,"; ");
-//		console.log(command);
 		self.db.run(command);
 		console.log('Записи добавлены в дамп');
-/*
-		self.db.parallelize(function() {
-			var stmt = self.db.prepare("INSERT INTO Dump VALUES (?, ?, ?)");
-			for(var i=0; i<self.queue.length; i++){
-				stmt.run(self.queue[i][0],self.queue[i][1],self.queue[i][2]);
-			}
-			stmt.finalize();
-		});
-*/
-
 	};
 
 	this.extractURL = function(url, callbackIfFound, callbackIfNotFound) {
