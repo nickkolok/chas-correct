@@ -1,9 +1,14 @@
 {
   "name": "chas-correct",
   "title": "chas-correct",
-  "id": "jid1-oPT182lJAHoB8Q",
+  "id": "jid1-oPT182lJAHoB8Q@jetpack",
   "description": "chas-correct add-on",
   "author": "",
-  "license": "MPL 2.0",
-  "version": "0.1"
+  "license": "GPL-3.0",
+  "main": "lib/main.js",
+  "engines": {
+    "firefox": ">=3",
+    "fennec": ">=3"
+  },
+  "version": "0.2.5"
 }
