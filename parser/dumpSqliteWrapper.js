@@ -37,6 +37,9 @@ function dumpSqliteWrapper(o){
 	};
 
 	this.flushQueue = function(){
+		if(!self.queue.length){
+			return;
+		}
 		var command="INSERT INTO 'Dump' ('url', 'time', 'content') VALUES \n";
 		for(var i=0; i<self.queue.length; i++){
 			command+=
