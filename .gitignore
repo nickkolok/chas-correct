@@ -5,6 +5,7 @@ nohup.out
 npm-debug.log
 
 *.orig
+.goutputstream-*
 
 chrome.pem
 .project
