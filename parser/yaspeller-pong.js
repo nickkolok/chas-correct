@@ -23,7 +23,7 @@ function getYaspellerJSON(callback,o){
 			'../node_modules/.bin/yaspeller '+
 				o.filename+'.words.yaspeller.replaced '+
 				'--by-words --ignore-capitalization --report json '+
-				'--dictionary known-words.json'
+				'--dictionary known-words.js'
 		);
 	} catch(e){
 		// А наплевать, оно всегда код ошибки возвращает, если есть незнакомые слова
