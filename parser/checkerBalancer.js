@@ -4,7 +4,7 @@ var threads=4;//Кол-во ядер проца, можно править
 var childrenFinished=0;
 for(var i=0; i<threads; i++){
 	children[i] = childProcess.fork(__dirname + '/checkerProcess.js');
-	children[i].on('message', function (m) {
+	children[i].on('message', function (m) { // Получили сообщение от процесса-потомка
 		switch(m.type){
 			case 'quantity':
 				totalQuantity+=m.quantity;
@@ -26,7 +26,7 @@ for(var i=0; i<threads; i++){
 var textsReceived=0;
 var totalQuantity=0;
 
-process.on('message', function (m) {
+process.on('message', function (m) { // Получили сообщение от процесса-родителя
 	switch(m.type){
 		case 'checktext':
 			children[textsReceived % threads].send(m);
