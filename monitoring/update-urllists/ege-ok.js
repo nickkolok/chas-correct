@@ -10,7 +10,7 @@ extractor.extractURLlistFromURLsequence({
 	reportEvery: 2,
 	flushEvery: 150,
 	prefix:	'http://ege-ok.ru/zapisi/page/',
-	linkpattern:	'http://ege-ok.ru/',
-	linkprefix:	'',
+	linkpattern:	'//ege-ok.ru/',
+	linkprefix:	'http:',
 	pause:2000,
 });
