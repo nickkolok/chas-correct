@@ -44,6 +44,15 @@ function getURLfromDumpOrHttp(beginFrom,endWith,newopts){
 }
 
 function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
+	options.falsepositives = [];
+	try {
+		options.falsepositives = require(process.cwd() + "/falsepositives/" + options.name + ".js");
+	}
+	catch(e) {
+		console.log(e);
+		// и фиг бы с ним
+	}
+
 	errors=0;
 	pagesProceeded=0;
 	pagesWithErrors=0;
@@ -105,6 +114,9 @@ function workWithGoodChunk(text,options){
 		.replace(/&nbsp;/g," ")
 		.replace(/[^А-Яа-я-]{20,}/g," | ")
 	;
+	options.falsepositives.map(function(t){
+		text=text.replace(t, " | ");
+	});
 	if(!options.fromDump){
 		dumper.queueURL(
 			options.url,
