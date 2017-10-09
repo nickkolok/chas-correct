@@ -114,6 +114,7 @@ function workWithGoodChunk(text,options){
 		.replace(/&nbsp;/g," ")
 		.replace(/[^А-Яа-я-]{20,}/g," | ")
 		.replace(/́/g, "") // Ударение
+		.replace(/̀/g, "") // Ударение побочное
 	;
 	options.falsepositives.map(function(t){
 		text=text.replace(t, " | ");
