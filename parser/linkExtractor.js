@@ -50,7 +50,7 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 		var urlsOnPage=(''+html).match(linkRegExp);
 		if(urlsOnPage){
 			for(var j=0; j<urlsOnPage.length; j++){
-				self.linksObject[urlsOnPage[j].replace(/<a[^>]+href="/g,o.linkprefix)]=0;
+				self.linksObject[encodeURI(urlsOnPage[j].replace(/<a[^>]+href="/g,o.linkprefix))]=0;
 			}
 		}
 		self.pagesParsed++;
