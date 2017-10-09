@@ -70,12 +70,12 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 	checkerProcess.on('message', function (m) {
 		switch(m.type){
 			case 'mistake':
-				console.log(m.options.url+(m.options.fromDump?' (cached)':'')+' : '+m.text+' : '+m.signatures);
+				console.log(decodeURI(m.options.url)+(m.options.fromDump?' (cached)':'')+' : '+m.text+' : '+m.signatures);
 				for(var i=0; i<m.signatures.length; i++){
 					m.text = m.text.replace(m.signatures[i],'<b>' + m.signatures[i] + '</b>');
 				}
 				htmlTable+='<tr>'+
-					'<td><a href="'+m.options.url+'">'+m.options.url.replace(/^https+\:\/\//,'')+'</a></td>'+
+					'<td><a href="'+m.options.url+'">'+decodeURI(m.options.url).replace(/^https+\:\/\//,'')+'</a></td>'+
 					'<td>'+m.text+'</td>'+
 					'<td>'+m.signatures.join(' ; ')+'</td>'+
 					'<td>'+new Date(m.options.time).toLocaleString()+'</td>'+
