@@ -10,7 +10,6 @@ urllist.countErrorsInURLarray(
 	'<body',
 	'</body>',
 	{
-		encoding:'win1251',
 		name:'cleverstudents',
 		pause:1500,
 	}
