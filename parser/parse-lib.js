@@ -3,9 +3,8 @@ var exec = require('child_process').exec;
 var http = require('http');
 var https = require('https');
 var request = require('request');
-var iconv = require('iconv-lite');
-iconv.skipDecodeWarning = true;
-//var iconvH = require('iconv');//Не встаёт, матюки малопонятны
+var detectEncoding = require('node-autodetect-utf8-cp1251-cp866').detectEncoding;
+
 var totalWords=0;
 
 var words = {};
@@ -130,7 +129,7 @@ function bruteReplace(ih){
 
 var actionArray;
 function countReplacableInJSON(filename,log){
-	
+
 	(filename);
 	var totalWords=selectReplacable();
 	resultToJSON(log);
@@ -310,13 +309,8 @@ function getHTMLfromURL(url,callback,options){
 
 function getChunkFromURL(url,callback,beginning,ending,options){
 	getHTMLfromURL(url,function(body){
-		body = iconv.decode(body, options.encoding || 'utf8');
-	/*
-		body = new Buffer(body, 'binary');
-		conv = new iconvH.Iconv(options.encoding || 'utf8', 'utf8');
-		body = conv.convert(body).toString();
-	*/
-	//	console.log(body);
+		body = detectEncoding(body).text;
+//		console.log(body);
 		callback(
 			body.substr(0,body.search(ending)).substr(body.search(beginning)),
 			options
