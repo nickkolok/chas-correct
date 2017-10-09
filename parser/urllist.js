@@ -120,7 +120,7 @@ function workWithGoodChunk(text,options){
 	if(!options.fromDump){
 		dumper.queueURL(
 			options.url,
-			Math.round((Date.now()-dateRelative)/60000),//С точностью до минут и фиксированным смещением - тобы меньше места занимало
+			Math.round((Date.now()-dateRelative)/60000),//С точностью до минут и фиксированным смещением - чтобы меньше места занимало
 			text
 		);
 	}
