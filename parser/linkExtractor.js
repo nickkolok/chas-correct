@@ -6,6 +6,7 @@ function LinkExtractor(o){
 	this.pagesTotal  = 0;
 	this.linksObject = o.linksObject || {};
 	this.name        = o.name        || '';
+	this.stripSid    = o.stripSid;
 
 	if(o.flushEvery){
 		setInterval(this.writeExtractedURLs.bind(this),o.flushEvery);
@@ -64,6 +65,9 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 
 LinkExtractor.prototype.writeExtractedURLs = function(){
 	var keys=Object.keys(this.linksObject);
+	if (this.stripSid) {
+		keys = keys.map(function(u){return u.replace(/\?sid=[0-9a-f]+$/,'')});
+	}
 	fs.writeFile(
 		"urllists/"+this.name+".urllist.json",
 		JSON.stringify(keys).replace(/^\[/,'[\r\n').replace(/,"/g,',\r\n"').replace(/\]$/,'\r\n]')
