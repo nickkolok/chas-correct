@@ -9,8 +9,8 @@ extractor.extractURLlistFromURLsequence({
 	pagesCount:	50,
 	reportEvery: 2,
 	flushEvery: 150,
-	prefix:	'http://matematikalegko.ru/zapisi/page/',
-	linkpattern:	'http://matematikalegko.ru/',
-	linkprefix:	'',
+	prefix:	'https://matematikalegko.ru/zapisi/page/',
+	linkpattern:	'//matematikalegko.ru/',
+	linkprefix:	'https:',
 	pause:1000,
 });
