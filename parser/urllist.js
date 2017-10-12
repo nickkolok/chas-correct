@@ -47,9 +47,10 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 	options.falsepositives = [];
 	try {
 		options.falsepositives = require(process.cwd() + "/falsepositives/" + options.name + ".js");
+		console.log('Загружен файл со списком ложных срабатываний');
 	}
 	catch(e) {
-		console.log(e);
+		// console.log(e);
 		// и фиг бы с ним
 	}
 
