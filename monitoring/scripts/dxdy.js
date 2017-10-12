@@ -11,7 +11,7 @@ urllist.countErrorsInURLarray(
 	'<div id="recs">',
 	{
 		name:'dxdy',
-		pause:1500,
+		pause:400,
 	}
 );
 
