@@ -17,6 +17,7 @@ for site in \
 	algebraclass_ru \
 	forum_exponenta_ru \
 	ru_solverbook_com \
+	ru_onlinemschool_com \
 ; do
 	nohup ionice -c3 nice -n9 js scripts/$site.js &
 done
