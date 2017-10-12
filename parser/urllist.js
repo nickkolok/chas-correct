@@ -26,6 +26,15 @@ var requestsSent=0;
 var dumper;
 
 function getURLfromDumpOrHttp(beginFrom,endWith,newopts){
+	if (newopts.nodumpuse) {
+		// Иногда правда быстрее скачать, чем искать на винте
+		newopts.time=Date.now();
+		setTimeout(function(){
+			parser.getChunkFromURL(newopts.url,workWithChunk,beginFrom,endWith,newopts);
+		},(newopts.pause||100)*requestsSent);
+		requestsSent++;
+
+	}
 	dumper.extractURL(
 		newopts.url,
 		function(rows){ //Есть такое в дампе
@@ -120,7 +129,7 @@ function workWithGoodChunk(text,options){
 	options.falsepositives.map(function(t){
 		text=text.replace(t, " | ");
 	});
-	if(!options.fromDump){
+	if(!options.fromDump && !options.nodumpuse){
 		dumper.queueURL(
 			options.url,
 			Math.round((Date.now()-dateRelative)/60000),//С точностью до минут и фиксированным смещением - чтобы меньше места занимало
