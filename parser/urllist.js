@@ -157,6 +157,12 @@ function workWithChunk(text,options){
 //	console.error(pagesProceeded+1,text.length,options);
 	workWithGoodChunk(text,options);
 	pagesProceeded++;
+	if(options.reportEvery && (pagesProceeded % options.reportEvery) == 0) {
+		console.log(
+			'Обработано ' + pagesProceeded + ' из ' + length +
+			' (' + Math.round(pagesProceeded/length*10000)/100 + '%)'
+		);
+	}
 	if(pagesProceeded==length){
 		finishCheck();
 	}
