@@ -64,15 +64,20 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 }
 
 LinkExtractor.prototype.writeExtractedURLs = function(){
-	var keys=Object.keys(this.linksObject);
+	this.writeExtractedURLsArray(Object.keys(this.linksObject));
+}
+
+LinkExtractor.prototype.writeExtractedURLsArray = function(array){
 	if (this.stripSid) {
-		keys = keys.map(function(u){return u.replace(/\?sid=[0-9a-f]+$/,'')});
+		array = array.map(function(u){return u.replace(/\?sid=[0-9a-f]+$/,'')});
 	}
 	fs.writeFile(
 		"urllists/"+this.name+".urllist.json",
-		JSON.stringify(keys).replace(/^\[/,'[\r\n').replace(/,"/g,',\r\n"').replace(/\]$/,'\r\n]')
+		JSON.stringify(array).replace(/^\[/,'[\r\n').replace(/,"/g,',\r\n"').replace(/\]$/,'\r\n]'),
+		function(){
+			console.log('В файл записано адресов: '+array.length);
+		}
 	);
-	console.log('В файл записано адресов: '+keys.length);
 }
 
 module.exports.LinkExtractor=LinkExtractor;
