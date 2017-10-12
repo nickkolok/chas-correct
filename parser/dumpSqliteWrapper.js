@@ -52,7 +52,13 @@ function dumpSqliteWrapper(o){
 				"'), ";
 		}
 		command=command.replace(/[,]\s*$/,"; ");
-		self.db.run(command);
+		self.db.run(command, [], function(err){
+			if (!err) {
+				console.log('Запрос на добавление выполнен');
+			} else {
+				console.log(err);
+			}
+		});
 		console.log('Записи добавлены в дамп');
 	};
 
