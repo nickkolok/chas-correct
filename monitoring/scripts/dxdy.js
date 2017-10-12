@@ -12,6 +12,8 @@ urllist.countErrorsInURLarray(
 	{
 		name:'dxdy',
 		pause:400,
+		nodumpuse: true,
+		reportEvery:100,
 	}
 );
 

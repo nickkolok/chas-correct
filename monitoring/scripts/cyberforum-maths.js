@@ -12,6 +12,8 @@ urllist.countErrorsInURLarray(
 	{
 		name:'cyberforum-maths',
 		pause:400,
+		nodumpuse: true,
+		reportEvery:100,
 	}
 );
 
