@@ -1,4 +1,7 @@
 var fs = require('fs');
+
+var Crawler = require("js-crawler");
+
 var parser = require('./parse-lib.js');
 
 function LinkExtractor(o){
@@ -79,5 +82,33 @@ LinkExtractor.prototype.writeExtractedURLsArray = function(array){
 		}
 	);
 }
+
+
+LinkExtractor.prototype.extractURLlistFromSiteRecursive = function(o){
+
+	var self = this;
+
+	var signature = o.root.replace(/^https?\:\/\//,'');
+
+	var crawler = new Crawler().configure({
+		shouldCrawl: function(url) {
+			//console.log('Thinking about ' + url);
+			//console.log(url.indexOf(signature));
+			return url.indexOf(signature) >= 0;
+		},
+		depth: o.depth || 1000,
+		maxRequestsPerSecond: (1000/o.pause) || 1,
+		maxConcurrentRequests: 5,
+	});
+
+
+	crawler.crawl(o.root, function(page) {
+		self.linksObject[page.url]=1;
+	}, null, function onAllFinished(crawledUrls) {
+		self.writeExtractedURLs();
+	});
+
+}
+
 
 module.exports.LinkExtractor=LinkExtractor;
