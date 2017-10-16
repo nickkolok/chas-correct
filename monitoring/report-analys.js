@@ -1,14 +1,17 @@
 var fs = require('fs');
 var cheerio = require('cheerio');
 
-var name = process.argv[2];
-
-var $ = cheerio.load(
-	fs.readFileSync(
+var reports = '';
+process.argv.slice(2).map(function(name){
+	reports += fs.readFileSync(
 		'results/' + name + '.report.html',
 		'utf-8'
-	)
-);
+	);
+});
+
+
+
+var $ = cheerio.load(reports);
 
 var chunksWithErrors = [];
 $('tr').map(function(i, tr) {
@@ -19,12 +22,12 @@ $('tr').map(function(i, tr) {
 });
 
 var dictionary = require('../prepareDictionary.js').actionArray;
-console.log(dictionary);
+//console.log(dictionary);
 
 var freqs = [];
 
 for(var i = 0; i < dictionary.length; i++) {
-	//console.log(i);
+	console.log(i);
 	freqs[i] = 0;
 	for(var j = 0; j < chunksWithErrors.length; j++) {
 		var newtext = chunksWithErrors[j].replace(dictionary[i][0],dictionary[i][1]);
@@ -51,3 +54,10 @@ for (var i = 0; i < dictionary.length; i++) {
 pairs.sort(function(a,b){return b[1]-a[1]});
 
 console.log(pairs);
+
+fs.writeFileSync(
+	'results/'+process.argv.slice(2).join('+')+'.errorsstat.json',
+	pairs.map(function(pair){
+		return ''+pair[1] + '  :  ' + pair[0].join('; ');
+	}).join('\n\r')
+);
