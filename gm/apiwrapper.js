@@ -48,8 +48,9 @@ var storageWrapper={
 				return JSON.parse(val);
 			};
 		} catch (e) { 
-			return defaultValue 
-		};
+			console.error(e);
+			return defaultValue;
+		}
 	},
 	setKey: function(key,value){
 		GM_setValue(key,JSON.stringify(value));
