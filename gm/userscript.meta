@@ -1,4 +1,4 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name          ЧАС-коррект
 // @namespace     http://www.example.com/gmscripts
 // @description   Исправление наиболее частотных ошибок на просматриваемых страницах
@@ -7,5 +7,7 @@
 // @version       0.2.0.5
 // @grant	  GM_getValue
 // @grant	  GM_setValue
+// @grant	  GM.getValue
+// @grant	  GM.setValue
 // @license       GNU GPLv3
 // ==/UserScript==
