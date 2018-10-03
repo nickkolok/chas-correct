@@ -47,13 +47,17 @@ var storageWrapper={
 			} else {
 				return JSON.parse(val);
 			};
-		} catch (e) { 
+		} catch (e) {
 			console.error(e);
 			return defaultValue;
 		}
 	},
 	setKey: function(key,value){
-		GM_setValue(key,JSON.stringify(value));
+    try{
+      GM_setValue(key,JSON.stringify(value));
+    }catch(e){
+      console.error(e);
+    }
 	},
 };
 
