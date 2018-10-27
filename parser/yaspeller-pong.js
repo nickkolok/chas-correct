@@ -35,8 +35,14 @@ function getYaspellerJSON(callback,o){
 }
 
 function getUnknownWordsList(o){
-	prepareYaspellerFile(o);
-	getYaspellerJSON(writeUnknownWords,o);
+	try{
+		console.log('Начинаем деление слов на известные и неизвестные...');
+		prepareYaspellerFile(o);
+		getYaspellerJSON(writeUnknownWords,o);	
+	}catch(e){
+		console.log('Не удалось обработать неизвестные слова:');
+		console.error(e);
+	}
 }
 
 function getJSONwithCounts(o){
