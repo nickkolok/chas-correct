@@ -1,3 +1,6 @@
+// Usage:
+// nodejs report-analys.js abireg dxdy forum_exponenta_ru
+
 var fs = require('fs');
 var cheerio = require('cheerio');
 
