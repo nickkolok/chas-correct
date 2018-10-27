@@ -6,6 +6,7 @@ urllist.countErrorsInURLlist(
 	'<span class="avtor" itemprop="headline">Репетитор по математике</span>',
 	'<div class="postinfo">',
 	{
-		pause:2000,
+		pause:10000,
+		name: 'ege-ok'
 	}
 );
