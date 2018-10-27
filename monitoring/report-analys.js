@@ -59,7 +59,7 @@ pairs.sort(function(a,b){return b[1]-a[1]});
 console.log(pairs);
 
 fs.writeFileSync(
-	'results/'+process.argv.slice(2).join('+')+'.errorsstat.json',
+	'results/'+process.argv.slice(2).join('+')+'.errorsstat.txt',
 	pairs.map(function(pair){
 		return ''+pair[1] + '  :  ' + pair[0].join('; ');
 	}).join('\n\r')
