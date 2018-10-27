@@ -1,0 +1,99 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 15.08.2 ] */
+
+/* [wxMaxima: input   start ] */
+load("lsquares");
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+data:read_matrix("ugc_all.txt")$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(m,co, t):=(
+    mse:'sum(('data[i,2]-a*(b+'data[i,1])^c)^2,i,1,m),
+    coeffsrc:lsquares_estimates_approximate (mse, [a, b, c], initial = co, tol = t),
+    coeff:coeffsrc[1],
+    coeff:[
+        part(coeff[1],2),
+        part(coeff[2],2),
+        part(coeff[3],2)
+    ]
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(m,a,b,c):=(
+    /*m:ev(m,numer),*/
+    avg:ev(sum(data[i][2],i,1,m)/m,numer),
+    ev(1-
+    sum((data[i,2]-a*(b+data[i,1])^c)^2,i,1,m)
+    /
+    sum((data[i,2]-avg)^2,i,1,m),numer)
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+initappr:[data[1][2], 0, -1];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+regrstep(50,initappr, 1e-1);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(50,initappr, 1e-2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(50, 874171.1552477268,2.300313592478763,-0.7565801497615073 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(1000, 874171.1552477268,2.300313592478763,-0.7565801497615073 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(2000, 874171.1552477268,2.300313592478763,-0.7565801497615073 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(2000, 1297603.663944504,3.539179021254991,-0.8747751962142613 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(20000, 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(20000, 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(length(data), 874171.1552477268,2.300313592478763,-0.7565801497615073 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(100,%o7,1e-4);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(length(data), 106197.1556527225,2.311116394383808,-0.8330305125235801 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(1000,%o6,1e-5);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+regrstep(300,%o14);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(10000,%);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

@@ -1,0 +1,128 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 15.08.2 ] */
+
+/* [wxMaxima: input   start ] */
+load("lsquares");
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+data:read_matrix("amt.txt")$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+regrstep(m,co, t):=(
+    mse:'sum(('data[i,2]-a*(b+'data[i,1])^c)^2,i,1,m),
+    coeffsrc:lsquares_estimates_approximate (mse, [a, b, c], initial = co, tol = t),
+    coeff:coeffsrc[1],
+    coeff:[
+        part(coeff[1],2),
+        part(coeff[2],2),
+        part(coeff[3],2)
+    ]
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+rsquare(m,a,b,c):=(
+    /*m:ev(m,numer),*/
+    avg:ev(sum(data[i][2],i,1,m)/m,numer),
+    ev(1-
+    sum((data[i,2]-a*(b+data[i,1])^c)^2,i,1,m)
+    /
+    sum((data[i,2]-avg)^2,i,1,m),numer)
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+initappr:[data[1][2], 0, -1];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+regrstep(50,initappr, 1e-1);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+regrstep(50,initappr, 1e-2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(50, 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(1000, 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(2000, 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(10000, 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(20000, 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(20000, 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(length(data), 120855.5762472096,2.64808867695112,-0.8743758279590136 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+regrstep(100,%o15,1e-4);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(length(data), 106197.1556527225,2.311116394383808,-0.8330305125235801 );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(1000,%o10,1e-4);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+regrstep(1000,initappr,1e-4);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+regrstep(300,%o16,1e-5);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(10000,%o11,1e-4);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(20000,[101638.4143135303,2.243553858479713,-0.8135495618453528],1e-2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(length(data),89321.40918306196,1.848085607863045,-0.7789972770736916);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(length(data),84987.45903373529,1.711838308060542,-0.7640502329831158);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(length(data),101638.4143135303,2.243553858479713,-0.8135495618453528);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(length(data),101638.4143162407,2.223684256412657,-0.8157330616074399);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

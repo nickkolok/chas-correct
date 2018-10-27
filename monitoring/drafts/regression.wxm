@@ -1,0 +1,90 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 15.08.2 ] */
+
+/* [wxMaxima: input   start ] */
+load("lsquares");
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+data:read_matrix("amt.txt")$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+mse1000:lsquares_mse (data1000, [x,y], y=a*((x+b)^c))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+mse1000;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+m:100;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+mse:'sum(('data[i,2]-a*(b+'data[i,1])^c)^2,i,1,m)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+coeffsrc:lsquares_estimates_approximate (mse, [a, b, c], initial = [data[1][2], 0, -1]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+coeff:coeffsrc[1];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+coeff:[
+    part(coeff[1],2),
+    part(coeff[2],2),
+    part(coeff[3],2)
+];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(m,co):=(
+    mse:'sum(('data[i,2]-a*(b+'data[i,1])^c)^2,i,1,m),
+    coeffsrc:lsquares_estimates_approximate (mse, [a, b, c], initial = co),
+    coeff:coeffsrc[1],
+    coeff:[
+        part(coeff[1],2),
+        part(coeff[2],2),
+        part(coeff[3],2)
+    ]
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+initappr:[data[1][2], 0, -1];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(1000,initappr);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(2000,%);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+regrstep(10000,%);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+rsquare(m,a,b,c):=(
+    avg:sum(data[i][2],i,1,m),
+    1-
+    sum((data[i,2]-a*(b+data[i,1])^c)^2,i,1,m)
+    /
+    sum((data[i,2]-avg)^2,i,1,m)    
+);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
