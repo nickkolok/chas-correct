@@ -6,11 +6,11 @@ var extractor = new LinkExtractor({
 });
 
 extractor.extractURLlistFromURLsequence({
-	pagesCount:	50,
+	pagesCount:	60,
 	reportEvery: 2,
 	flushEvery: 150,
 	prefix:	'https://matematikalegko.ru/zapisi/page/',
 	linkpattern:	'//matematikalegko.ru/',
 	linkprefix:	'https:',
-	pause:1000,
+	pause:5000,
 });

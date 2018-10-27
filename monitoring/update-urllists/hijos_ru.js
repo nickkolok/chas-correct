@@ -1,13 +1,13 @@
 var LinkExtractor = require('../../parser/linkExtractor.js').LinkExtractor;
 
 var extractor = new LinkExtractor({
-	flushEvery: 10,
+	flushEvery: 1000,
 	name:	'hijos_ru',
 });
 
 
 extractor.extractURLlistFromURLsequence({
-	pagesCount:	10,
+	pagesCount:	15,
 	reportEvery: 1,
 	flushEvery: 1,
 	prefix:	'http://hijos.ru/karta-saita/?pg=',

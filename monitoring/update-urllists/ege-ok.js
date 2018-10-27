@@ -6,11 +6,11 @@ var extractor = new LinkExtractor({
 });
 
 extractor.extractURLlistFromURLsequence({
-	pagesCount:	50,
+	pagesCount:	70,
 	reportEvery: 2,
 	flushEvery: 150,
-	prefix:	'http://ege-ok.ru/zapisi/page/',
+	prefix:	'https://ege-ok.ru/reshenie-zadach-po-matematike/page/',
 	linkpattern:	'//ege-ok.ru/',
-	linkprefix:	'http:',
-	pause:2000,
+	linkprefix:	'https:',
+	pause:10000,
 });
