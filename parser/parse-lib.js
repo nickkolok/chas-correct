@@ -321,7 +321,10 @@ function getHTMLfromURL(url,callback,options){
 function getChunkFromURL(url,callback,beginning,ending,options){
 	getHTMLfromURL(url,function(body){
 		body = detectEncoding(body).text;
-//		console.log(body);
+		//console.log(body);
+		//console.log(body.substr(0,body.search(ending)));
+		console.log('Получено с сервера: ' + url);
+		console.log('Длина ответа: ' + body.length);
 		callback(
 			body.substr(0,body.search(ending)).substr(body.search(beginning)),
 			options
