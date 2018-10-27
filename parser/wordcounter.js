@@ -76,6 +76,8 @@ Wordcounter.prototype.writeFiles=function(filename){
 		'<table border="1" cellspacing="0" cellpadding="5">\n'+
 		html+'</table></body></html>'
 	);
+
+	console.log('Словарь записан');
 }
 
 module.exports.Wordcounter=Wordcounter;
