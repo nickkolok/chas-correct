@@ -291,8 +291,19 @@ function repairAbsentFiles(o){
 var thePool={maxSockets: 4096};//Из гуманитарных соображений
 
 function getHTMLfromURL(url,callback,options){
+	var headers = {};
+//	headers['referer'] = url;
+	headers['accept'] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
+//	headers['accept-encoding'] = "gzip, deflate, br";
+	headers['accept-language'] = "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7";
+	headers['cache-control'] = "max-age=0";
+	headers['dnt'] = 1;
+	headers['upgrade-insecure-requests'] = 1;
+	headers['User-Agent'] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/69.0.3497.81 Chrome/69.0.3497.81 Safari/537.36";
+
 	request.get({
 		uri: url,
+		headers: headers,
 		encoding: null,
 		followRedirects : true,
 //		pool: thePool,
