@@ -40,11 +40,13 @@ function getURLfromDumpOrHttp(beginFrom,endWith,newopts){
 		function(rows){ //Есть такое в дампе
 			newopts.fromDump=1;
 			newopts.time=rows[0].time;
+			//console.log(rows[0].content);
 			workWithChunk(rows[0].content,newopts);
 		},
 		function(){ //Нет такого в дампе
 			newopts.time=Date.now();
 			setTimeout(function(){
+				console.log('Запрашиваем с сервера:  ' + newopts.url)
 				parser.getChunkFromURL(newopts.url,workWithChunk,beginFrom,endWith,newopts);
 			},(newopts.pause||100)*requestsSent);
 			requestsSent++;
