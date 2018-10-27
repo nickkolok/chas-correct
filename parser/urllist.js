@@ -40,7 +40,7 @@ function getURLfromDumpOrHttp(beginFrom,endWith,newopts){
 		function(rows){ //Есть такое в дампе
 			newopts.fromDump=1;
 			newopts.time=rows[0].time;
-			console.log(rows[0].content);
+			//console.log(rows[0].content);
 			workWithChunk(rows[0].content,newopts);
 		},
 		function(){ //Нет такого в дампе
