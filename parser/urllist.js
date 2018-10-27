@@ -33,14 +33,14 @@ function getURLfromDumpOrHttp(beginFrom,endWith,newopts){
 			parser.getChunkFromURL(newopts.url,workWithChunk,beginFrom,endWith,newopts);
 		},(newopts.pause||100)*requestsSent);
 		requestsSent++;
-
+		return;
 	}
 	dumper.extractURL(
 		newopts.url,
 		function(rows){ //Есть такое в дампе
 			newopts.fromDump=1;
 			newopts.time=rows[0].time;
-			//console.log(rows[0].content);
+			console.log(rows[0].content);
 			workWithChunk(rows[0].content,newopts);
 		},
 		function(){ //Нет такого в дампе
