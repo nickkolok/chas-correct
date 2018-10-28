@@ -118,6 +118,9 @@ function countErrorsInURLlist(filename,maxlength,beginFrom,endWith,options){
 function workWithGoodChunk(text,options){
 //	console.log(text);
 //	text=text.replace(/[^а-яё]{4,}/gi,";");
+	options.falsepositives.map(function(t){
+		text=text.replace(t, " | ");
+	});
 	text=text
 		.replace(/<[^>]*>/gi,"|")
 		.replace(/<\s+>/g," ")
