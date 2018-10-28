@@ -7,7 +7,7 @@ urllist.countErrorsInURLarray(
 	list,
 	10000000,
 	'<div id="content">',
-	'//yandex.st/share/share.js',
+	'<div id="comments">',
 	{
 		name:'hijos_ru',
 		pause:1500,
