@@ -12,7 +12,7 @@ function LinkExtractor(o){
 	this.stripSid    = o.stripSid;
 
 	if(o.flushEvery){
-		setInterval(this.writeExtractedURLs.bind(this),o.flushEvery);
+		this.flushInterval = setInterval(this.writeExtractedURLs.bind(this),o.flushEvery);
 	}
 
 	if(!o.dontReadPrevious){
@@ -117,6 +117,7 @@ LinkExtractor.prototype.extractURLlistFromSiteRecursive = function(o){
 	}, null, function onAllFinished(crawledUrls) {
 		self.filterExtratedURLs(signature);
 		self.writeExtractedURLs();
+		clearInterval(this.flushInterval);
 		console.log('Краулинг закончен!');
 	});
 
