@@ -127,10 +127,15 @@ function workWithGoodChunk(text,options){
 		.replace(/&quot;/g,"\"")
 		.replace(/\s+/g," ")
 		.replace(/&nbsp;/g," ")
-		.replace(/[^А-Яа-я-]{20,}/g," | ")
+		.replace(/&#160;/g," ")
+		.replace(/[^А-Яа-яЁё-]([^А-Яа-яЁё]{8,})[^А-Яа-яЁё-]/g," | ")
+		//.replace(/<\/?[^А-Яа-яЁё>]>/g,"|")
 		.replace(/́/g, "") // Ударение
 		.replace(/̀/g, "") // Ударение побочное
-	;
+		.replace(/­/g, "") // Мягкий перенос
+		.replace(/\s+/g," ")
+		.trim()
+		;
 	options.falsepositives.map(function(t){
 		text=text.replace(t, " | ");
 	});
