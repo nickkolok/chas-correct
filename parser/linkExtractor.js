@@ -84,12 +84,21 @@ LinkExtractor.prototype.writeExtractedURLsArray = function(array){
 }
 
 
+LinkExtractor.prototype.filterExtratedURLs = function(signature){
+	for (l in this.linksObject){
+		if(l.search(signature) === -1){
+			delete this.linksObject[l];
+		}
+	}
+}
+
 LinkExtractor.prototype.extractURLlistFromSiteRecursive = function(o){
 
 	var self = this;
 
 	var signature = o.root.replace(/^https?\:\/\//,'');
 
+	self.filterExtratedURLs(signature);
 	var crawler = new Crawler().configure({
 		shouldCrawl: function(url) {
 			//console.log('Thinking about ' + url);
@@ -104,8 +113,11 @@ LinkExtractor.prototype.extractURLlistFromSiteRecursive = function(o){
 
 	crawler.crawl(o.root, function(page) {
 		self.linksObject[page.url]=1;
+		self.filterExtratedURLs(signature);
 	}, null, function onAllFinished(crawledUrls) {
+		self.filterExtratedURLs(signature);
 		self.writeExtractedURLs();
+		console.log('Краулинг закончен!');
 	});
 
 }
