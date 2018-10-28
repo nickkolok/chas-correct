@@ -10,7 +10,7 @@ urllist.countErrorsInURLarray(
 	'<div id="comments">',
 	{
 		name:'hijos_ru',
-		pause:1500,
+		pause:2500,
 	}
 );
 
