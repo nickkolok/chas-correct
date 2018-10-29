@@ -153,7 +153,7 @@ function workWithGoodChunk(text,options){
 	options.falsepositives.map(function(t){
 		text=text.replace(t, " | ");
 	});
-	if(!options.fromDump && !options.nodumpuse){
+	if(!options.fromDump && !options.nodumpuse && text){
 		dumper.queueURL(
 			options.url,
 			Math.round((Date.now()-dateRelative)/60000),//С точностью до минут и фиксированным смещением - чтобы меньше места занимало
