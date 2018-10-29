@@ -65,9 +65,14 @@ function dumpSqliteWrapper(o){
 	this.extractURL = function(url, callbackIfFound, callbackIfNotFound) {
 		self.db.serialize(function() {
 			self.db.all("SELECT rowid AS id, url, time, content FROM Dump WHERE url='"+url+"'", function(err, rows) {
+				try{
 				if(rows.length){
 					callbackIfFound(rows);
 				} else {
+					callbackIfNotFound();
+				}
+				}catch(e){
+					console.error(e);
 					callbackIfNotFound();
 				}
 			});
