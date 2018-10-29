@@ -83,11 +83,24 @@ LinkExtractor.prototype.writeExtractedURLsArray = function(array){
 	);
 }
 
+function isNonParseableFormat(url){
+	return (
+		/\.(zip|rar|exe|jpg|png|gif|svg|djvu|pdf|od.|docx?|xlsx?|pptx?|ppsx?|dotx?|xltx?)$/i.test(url)
+	);
+}
 
-LinkExtractor.prototype.filterExtratedURLs = function(signature){
+LinkExtractor.prototype.filterExtratedURLs = function(signature, o){
 	for (l in this.linksObject){
-		if(l.search(signature) === -1){
+		if(l.search(signature) === -1 || isNonParseableFormat(l)){
 			delete this.linksObject[l];
+		}
+		if(o && o.exclude){
+			for(var i = 0; i < o.exclude.length; i++){
+				if(l.search(o.exclude[i])!==-1){
+					delete this.linksObject[l];
+					break;
+				}
+			}		
 		}
 	}
 }
@@ -98,12 +111,22 @@ LinkExtractor.prototype.extractURLlistFromSiteRecursive = function(o){
 
 	var signature = o.root.replace(/^https?\:\/\//,'');
 
-	self.filterExtratedURLs(signature);
+	self.filterExtratedURLs(signature, o);
 	var crawler = new Crawler().configure({
 		shouldCrawl: function(url) {
 			//console.log('Thinking about ' + url);
 			//console.log(url.indexOf(signature));
-			return url.indexOf(signature) >= 0;
+			if(o.exclude){
+				for(var i = 0; i < o.exclude.length; i++){
+					if(url.search(o.exclude[i])!==-1){
+						return false;
+					}
+				}
+			}
+			return (
+				!isNonParseableFormat(url) &&
+				url.indexOf(signature) >= 0
+			);
 		},
 		depth: o.depth || 1000,
 		maxRequestsPerSecond: (1000/o.pause) || 1,
@@ -113,9 +136,9 @@ LinkExtractor.prototype.extractURLlistFromSiteRecursive = function(o){
 
 	crawler.crawl(o.root, function(page) {
 		self.linksObject[page.url]=1;
-		self.filterExtratedURLs(signature);
+		self.filterExtratedURLs(signature, o);
 	}, null, function onAllFinished(crawledUrls) {
-		self.filterExtratedURLs(signature);
+		self.filterExtratedURLs(signature, o);
 		self.writeExtractedURLs();
 		clearInterval(this.flushInterval);
 		console.log('Краулинг закончен!');
