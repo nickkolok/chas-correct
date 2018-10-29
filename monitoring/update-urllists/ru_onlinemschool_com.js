@@ -9,4 +9,9 @@ var extractor = new LinkExtractor({
 extractor.extractURLlistFromSiteRecursive({
 	pause:1000,
 	root: 'http://ru.onlinemschool.com/',
+	exclude:[
+		/^https:\/\/accounts\.google\.com/,
+		/^https:\/\/twitter\.com/,
+		/^https?:\/\/ru\.onlinemschool\.com\/modules\/feedback\/\?page=/,
+	],
 });
