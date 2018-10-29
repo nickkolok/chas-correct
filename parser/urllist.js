@@ -82,12 +82,20 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 	checkerProcess.on('message', function (m) {
 		switch(m.type){
 			case 'mistake':
-				console.log(decodeURI(m.options.url)+(m.options.fromDump?' (cached)':'')+' : '+m.text+' : '+m.signatures);
+				var url = m.options.url;
+				try{
+					url = decodeURI(url);
+				}catch(e){
+					console.log('Unable to decode URI:');
+					console.log(url);
+					console.error(e);
+				}
+				console.log(url+(m.options.fromDump?' (cached)':'')+' : '+m.text+' : '+m.signatures);
 				for(var i=0; i<m.signatures.length; i++){
 					m.text = m.text.replace(m.signatures[i],'<b>' + m.signatures[i] + '</b>');
 				}
 				htmlTable+='<tr>'+
-					'<td><a href="'+m.options.url+'">'+decodeURI(m.options.url).replace(/^https+\:\/\//,'')+'</a></td>'+
+					'<td><a href="'+m.options.url+'">'+url.replace(/^https+\:\/\//,'')+'</a></td>'+
 					'<td>'+m.text+'</td>'+
 					'<td>'+m.signatures.join(' ; ')+'</td>'+
 					'<td>'+new Date(m.options.time).toLocaleString()+'</td>'+
