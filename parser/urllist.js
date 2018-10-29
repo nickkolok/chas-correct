@@ -107,6 +107,12 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 		}
 	});
 
+	// If you don't do this, then the script gets stuck while trying to get pages from cache
+	// Shuffling the URLs array allows to spliy the resources between new pages (which neednetwork) and old pages (which need HDD)
+	if(!options.noshuffle){
+		urls.sort(()=>(Math.random()>0.61?1:-1));
+	}
+
 	for(var i=0; i<length; i++){
 		var newopts={};
 		for(var prop in options)
