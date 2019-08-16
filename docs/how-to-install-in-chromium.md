@@ -1,4 +1,4 @@
-#Инструкция по установке "ЧАС-коррект" на Chromium и ему подобные браузеры
+## Инструкция по установке "ЧАС-коррект" на Chromium и ему подобные браузеры
 *(Google Chrome, Яндекс.Браузер, Opera, Спутник и прочие элементы таблицы Менделеева)*
 
 1. Открываем [страницу расширения Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=ru) в каталоге расширений.
