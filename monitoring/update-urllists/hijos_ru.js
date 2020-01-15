@@ -15,3 +15,5 @@ extractor.extractURLlistFromURLsequence({
 	linkprefix:	'',
 	pause:2500,
 });
+
+//TODO: exclude pages with /comment-page-1/ in URL
