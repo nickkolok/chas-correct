@@ -14,3 +14,13 @@ extractor.extractURLlistFromURLsequence({
 	linkprefix:	'http://mathprofi.ru/',
 	pause:2000,
 });
+
+extractor.extractURLlistFromURLsequence({
+	pagesCount:	1,
+	reportEvery: 1,
+	flushEvery: 1,
+	prefix:	'http://mathprofi.ru/#',
+	linkpattern:	'',
+	linkprefix:	'http://mathprofi.ru/',
+	pause:2000,
+});
