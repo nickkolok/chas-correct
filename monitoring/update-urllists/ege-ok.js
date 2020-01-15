@@ -6,7 +6,7 @@ var extractor = new LinkExtractor({
 });
 
 extractor.extractURLlistFromURLsequence({
-	pagesCount:	70,
+	pagesCount:	100,
 	reportEvery: 2,
 	flushEvery: 150,
 	prefix:	'https://ege-ok.ru/reshenie-zadach-po-matematike/page/',
