@@ -5,4 +5,8 @@ module.exports = [
 	'Неутрален елемент',
 	'Елементарні функції',
 	'bg:X  елемент',
+	'<span class="tex" dir="ltr">$ 2 $</span>; во-вторых, <span class="tex" dir="ltr">$ a^5-a $</span>',
+	'<span class="tex" dir="ltr">$ 3 $</span>; в-третьих, <span class="tex" dir="ltr">$ a^5-a $</span>',
+	'откуда получаем, что сходимость гарантируется, когда, во-первых',
+	'Теорія груп'
 ];
