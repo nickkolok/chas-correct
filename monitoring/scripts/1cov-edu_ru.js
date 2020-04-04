@@ -6,8 +6,8 @@ var list=JSON.parse(fs.readFileSync("./urllists/1cov-edu_ru.urllist.json", 'utf-
 urllist.countErrorsInURLarray(
 	list,
 	10000000,
-	'<div id="contents_inner" itemscope',
-	'<div id="content_bottom"',
+	'<td id="td_contents">',
+	'</article>',
 	{
 //		encoding:'win1251',
 		name:'1cov-edu_ru',
