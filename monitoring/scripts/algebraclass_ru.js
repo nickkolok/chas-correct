@@ -7,7 +7,7 @@ urllist.countErrorsInURLarray(
 	list,
 	10000000,
 	'<section id="content" role="main">',
-	'<footer id="footer" role="contentinfo">',
+	/<h3 class="comments-title">|<footer id="footer" role="contentinfo">/,
 	{
 		name:'algebraclass_ru',
 		pause:1500,
