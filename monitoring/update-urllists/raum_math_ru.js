@@ -13,5 +13,8 @@ extractor.extractURLlistFromSiteRecursive({
 		'http://raum.math.ru/user/login',
 		'http://raum.math.ru/user/register',
 		'http://raum.math.ru/forum/',
+		'https://raum.math.ru/user/login',
+		'https://raum.math.ru/user/register',
+		'https://raum.math.ru/forum/',
 	],
 });
