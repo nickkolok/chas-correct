@@ -6,8 +6,8 @@ var list=JSON.parse(fs.readFileSync("./urllists/ru_solverbook_com.urllist.json",
 urllist.countErrorsInURLarray(
 	list,
 	10000000,
-	'<div class="breadcrumbs roundRectangle shadow">',
-	'<!-- .mainWrapper -->',
+	/(<div class="breadcrumbs roundRectangle shadow">)|(<div class="articles-single-content main")/,
+	/(<!-- .mainWrapper -->)|(<!-- .megaWrapper -->)|(<div class="footer">)/,
 	{
 		name:'ru_solverbook_com',
 		pause:1500,
