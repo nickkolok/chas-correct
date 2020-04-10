@@ -13,9 +13,14 @@ extractor.extractURLlistFromSiteRecursive({
 		'http://www.mathsolution.ru/book-list/',
 		'http://www.mathsolution.ru/ortDict',
 		'http://www.mathsolution.ru/books/',
-		/*
-		'',
-		'',
-		*/
+		'http://www.mathsolution.ru/slang-list/',
+		'http://www.mathsolution.ru/slang/',
+		'http://www.mathsolution.ru/school/',
+		'http://www.mathsolution.ru/school-list/',
+		'http://www.mathsolution.ru/college-list/',
+		'http://www.mathsolution.ru/college/',
+		'http://www.mathsolution.ru/referat/', // Архивы
+		'http://www.mathsolution.ru/ref-list/',
+		'http://www.mathsolution.ru/univer-list/',
 	]
 });
