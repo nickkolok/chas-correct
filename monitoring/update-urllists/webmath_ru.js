@@ -11,5 +11,7 @@ extractor.extractURLlistFromSiteRecursive({
 	root: 'http://webmath.ru/',
 	exclude:[
 		'http://www.webmath.ru/forum/',
+		'https://www.webmath.ru/forum/',
+		'https://www.webmath.ru/repetitors/sankt_peterburg/',
 	]
 });
