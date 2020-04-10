@@ -5,12 +5,8 @@ var extractor = new LinkExtractor({
 	name:	'matematikalegko',
 });
 
-extractor.extractURLlistFromURLsequence({
-	pagesCount:	60,
-	reportEvery: 2,
-	flushEvery: 150,
-	prefix:	'https://matematikalegko.ru/zapisi/page/',
-	linkpattern:	'//matematikalegko.ru/',
-	linkprefix:	'https:',
+
+extractor.extractURLlistFromSiteRecursive({
 	pause:5000,
+	root: 'https://matematikalegko.ru/',
 });
