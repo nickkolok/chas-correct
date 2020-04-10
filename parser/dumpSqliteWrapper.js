@@ -31,7 +31,7 @@ function dumpSqliteWrapper(o){
 	this.queueURL = function(url,time,content){
 		this.queue.push([url,time,content]);
 		this.URLsQueued++;
-		if(!(this.URLsQueued%10)){
+		if(!(this.URLsQueued%1000)){
 			this.flushQueue();
 		}
 	};
