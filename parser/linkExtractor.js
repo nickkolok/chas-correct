@@ -131,6 +131,7 @@ LinkExtractor.prototype.extractURLlistFromSiteRecursive = function(o){
 		depth: o.depth || 1000,
 		maxRequestsPerSecond: (1000/o.pause) || 1,
 		maxConcurrentRequests: 5,
+		userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/69.0.3497.81 Chrome/69.0.3497.81 Safari/537.36",
 	});
 
 
