@@ -19,6 +19,8 @@ function LinkExtractor(o){
 		try{
 			var urlArray=JSON.parse(fs.readFileSync("urllists/"+this.name+".urllist.json",'utf-8'));
 			console.log('Ссылок прочитано из файла: '+urlArray.length);
+			//urlArray.sort(()=>(Math.random()>0.61?1:-1));
+			urlArray.map((uri)=>encodeURI(uri));
 			for(var i=0; i<urlArray.length; i++){
 				this.linksObject[urlArray[i]]=0;
 			}
