@@ -12,6 +12,6 @@ extractor.extractURLlistFromSiteRecursive({
 	exclude:[
 		/^https:\/\/accounts\.google\.com/,
 		/^https:\/\/twitter\.com/,
-		/^https?:\/\/ru\.onlinemschool\.com\/modules\/feedback\/\?page=/,
+		/^https?:\/\/ru\.onlinemschool\.com\/modules\/feedback\//,
 	],
 });
