@@ -134,6 +134,7 @@ function workWithGoodChunk(text,options){
 //	text=text.replace(/[^а-яё]{4,}/gi,";");
 	options.falsepositives.map(function(t){
 		text=text.replace(t, " | ");
+		text=text.split(t).join(" | ");
 	});
 	text=text
 		.replace(/<[^>]*>/gi,"|")
@@ -152,6 +153,7 @@ function workWithGoodChunk(text,options){
 		;
 	options.falsepositives.map(function(t){
 		text=text.replace(t, " | ");
+		text=text.split(t).join(" | ");
 	});
 	if(!options.fromDump && !options.nodumpuse && text){
 		dumper.queueURL(
