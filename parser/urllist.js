@@ -197,7 +197,7 @@ function workWithChunk(text,options){
 var wordsCount=0;
 
 function finishCheck(){
-	fs.writeFile("results/"+name+".404.log",log404);
+	fs.writeFile("results/"+name+".404.log",log404,()=>{});
 	dumper.flushQueue();
 
 	wordcounterProcess.on('message', function (count) {
