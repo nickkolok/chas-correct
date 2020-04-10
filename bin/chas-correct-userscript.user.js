@@ -4,7 +4,7 @@
 // @description   Исправление наиболее частотных ошибок на просматриваемых страницах
 // @include       http://*
 // @include       https://*
-// @version       0.2.0.7
+// @version       0.2.0.8
 // @grant	  GM_getValue
 // @grant	  GM_setValue
 // @grant	  GM.getValue
