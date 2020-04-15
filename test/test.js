@@ -1,14 +1,28 @@
 var actionArray = require('../chrome/prepareDictionary.js').actionArray;
-var testDictionary = require('./testDictionary.js').testDictionary;
+var testDictionary = require("./testDictionary").testDictionary;
 
-function testing(fDictionary) {
-    actionArray.map(function (fActionArray) {
-        fDictionary[0] = fDictionary[0].replace(fActionArray[0], fActionArray[1]);
-    });
-    return fDictionary[0] == fDictionary[1];
+function tested(fDictionary, fActionArray)
+{
+        var countFActionArray = 0;
+        while(countFActionArray < fActionArray.length)
+        {
+            fDictionary[0] = fDictionary[0].replace(fActionArray[countFActionArray][0], fActionArray[countFActionArray][1]);
+            countFActionArray++;
+        }
+        if(fDictionary[0] == fDictionary[1])
+            return true;
+        else
+            return false;
 }
 
-QUnit.test("QUnit test: checking words from testDictionary.js", function (errorMessage) {
-    for (var i = 0; i < testDictionary.length; i++)
-        errorMessage.ok(testing(testDictionary[i]), "Ошибка в слове testDictionary[" + i + "]: [" + testDictionary[i] + "]");
+QUnit.test( "TEST-TEST", function(errorMessage){
+    var count = 0;
+    while(count < testDictionary.length)
+    {
+        errorMessage.ok(tested(testDictionary[count], actionArray),
+        "Ошибка в слове testDictionary[" + count + "]: [" + testDictionary[count] + "]");
+        count++;
+    }
 });
+
+//для запуска в консоле использовал: qunit test.js
