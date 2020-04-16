@@ -1,5 +1,5 @@
 var actionArray = require('../chrome/prepareDictionary.js').actionArray;
-var testDictionary = require("./testDictionary").testDictionary;
+var testDictionary = require('./testDictionary.js').testDictionary;
 
 function tested(fDictionary, fActionArray)
 {
@@ -9,13 +9,10 @@ function tested(fDictionary, fActionArray)
             fDictionary[0] = fDictionary[0].replace(fActionArray[countFActionArray][0], fActionArray[countFActionArray][1]);
             countFActionArray++;
         }
-        if(fDictionary[0] == fDictionary[1])
-            return true;
-        else
-            return false;
+            return fDictionary[0] == fDictionary[1] ?  true : false;
 }
 
-QUnit.test( "TEST-TEST", function(errorMessage){
+QUnit.test( "QUnit test: checking words from testDictionary.js", function(errorMessage){
     var count = 0;
     while(count < testDictionary.length)
     {
