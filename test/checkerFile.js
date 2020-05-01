@@ -1,30 +1,17 @@
 var fs = require('fs');
 var actionArray = require('../chrome/prepareDictionary.js').actionArray;
 
-function correctionFile(fPathFile){
+function checkingFile(fPathFile) {
     var textRead = fs.readFileSync(fPathFile, 'utf8');
-    var strLine = '';
-    var tempStrLine = '';
-    var strFile = '';
-    var lineNumber = 0;
-    for (var i = 0; i < textRead.length; i++) {
-        if (textRead[i] != '\n')
-            strLine += textRead[i];
-        else {
-            tempStrLine = strLine;
-            for (var j = 0; j < actionArray.length; j++)
-                tempStrLine = tempStrLine.replace(actionArray[j][0], actionArray[j][1]);
-            if(tempStrLine != strLine) {
-                console.log("Исправлена строка " + (lineNumber + 1));
-                //console.log("Исправлена строка " + (lineNumber + 1) + ": " + strLine + " -> " + tempStrLine); //проблемы с выводом
-            }
-            else
-                strFile += strLine + '\n';
-            strLine = '';
-            lineNumber++;
-        }
-    }
+    strFile = textRead.split('\n').map(function (strLine) {
+        var tempStrLine = strLine;
+        for (var i = 0; i < actionArray.length; i++)
+            tempStrLine = tempStrLine.replace(actionArray[i][0], actionArray[i][1]);
+        return strLine == tempStrLine ? strLine : null;
+    }).filter(function(strLine){
+        return strLine != null;
+    }).join('\n');
     fs.writeFileSync(fPathFile, strFile);
 }
 
-correctionFile('../words-to-process.txt');
+checkingFile('../words-to-process.txt');
