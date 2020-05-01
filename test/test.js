@@ -4,7 +4,7 @@ var testDictionary = require('./testDictionary.js').testDictionary;
 function testing(fDictionary, fActionArray) {
     for (var i = 0; i < fActionArray.length; i++)
         fDictionary[0] = fDictionary[0].replace(fActionArray[i][0], fActionArray[i][1]);
-    return fDictionary[0] == fDictionary[1] ? true : false;
+    return fDictionary[0] == fDictionary[1];
 }
 
 QUnit.test("QUnit test: checking words from testDictionary.js", function (errorMessage) {
