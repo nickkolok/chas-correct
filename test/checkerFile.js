@@ -1,17 +1,24 @@
 var fs = require('fs');
 var actionArray = require('../chrome/prepareDictionary.js').actionArray;
 
-function checkingFile(fPathFile) {
+function checkFile(fPathFile) {
     var textRead = fs.readFileSync(fPathFile, 'utf8');
-    strFile = textRead.split('\n').map(function (strLine) {
+    var strFile = textRead.split('\n').map(function (strLine, numberLine) {
         var tempStrLine = strLine;
-        for (var i = 0; i < actionArray.length; i++)
-            tempStrLine = tempStrLine.replace(actionArray[i][0], actionArray[i][1]);
+        actionArray.map(function (fActionArray) {
+            tempStrLine = tempStrLine.replace(fActionArray[0], fActionArray[1]);
+        });
+        if ((process.argv[2] == '--log' || process.argv[2] == '--all') && strLine != tempStrLine)
+            console.log('Исправлена строка ' + (numberLine + 1));
         return strLine == tempStrLine ? strLine : null;
-    }).filter(function(strLine){
+    }).filter(function (strLine) {
         return strLine != null;
     }).join('\n');
-    fs.writeFileSync(fPathFile, strFile);
+    if (process.argv[2] == '--save' || process.argv[2] == '--all')
+        fs.writeFileSync(fPathFile, strFile);
 }
 
-checkingFile('../words-to-process.txt');
+if (process.argv[2] == '--log' || process.argv[2] == '--save' || process.argv[2] == '--all')
+    checkFile('../words-to-process.txt');
+else
+    console.log('--log -вывести результат работы\n--save -сохранить результат работы\n--all -показать и сохранить результат работы');
