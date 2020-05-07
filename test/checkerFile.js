@@ -3,16 +3,14 @@ var actionArray = require('../chrome/prepareDictionary.js').actionArray;
 
 function checkFile(fPathFile) {
     var textRead = fs.readFileSync(fPathFile, 'utf8');
-    var strFile = textRead.split('\n').map(function (strLine, numberLine) {
+    var strFile = textRead.split('\n').filter(function (strLine, numberLine) {
         var tempStrLine = strLine;
         actionArray.map(function (fActionArray) {
             tempStrLine = tempStrLine.replace(fActionArray[0], fActionArray[1]);
         });
         if ((process.argv[2] == '--log' || process.argv[2] == '--all') && strLine != tempStrLine)
             console.log('Исправлена строка ' + (numberLine + 1));
-        return strLine == tempStrLine ? strLine : null;
-    }).filter(function (strLine) {
-        return strLine != null;
+        return strLine == tempStrLine;
     }).join('\n');
     if (process.argv[2] == '--save' || process.argv[2] == '--all')
         fs.writeFileSync(fPathFile, strFile);
