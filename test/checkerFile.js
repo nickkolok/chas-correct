@@ -12,7 +12,7 @@ function checkFile(fPathFile) {
             console.log('Исправлена строка ' + (numberLine + 1));
         return strLine == tempStrLine ? strLine : null;
     }).filter(function (strLine) {
-        return strLine != null;
+        return strLine;
     }).join('\n');
     if (process.argv[2] == '--save' || process.argv[2] == '--all')
         fs.writeFileSync(fPathFile, strFile);
