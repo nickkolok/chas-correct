@@ -10,7 +10,7 @@ function checkFile(fPathFile) {
         });
         if ((process.argv[2] == '--log' || process.argv[2] == '--all') && strLine != tempStrLine)
             console.log('Исправлена строка ' + (numberLine + 1));
-        return strLine == tempStrLine ? strLine : null;
+        return strLine == tempStrLine;
     }).join('\n');
     if (process.argv[2] == '--save' || process.argv[2] == '--all')
         fs.writeFileSync(fPathFile, strFile);
