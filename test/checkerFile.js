@@ -8,11 +8,11 @@ function checkFile(fPathFile) {
         actionArray.map(function (fActionArray) {
             tempStrLine = tempStrLine.replace(fActionArray[0], fActionArray[1]);
         });
-        if ((process.argv[2] == '--log' || process.argv[2] == '--all') && strLine != tempStrLine)
+        if (process.argv[2] != '--save' && strLine != tempStrLine)
             console.log('Исправлена строка ' + (numberLine + 1));
         return strLine == tempStrLine;
     }).join('\n');
-    if (process.argv[2] == '--save' || process.argv[2] == '--all')
+    if (process.argv[2] != '--log')
         fs.writeFileSync(fPathFile, strFile);
 }
 
