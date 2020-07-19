@@ -23,7 +23,8 @@
   },
   "homepage": "https://github.com/nickkolok/chas-correct#readme",
   "devDependencies": {
-    "iconv-lite": "^0.4.13"
+    "iconv-lite": "^0.4.13",
+    "qunit": "^2.10.1"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
