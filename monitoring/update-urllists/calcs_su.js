@@ -9,4 +9,8 @@ var extractor = new LinkExtractor({
 extractor.extractURLlistFromSiteRecursive({
 	pause:5000,
 	root: 'http://calcs.su/',
+	exclude: [
+		'http://calcs.su/de/',
+		/https:\/\/calcs.su\/html\/calcs\/region\/(?!khabarovsk-krai)/
+	]
 });
