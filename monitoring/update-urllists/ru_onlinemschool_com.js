@@ -13,5 +13,7 @@ extractor.extractURLlistFromSiteRecursive({
 		/^https:\/\/accounts\.google\.com/,
 		/^https:\/\/twitter\.com/,
 		/^https?:\/\/ru\.onlinemschool\.com\/modules\/feedback\//,
+		/https:\/\/ru.onlinemschool.com\/math\/practice\/arithmetic\/multiplication_[^2]\d?_times_table/,
+		/https:\/\/ru.onlinemschool.com\/math\/practice\/arithmetic\/[^2]\d?_times_table_division/
 	],
 });
