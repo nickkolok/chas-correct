@@ -55,6 +55,7 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 //		console.log(''+html);
 		var urlsOnPage=(''+html).match(linkRegExp);
 		if(urlsOnPage){
+			exceptionsURLlistFromURLsequence(o, urlsOnPage);
 			for(var j=0; j<urlsOnPage.length; j++){
 				self.linksObject[encodeURI(urlsOnPage[j].replace(/<a[^>]+href="/g,o.linkprefix))]=0;
 			}
@@ -64,6 +65,24 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 			self.writeExtractedURLs(o);
 		} else if(!(i%(o.reportEvery||20))){
 			console.log(i);
+		}
+	}
+}
+
+function exceptionsURLlistFromURLsequence(o, urllists) {
+	for(var i = 0; i < urllists.length; i++) {
+		if(isNonParseableFormat(urllists[i])) {
+			urllists.splice(i, 1);
+			i--;
+		}
+		else if(o && o.exclude) {
+			for(var j = 0; j < o.exclude.length; j++) {
+				if(o.exclude[j].test(urllists[i])) {
+					urllists.splice(i, 1);
+					i--;
+					break;
+				}
+			}
 		}
 	}
 }
