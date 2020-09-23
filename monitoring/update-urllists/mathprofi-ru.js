@@ -13,6 +13,9 @@ extractor.extractURLlistFromURLsequence({
 	linkpattern:	'',
 	linkprefix:	'http://mathprofi.ru/',
 	pause:2000,
+	exclude: [
+		'http://mathprofi.ru/scripts/gb'
+	],
 });
 
 extractor.extractURLlistFromURLsequence({
@@ -23,4 +26,7 @@ extractor.extractURLlistFromURLsequence({
 	linkpattern:	'',
 	linkprefix:	'http://mathprofi.ru/',
 	pause:2000,
+	exclude: [
+		'http://mathprofi.ru/scripts/gb'
+	],
 });
