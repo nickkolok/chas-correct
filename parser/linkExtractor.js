@@ -58,6 +58,7 @@ LinkExtractor.prototype.extractURLlistFromURLsequence = function(o){
 			for(var j=0; j<urlsOnPage.length; j++){
 				self.linksObject[encodeURI(urlsOnPage[j].replace(/<a[^>]+href="/g,o.linkprefix))]=0;
 			}
+			self.filterExtratedURLs('', o);
 		}
 		self.pagesParsed++;
 		if(self.pagesParsed==self.pagesTotal){
