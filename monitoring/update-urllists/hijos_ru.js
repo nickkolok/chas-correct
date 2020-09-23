@@ -14,6 +14,7 @@ extractor.extractURLlistFromURLsequence({
 	linkpattern:	'http://hijos.ru/',
 	linkprefix:	'',
 	pause:2500,
+	exclude: [
+		'/comment-page-1/'
+	]
 });
-
-//TODO: exclude pages with /comment-page-1/ in URL
