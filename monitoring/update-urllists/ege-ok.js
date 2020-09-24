@@ -13,4 +13,8 @@ extractor.extractURLlistFromURLsequence({
 	linkpattern:	'//ege-ok.ru/',
 	linkprefix:	'https:',
 	pause:10000,
+	exclude: [
+		"/tag/",
+		"https://ege-ok.ru/reshenie-zadach-po-matematike/page/"
+	],
 });
