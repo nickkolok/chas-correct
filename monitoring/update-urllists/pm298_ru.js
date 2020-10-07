@@ -9,4 +9,7 @@ var extractor = new LinkExtractor({
 extractor.extractURLlistFromSiteRecursive({
 	pause: 3000,
 	root: 'http://www.pm298.ru/',
+	exclude: [
+		'http://www.pm298.ru/.?tab_'
+	]
 });
