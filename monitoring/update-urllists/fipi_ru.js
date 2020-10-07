@@ -10,6 +10,8 @@ extractor.extractURLlistFromSiteRecursive({
 	pause:5000,
 	root: 'http://fipi.ru/',
 	exclude: [
-		'http://www.old.fipi.ru/'
+		'http://www.old.fipi.ru/',
+		'http://ege.fipi.ru/os11/',
+		'http://os.fipi.ru/'
 	]
 });
