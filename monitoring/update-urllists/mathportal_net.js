@@ -9,4 +9,7 @@ var extractor = new LinkExtractor({
 extractor.extractURLlistFromSiteRecursive({
     pause: 5000,
     root: 'http://mathportal.net/',
+    exclude: [
+        /print=/
+    ]
 });
