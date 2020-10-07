@@ -15,6 +15,8 @@ extractor.extractURLlistFromURLsequence({
 	linkprefix:	'',
 	pause: 5000,
 	exclude: [
+		'http://www.treugolniki.ru/sitemap/',
+		/http:\/\/www.treugolniki.ru\/index.php\?page_id=7&amp;pg=.+/,
 		'http://www.treugolniki.ru/category/'
 	]
 });
