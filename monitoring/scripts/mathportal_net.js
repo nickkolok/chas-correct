@@ -1,6 +1,6 @@
 var urllist = require('../../parser/urllist.js');
 
-var name = 'mathportal_net.js';
+var name = 'mathportal_net';
 
 urllist.countErrorsInURLlist(
 	'urllists/' + name + '.urllist.json',
