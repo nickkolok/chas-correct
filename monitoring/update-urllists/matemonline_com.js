@@ -10,6 +10,7 @@ extractor.extractURLlistFromSiteRecursive({
     pause: 2000,
     root: 'https://matemonline.com/',
     exclude: [
-        'https://matemonline.com/page/'
+        'https://matemonline.com/page/',
+        '/comment-page'
     ],
 });
