@@ -11,6 +11,8 @@ extractor.extractURLlistFromSiteRecursive({
     root: 'https://matemonline.com/',
     exclude: [
         'https://matemonline.com/page/',
-        '/comment-page'
+        '/comment-page',
+        'https://matemonline.com/rubrika/',
+        'https://matemonline.com/metki/',
     ],
 });
