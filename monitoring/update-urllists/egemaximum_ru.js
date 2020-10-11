@@ -9,4 +9,7 @@ var extractor = new LinkExtractor({
 extractor.extractURLlistFromSiteRecursive({
 	pause:2000,
 	root: 'http://egemaximum.ru/',
+	exclude: [
+		/\/\?amp;preview=true/,
+	]
 });
