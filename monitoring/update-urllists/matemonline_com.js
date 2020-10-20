@@ -14,5 +14,6 @@ extractor.extractURLlistFromSiteRecursive({
         '/comment-page',
         'https://matemonline.com/rubrika/',
         'https://matemonline.com/metki/',
+        '-otzyvy-',
     ],
 });
