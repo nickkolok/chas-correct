@@ -88,7 +88,7 @@ LinkExtractor.prototype.writeExtractedURLsArray = function(array){
 
 function isNonParseableFormat(url){
 	return (
-		/\.(zip|rar|exe|jpe?g|png|mp3|gif|svg|djvu|pdf|od.|rtf|docx?|xlsx?|pptx?|ppsx?|dotx?|xltx?)$/i.test(url)
+		/\.(zip|rar|exe|jpe?g|png|mp3|gif|svg|swf|djvu|pdf|od.|rtf|docx?|xlsx?|pptx?|ppsx?|dotx?|xltx?)$/i.test(url)
 	);
 }
 
