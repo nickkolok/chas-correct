@@ -1,4 +1,5 @@
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 var parser = require('./parse-lib.js');
 var dumpSqliteWrapper=require('./dumpSqliteWrapper.js');
 var childProcess=require('child_process');
@@ -190,6 +191,9 @@ function workWithChunk(text,options){
 		);
 	}
 	if(pagesProceeded==length){
+		var madeDir = mkdirp.sync('results/' + name);
+		if(madeDir)
+			console.log('Была создана директория: ' + madeDir);
 		finishCheck();
 	}
 }
@@ -197,7 +201,7 @@ function workWithChunk(text,options){
 var wordsCount=0;
 
 function finishCheck(){
-	fs.writeFile("results/"+name+".404.log",log404,()=>{});
+	fs.writeFile("results/"+name+'/'+name+".404.log",log404,()=>{});
 	dumper.flushQueue();
 
 	wordcounterProcess.on('message', function (count) {
@@ -206,7 +210,7 @@ function finishCheck(){
 	});
 	wordcounterProcess.send({
 		type: 'finish',
-		filename: 'results/'+name,
+		filename: 'results/'+name+'/'+name,
 	});
 }
 
@@ -229,7 +233,7 @@ function printNumbers(mistakes){
 		'<tr><th>Адрес</th><th>Контекст</th><th>Сигнатуры</th><th>Обновлено</th></tr>'+
 		htmlTable+
 		'</table></body></html>';
-	fs.writeFileSync('results/'+name+'.report.html',html);
+	fs.writeFileSync('results/'+name+'/'+name+'.report.html',html);
 	console.error("Завершено: "+name);
 	setTimeout(process.exit,10000);
 }
