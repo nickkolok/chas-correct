@@ -9,4 +9,7 @@ var extractor = new LinkExtractor({
 extractor.extractURLlistFromSiteRecursive({
 	pause:5000,
 	root: 'https://matematikalegko.ru/',
+	exclude: [
+		'/page/', //дублирование
+	]
 });
