@@ -306,6 +306,7 @@ function getHTMLfromURL(url,callback,options){
 		headers: headers,
 		encoding: null,
 		followRedirects : true,
+//		rejectUnauthorized: false, //разрешить работу без сертификатов
 //		pool: thePool,
 	}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
