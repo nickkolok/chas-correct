@@ -314,6 +314,7 @@ function getHTMLfromURL(url,callback,options){
 			options || (options = {});
 			options.error=error;
 			callback("",options);
+			console.log(error);
 		}
 	});
 }
