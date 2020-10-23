@@ -306,6 +306,7 @@ function getHTMLfromURL(url,callback,options){
 		headers: headers,
 		encoding: null,
 		followRedirects : true,
+		rejectUnauthorized: typeof options.rejectUnauthorized == 'undefined' ? true : options.rejectUnauthorized,
 //		pool: thePool,
 	}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
@@ -330,7 +331,7 @@ function getChunkFromURL(url,callback,beginning,ending,options){
 			body.substr(0,body.search(ending)).substr(body.search(beginning)),
 			options
 		);
-	})
+	}, options)
 }
 
 
