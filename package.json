@@ -30,6 +30,7 @@
     "cheerio": "^1.0.0-rc.2",
     "iconv-lite": "^0.4.13",
     "js-crawler": "^0.3.21",
+    "mkdirp": "^1.0.4",
     "node-autodetect-utf8-cp1251-cp866": "^0.1.0",
     "sqlite3": "^4.1.0",
     "yaspeller": "^5.0.1"
