@@ -292,6 +292,7 @@ var thePool={maxSockets: 4096};//Из гуманитарных соображе�
 
 function getHTMLfromURL(url,callback,options){
 	var headers = {};
+	options = options || {};
 //	headers['referer'] = url;
 	headers['accept'] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
 //	headers['accept-encoding'] = "gzip, deflate, br";
@@ -312,7 +313,6 @@ function getHTMLfromURL(url,callback,options){
 		if (!error && response.statusCode == 200) {
 			callback(body,options);
 		} else {
-			options || (options = {});
 			options.error=error;
 			callback("",options);
 			console.log(error);
