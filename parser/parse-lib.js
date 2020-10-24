@@ -306,7 +306,7 @@ function getHTMLfromURL(url,callback,options){
 		headers: headers,
 		encoding: null,
 		followRedirects : true,
-		rejectUnauthorized: typeof options.rejectUnauthorized == 'undefined' ? true : options.rejectUnauthorized,
+		rejectUnauthorized: 'rejectUnauthorized' in options ? options.rejectUnauthorized : true,
 //		pool: thePool,
 	}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
