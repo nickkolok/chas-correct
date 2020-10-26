@@ -23,16 +23,15 @@
   },
   "homepage": "https://github.com/nickkolok/chas-correct#readme",
   "devDependencies": {
-    "iconv-lite": "^0.4.13",
+    "iconv-lite": "^0.4.24",
     "qunit": "^2.11.3"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
-    "iconv-lite": "^0.4.13",
+    "cheerio": "^1.0.0-rc.3",
     "js-crawler": "^0.3.21",
     "mkdirp": "^1.0.4",
     "node-autodetect-utf8-cp1251-cp866": "^0.1.0",
-    "sqlite3": "^4.1.0",
-    "yaspeller": "^5.0.1"
+    "sqlite3": "^5.0.0",
+    "yaspeller": "^7.0.0"
   }
 }
