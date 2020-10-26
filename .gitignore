@@ -4,6 +4,8 @@
 nohup.out
 npm-debug.log
 
+package-lock.json
+
 *.orig
 .goutputstream-*
 
