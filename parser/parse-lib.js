@@ -314,8 +314,12 @@ function getHTMLfromURL(url,callback,options){
 			callback(body,options);
 		} else {
 			options.error=error;
+			//console.log(error);
 			callback("",options);
+			console.log(url);
+			console.log(options);
 			console.log(error);
+			//console.log(""+response.body);
 		}
 	});
 }
