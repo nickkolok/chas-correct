@@ -9,14 +9,14 @@ var extractor = new LinkExtractor({
 });
 
 
-for(var year=2013; year<=2016; year++){
+for(var year=2013; year<=2030; year++){
 	for(var i=0; i<12; i++){
 		extractor.extractURLlistFromURLsequence({
-			pagesCount:	32,
+			pagesCount:	1,
 			reportEvery: 10,
-			prefix:	'http://www.kommersant.ru/archive/news/36/'+year+'-'+months[i]+'-',
-			linkpattern:	'/news/',
-			linkprefix:	'http://www.kommersant.ru',
+			prefix:	'https://www.kommersant.ru/archive/news/36/month/'+year+'-'+months[i]+'-01#',
+			linkpattern:	'/doc/',
+			linkprefix:	'https://www.kommersant.ru',
 		});
 	}
 }
