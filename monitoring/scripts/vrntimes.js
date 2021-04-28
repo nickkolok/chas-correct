@@ -1,3 +1,14 @@
 var urllist = require('../../parser/urllist.js');
-//vrntimes.ru - удобнее с версии для печати, отдельный респект за <article>
-urllist.countErrorsInURLlist('urllists/vrntimes.urllist.json',100000,'<article','</article>',{pause:500,});
+
+var name = 'vrntimes';
+
+urllist.countErrorsInURLlist(
+    'urllists/' + name + '.urllist.json',
+    1000000,
+    /(<div id="contentinner">)/i,
+    /(<div class="createddate">)/i,
+    {
+        pause: 2000,
+        name: name,
+    }
+);
