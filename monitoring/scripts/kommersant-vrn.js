@@ -1,10 +1,15 @@
-var urllist = require('../../parser/urllist.js');
 //kommersant.ru, регион - Воронеж
+var urllist = require('../../parser/urllist.js');
+
+var name = 'kommersant-vrn';
+
 urllist.countErrorsInURLlist(
-	'urllists/kommersant-vrn.urllist.json',
-	100000,
-	'<p class="b-article__text">',
-	'<div class="b-socials_buttons">',
-	//'<p class="b-article__text document_authors">',
-	{encoding:'win1251',name:'kommersant-vrn'}
+	'urllists/' + name + '.urllist.json',
+	1000000,
+	/(<header>)/i,
+	/(<p class="b-article__text document_authors">)/i,
+	{
+		pause: 1000,
+		name: name,
+	}
 );
