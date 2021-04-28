@@ -1,3 +1,14 @@
 var urllist = require('../../parser/urllist.js');
-//riavrn.ru - удобнее с мобильной версии
-urllist.countErrorsInURLlist('urllists/riavrn.urllist.json',200000000,'<div class="page-inner">','<div class="article-comments-social">');
+
+var name = 'riavrn';
+
+urllist.countErrorsInURLlist(
+    'urllists/' + name + '.urllist.json',
+    1000000,
+    /(<div class="article-intro">)/i,
+    /(<div class="article-info tag-tabs-info">)/i,
+    {
+        pause: 2000,
+        name: name,
+    }
+);
