@@ -1,3 +1,14 @@
 var urllist = require('../../parser/urllist.js');
-//moe-online.ru
-urllist.countErrorsInURLlist('urllists/moe-online.urllist.json',1000000,'<li id="toc">','<div id="orphus1" title="Система Orphus">',{pause:500});
+
+var name = 'moe-online';
+
+urllist.countErrorsInURLlist(
+    'urllists/' + name + '.urllist.json',
+    1000000,
+    /<h1 class="st-name" itemprop="headline">/i,
+    /<p id="end_news">/i,
+    {
+        pause: 2000,
+        name: name,
+    }
+);
