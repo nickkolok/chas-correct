@@ -1,29 +1,17 @@
 var LinkExtractor = require('../../parser/linkExtractor.js').LinkExtractor;
 
 var extractor = new LinkExtractor({
-	flushEvery: 60*1000,
-	name:	'riavrn',
+	flushEvery: 2000,
+	name: 'riavrn',
 });
 
-var rubrics=[
-	'accidents',
-	'society',
-	'culture',
-	'sport',
-	'gov',
-	'economy',
-	'afisha/movie',
-	'opinions',
-//	'reporter',
-//	'news',
-];
 
-for(var i=0; i<rubrics.length; i++){
-	extractor.extractURLlistFromURLsequence({
-		pagesCount:	300,
-		reportEvery: 50,
-		prefix:	'http://m.riavrn.ru/'+rubrics[i]+'/?load=y&PAGEN_1=',
-		linkpattern:	'/'+rubrics[i]+'/',
-		linkprefix:	'http://m.riavrn.ru',
-	});
-}
+extractor.extractURLlistFromURLsequence({
+	pagesCount: 500,
+	reportEvery: 2000,
+	flushEvery: 2000,
+	prefix: 'https://riavrn.ru/news/page/',
+	linkpattern: 'https://riavrn.ru/news/',
+	linkprefix: '',
+	pause: 2000
+});
