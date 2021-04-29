@@ -103,7 +103,7 @@ LinkExtractor.prototype.filterExtratedURLs = function(signature, o){
 					delete this.linksObject[l];
 					break;
 				}
-			}		
+			}
 		}
 	}
 }
