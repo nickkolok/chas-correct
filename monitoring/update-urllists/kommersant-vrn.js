@@ -9,7 +9,7 @@ var extractor = new LinkExtractor({
 });
 
 
-for(var year=2018; year<=2030; year++){
+for(var year=2013; year<=2030; year++){
 	for(var i=0; i<12; i++){
 		extractor.extractURLlistFromURLsequence({
 			pagesCount:	1,
