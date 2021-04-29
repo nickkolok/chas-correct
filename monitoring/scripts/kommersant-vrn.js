@@ -7,7 +7,7 @@ urllist.countErrorsInURLlist(
 	'urllists/' + name + '.urllist.json',
 	1000000,
 	/(<header>)/i,
-	/(<p class="b-article__text document_authors">)/i,
+	/(<div class="b-archive_link cf">)/i,
 	{
 		pause: 1000,
 		name: name,
