@@ -99,6 +99,7 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 					'<td><a href="'+m.options.url+'">'+url.replace(/^https+\:\/\//,'')+'</a></td>'+
 					'<td>'+m.text+'</td>'+
 					'<td>'+m.signatures.join(' ; ')+'</td>'+
+					'<td>'+m.correct.join(' ; ')+'</td>'+
 					'<td>'+new Date(m.options.time).toLocaleString()+'</td>'+
 				'</tr>';
 			break;
@@ -230,7 +231,7 @@ function printNumbers(mistakes){
 	bothLog("Ошибок на 1000 словоупотреблений обнаружено: "+(mistakes/wordsCount*1000));
 	bothLog("В среднем одна ошибка на "+(wordsCount/mistakes)+" словоупотреблений");
 	html+='<table cellpadding="5" cellspacing="0" border="1">'+
-		'<tr><th>Адрес</th><th>Контекст</th><th>Сигнатуры</th><th>Обновлено</th></tr>'+
+		'<tr><th>Адрес</th><th>Контекст</th><th>Сигнатуры</th><th>Обновлено</th><th>Исправлено на</th></tr>'+
 		htmlTable+
 		'</table></body></html>';
 	fs.writeFileSync('results/'+name+'/'+name+'.report.html',html);

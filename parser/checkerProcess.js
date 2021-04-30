@@ -78,6 +78,7 @@ function checkText(text,options){
 	for(var i=0; i<possibleMistakes.length; i++){
 		var signatures = possibleMistakes[i].match(globalExpression);
 		var confirmedSignatures=[];
+		var correctedInto=[];
 
 		for(var l=0; l<signatures.length; l++){
 			var buf=signatures[l];
@@ -88,6 +89,7 @@ function checkText(text,options){
 			}
 			if(normalize(buf) != normalize(signatures[l])){
 				confirmedSignatures.push(signatures[l]);
+				correctedInto.push(buf);
 			}
 		}
 
@@ -97,6 +99,7 @@ function checkText(text,options){
 				text:       possibleMistakes[i],
 				options:    options,
 				signatures: confirmedSignatures,
+				correct:    correctedInto,
 			});
 			errors += confirmedSignatures.length;
 		}
