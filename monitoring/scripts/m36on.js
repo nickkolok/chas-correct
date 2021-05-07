@@ -7,7 +7,7 @@ urllist.countErrorsInURLlist(
 	'urllists/' + name + '.urllist.json',
 	1000000,
 	/(<div class='mobile_title l-page__content text'>)/i,
-	/(<div class='share_block'>)/i,
+	/(<div id="yandex_ad"><\/div>)/i,
 	{
 		pause: 500,
 		name: name,
