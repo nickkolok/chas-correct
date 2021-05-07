@@ -7,7 +7,7 @@ var cheerio = require('cheerio');
 var reports = '';
 process.argv.slice(2).map(function(name){
 	reports += fs.readFileSync(
-		'results/' + name + '.report.html',
+		'results/' + name + '/' + name + '.report.html',
 		'utf-8'
 	);
 });
