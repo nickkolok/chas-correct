@@ -7,7 +7,7 @@ var extractor = new LinkExtractor({
 
 
 extractor.extractURLlistFromURLsequence({
-    pagesCount: 14,
+    pagesCount: 16,
     reportEvery: 10000,
     flushEvery: 10000,
     prefix: 'https://tutomath.ru/page/',
