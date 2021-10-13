@@ -7,7 +7,7 @@ var extractor = new LinkExtractor({
 
 
 extractor.extractURLlistFromURLsequence({
-	pagesCount: 22,
+	pagesCount: 60,
 	reportEvery: 10000,
 	flushEvery: 10000,
 	prefix: 'https://ege314.ru/sitemap/',
