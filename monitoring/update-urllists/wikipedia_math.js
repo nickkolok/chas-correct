@@ -14,7 +14,7 @@ request(reqstring, function (error, response, body) {
 
     parsed.sort();
     parsed = parsed.map((name)=>encodeURI('https://ru.wikipedia.org/wiki/'+name));
-    fs.writeFile(
+    fs.writeFileSync(
         'urllists/wikipedia_math.urllist.json',
         JSON.stringify(parsed).replace(/","/g,'",\n"')
     );
