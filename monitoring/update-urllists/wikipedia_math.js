@@ -11,7 +11,8 @@ request(reqstring, function (error, response, body) {
 
     var parsed = JSON.parse(body);
     parsed = parsed['*'][0].a['*'];
-    
+
+    parsed.sort();
     parsed = parsed.map((name)=>encodeURI('https://ru.wikipedia.org/wiki/'+name));
     fs.writeFile(
         'urllists/wikipedia_math.urllist.json',
