@@ -1,0 +1,6 @@
+var links = document.getElementsByTagName('a');
+var hrefKeys={};
+for(var a of links){
+    hrefKeys[a.href]=true;
+}
+JSON.stringify(Object.keys(hrefKeys)).replace(/","/g,'",\n"');
