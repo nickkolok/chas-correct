@@ -95,13 +95,13 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 				for(var i=0; i<m.signatures.length; i++){
 					m.text = m.text.replace(m.signatures[i],'<b>' + m.signatures[i] + '</b>');
 				}
-				htmlTable.push('<tr>'+
+				htmlTable.push(
 					'<td><a href="'+m.options.url+'">'+url.replace(/^https+\:\/\//,'')+'</a></td>'+
 					'<td>'+m.text+'</td>'+
 					'<td>'+m.signatures.join(' ; ')+'</td>'+
 					'<td>'+m.correct.join(' ; ')+'</td>'+
-					'<td>'+new Date(m.options.time).toLocaleString()+'</td>'+
-				'</tr>');
+					'<td>'+new Date(m.options.time).toLocaleString()+'</td>'
+				);
 			break;
 			case 'quantity':
 				printNumbers(m.quantity);
@@ -222,6 +222,9 @@ function printNumbers(mistakes){
 	}
 
 	htmlTable.sort(); //Чтобы урлы стояли хотя бы приблизительно по алфавиту!
+	htmlTable=htmlTable.map(function(row,i){
+		return '<tr>' + '<td>' + (i+1) + '</td>' + row + '</tr>';
+	});
 
 	var html='<html><head><meta charset="utf-8"/></head><body>';
 	var successPages=pagesProceeded-pagesWithErrors;
@@ -233,7 +236,7 @@ function printNumbers(mistakes){
 	bothLog("Ошибок на 1000 словоупотреблений обнаружено: "+(mistakes/wordsCount*1000));
 	bothLog("В среднем одна ошибка на "+(wordsCount/mistakes)+" словоупотреблений");
 	html+='<table cellpadding="5" cellspacing="0" border="1">'+
-		'<tr><th>Адрес</th><th>Контекст</th><th>Сигнатуры</th><th>Исправлено на</th><th>Обновлено</th></tr>'+
+		'<tr><th>№</th><th>Адрес</th><th>Контекст</th><th>Сигнатуры</th><th>Исправлено на</th><th>Обновлено</th></tr>'+
 		htmlTable.join('')+
 		'</table></body></html>';
 	fs.writeFileSync('results/'+name+'/'+name+'.report.html',html);
