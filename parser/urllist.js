@@ -21,7 +21,7 @@ var pagesWithErrors;
 var name="log";
 var log404="";
 
-var htmlTable='';
+var htmlTable=[];
 
 var requestsSent=0;
 var dumper;
@@ -95,13 +95,13 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 				for(var i=0; i<m.signatures.length; i++){
 					m.text = m.text.replace(m.signatures[i],'<b>' + m.signatures[i] + '</b>');
 				}
-				htmlTable+='<tr>'+
+				htmlTable.push('<tr>'+
 					'<td><a href="'+m.options.url+'">'+url.replace(/^https+\:\/\//,'')+'</a></td>'+
 					'<td>'+m.text+'</td>'+
 					'<td>'+m.signatures.join(' ; ')+'</td>'+
 					'<td>'+m.correct.join(' ; ')+'</td>'+
 					'<td>'+new Date(m.options.time).toLocaleString()+'</td>'+
-				'</tr>';
+				'</tr>');
 			break;
 			case 'quantity':
 				printNumbers(m.quantity);
@@ -221,6 +221,8 @@ function printNumbers(mistakes){
 		html+='<br/>'+text;
 	}
 
+	htmlTable.sort(); //Чтобы урлы стояли хотя бы приблизительно по алфавиту!
+
 	var html='<html><head><meta charset="utf-8"/></head><body>';
 	var successPages=pagesProceeded-pagesWithErrors;
 	bothLog("Страниц обработано успешно: "+successPages);
@@ -232,7 +234,7 @@ function printNumbers(mistakes){
 	bothLog("В среднем одна ошибка на "+(wordsCount/mistakes)+" словоупотреблений");
 	html+='<table cellpadding="5" cellspacing="0" border="1">'+
 		'<tr><th>Адрес</th><th>Контекст</th><th>Сигнатуры</th><th>Исправлено на</th><th>Обновлено</th></tr>'+
-		htmlTable+
+		htmlTable.join('')+
 		'</table></body></html>';
 	fs.writeFileSync('results/'+name+'/'+name+'.report.html',html);
 	console.error("Завершено: "+name);
