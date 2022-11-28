@@ -49,6 +49,7 @@ function checkText(text,options){
 			.replace(/([а-яёА-ЯёA-Za-z][«"\s,\-:;]+)[А-ЯЁ][а-яё\-]+/g,'$1X ')
 			.replace(/\s*(&nbsp;)+\s*/gi,' ')
 			.replace(/[А-ЯЁ]*[іiїқѣєңәўғұњҙүөӡ][А-ЯЁ]*/i,' ')
+			.replace(/<!--/i,' ') //TODO: strip HTML comments properly!
 		;
 	//}}Костыли
 
