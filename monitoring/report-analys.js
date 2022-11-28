@@ -18,7 +18,7 @@ var $ = cheerio.load(reports);
 
 var chunksWithErrors = [];
 $('tr').map(function(i, tr) {
-	var td = $('td', tr)[1];
+	var td = $('td', tr)[2];
 	if(td && $(td).text()) {
 		chunksWithErrors.push($(td).text());
 	}

@@ -22,6 +22,7 @@ var name="log";
 var log404="";
 
 var htmlTable=[];
+var URLsWithErrors = {};
 
 var requestsSent=0;
 var dumper;
@@ -84,6 +85,7 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 		switch(m.type){
 			case 'mistake':
 				var url = m.options.url;
+				URLsWithErrors[url] = true;
 				try{
 					url = decodeURI(url);
 				}catch(e){
@@ -105,6 +107,7 @@ function countErrorsInURLarray(urls,maxlength,beginFrom,endWith,options){
 			break;
 			case 'quantity':
 				printNumbers(m.quantity);
+				writeURLsWithErrors();
 			break;
 		}
 	});
@@ -200,6 +203,14 @@ function workWithChunk(text,options){
 }
 
 var wordsCount=0;
+
+function writeURLsWithErrors(){
+	fs.writeFileSync(
+		"results/"+name+'/'+name+".pages-with-errors.urllist.json",
+		JSON.stringify(Object.keys(URLsWithErrors).sort()).replace(/","/g,'",\n"'),
+		()=>{}
+	);
+}
 
 function finishCheck(){
 	fs.writeFile("results/"+name+'/'+name+".404.log",log404,()=>{});
