@@ -94,10 +94,14 @@ function checkText(text,options){
 			}
 		}
 
+		//var leftEdge = text.indexOf(''+possibleMistakes[i]);
+		//var rightEdge = leftEdge + possibleMistakes.length;
+
 		if(confirmedSignatures.length){
 			process.send({
 				type:       'mistake',
 				text:       possibleMistakes[i],
+				//text:       text.substr(Math.max(0,leftEdge - 100), 500),
 				options:    options,
 				signatures: confirmedSignatures,
 				correct:    correctedInto,
