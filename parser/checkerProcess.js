@@ -20,7 +20,7 @@ function initGlobalExpression(left,right){
 	}
 	globalExpression     = new RegExp(globalExpressionSrc,"g");
 	globalExpressionLess = new RegExp(globalExpressionLessSrc,"i");
-	
+
 	globalExpressionSrc = left+'('+globalExpressionSrc+')'+right;
 	globalExpressionExt  = new RegExp(globalExpressionSrc,"g");
 }
